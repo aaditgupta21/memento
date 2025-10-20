@@ -82,32 +82,6 @@ npm run build
 
 The Vite dev server is configured to proxy API requests to the Express server.
 
-## API Endpoints
-
-- `GET /api` - Test endpoint that returns a welcome message
-- `GET /api/health` - Health check endpoint
-
-## Technologies Used
-
-### Frontend
-
-- ⚡ **Vite** - Lightning fast build tool
-- ⚛️ **React 18** - UI library
-- 🎨 Modern CSS with gradient design
-
-### Backend
-
-- 🚀 **Express.js** - Web framework
-- 🔒 **CORS** - Cross-origin resource sharing
-- 🔐 **dotenv** - Environment variables
-
-## Why Vite?
-
-- ⚡️ **10-100x faster** than Create React App
-- 🔥 **Instant HMR** (Hot Module Replacement)
-- 📦 **Smaller bundles** - optimized production builds
-- 🎯 **Modern** - ES modules, better DX
-
 ## Development
 
 - The client will automatically reload when you make changes (HMR)
