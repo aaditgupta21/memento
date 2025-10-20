@@ -125,4 +125,4 @@ NODE_ENV=development
 
 ## License
 
-ISC
+MIT - See [LICENSE](LICENSE) file for details
