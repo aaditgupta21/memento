@@ -1,0 +1,113 @@
+/* LoginPage.module.css */
+body {
+  background-color: #f5f0eb;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    sans-serif;
+}
+
+.main {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f5f0eb;
+}
+
+.main > * {
+  background-color: #faf8f6;
+  border-radius: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 60px 80px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.main h1 {
+  font-size: 24px;
+  margin-bottom: 30px;
+  text-align: center;
+  color: #b8a296;
+}
+
+.main form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.main form h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #b8a296;
+}
+
+.main form div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.main label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #9a8a7e;
+}
+
+.main input {
+  padding: 10px;
+  border: 1px solid #e8e0d8;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #faf8f6;
+  color: #6b5d54;
+}
+
+.main input:focus {
+  outline: none;
+  border-color: #d4c4b8;
+}
+
+.main input::placeholder {
+  color: #c9bcb3;
+}
+
+.main button {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.main button[type="submit"] {
+  background-color: #daa89a;
+  color: white;
+}
+
+.main button:hover {
+  transform: scale(1.05);
+}
+
+.main button[type="button"]:first-of-type {
+  background-color: #faf8f6;
+  border: 1px solid #e8e0d8;
+  color: #6b5d54;
+}
+
+.main p {
+  text-align: center;
+  font-size: 14px;
+  color: #b8a296;
+}
+
+.main p button {
+  background: none;
+  border: none;
+  color: #daa89a;
+  text-decoration: underline;
+  padding: 0;
+  cursor: pointer;
+}
