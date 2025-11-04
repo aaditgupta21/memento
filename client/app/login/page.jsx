@@ -22,6 +22,8 @@ export default function LoginPage() {
     }
   }
 
+  // TODO: implement google auth
+
   return (
     <main>
       <h1>Welcome back to your memories</h1>
