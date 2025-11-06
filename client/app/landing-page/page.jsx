@@ -1,12 +1,22 @@
 import Link from "next/link";
-import { CameraIcon,Heart,HeartIcon,SparklesIcon } from "lucide-react";
+import { CameraIcon, HeartIcon, SparklesIcon } from "lucide-react";
+
+
+
 
 export default function Landing() {
+  const sampleMemories = [
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+    'https://explorerchick.com/wp-content/uploads/2023/08/hiking_groups1.jpg',
+    'https://i0.pickpik.com/photos/58/125/279/nature-mountains-hiking-outddors-preview.jpg'
+  ]
+
+
   return (
     <div className="min-h-screen bg-[#e5cbc1]">
       <div className="max-w-7xl mx-auto px-6 py-12">
 
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
 
           <h1 className="font-serif text-6xl md:text-7xl text-[#928a7b] mb-4">
             Memento
@@ -18,7 +28,7 @@ export default function Landing() {
 
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
+        <div className="grid md:grid-cols-3 gap-8 mb-8">
 
           <div className=" bg-white/45 rounded-3xl p-8 shadow-md">
             <div className="bg-[#FF8559]/20 w-16 h-16 rounded-full flex items-center justify-center mb-3">
@@ -58,6 +68,14 @@ export default function Landing() {
 
         </div>
 
+        <div className="grid md:grid-cols-3 gap-8 mb-10">
+          {sampleMemories.map((image, index) => (
+            <img key={index} src={image} alt={'Memory ${index+1}'} className = "rounded-3xl shadow-lg w-full h-full object-cover"/>
+          ))}
+          
+
+        </div>
+
         <div className="flex gap-4 justify-center">
 
           <Link href="/signup">
@@ -67,7 +85,6 @@ export default function Landing() {
           </Link>
 
           <Link href="/login">
-            {/* <button className="bg-amber-300 text-white px-8 py-4 rounded-full font-medium hover:bg-green-500 transition-all hover:scale-105 shadow-md"> */}
             <button className="bg-white/80 hover:bg-white text-[#928a7b]/80 px-8 py-4 rounded-full font-bold font-sans transition-all hover:scale-105 shadow-md">
               Login
             </button>
