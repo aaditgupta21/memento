@@ -15,15 +15,13 @@ export default function LoginPage() {
     setError("");
     try {
       console.log("Logging in with:", email, password);
-      // API call here
+      // API call here for manual auth
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   }
-
-  // TODO: implement google auth
 
   return (
     <main className={styles.main}>
