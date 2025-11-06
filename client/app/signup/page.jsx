@@ -2,22 +2,27 @@
 import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./LoginPage.module.css";
+import styles from "./SignupPage.module.css";
 
-export default function LoginPage() {
+export default function SignupPage() {
+  // use states for user signing up to track relevant info
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // router for navigation
   const router = useRouter();
 
+  // handle form submission
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      console.log("Logging in with:", email, password);
+      console.log("Signing up with:", email, password);
+      console.log("Signing up as:", username);
       // API call here for manual auth
     } catch (err) {
       setError(err.message);
@@ -29,14 +34,25 @@ export default function LoginPage() {
   return (
     <main className={styles.main}>
       <div>
-        <h1>Welcome back to your memories</h1>
+        <h1>Welcome to your memories</h1>
         <form onSubmit={handleSubmit}>
-          <h2>Sign in</h2>
+          <h2>Sign up</h2>
           {error && (
             <div className="error-message" style={{ color: "red" }}>
               {error}
             </div>
           )}
+          <div>
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
 
           <div>
             <label htmlFor="email">Email</label>
@@ -44,8 +60,7 @@ export default function LoginPage() {
               id="email"
               name="email"
               type="email"
-              autoComplete="email"
-              placeholder="you@example.com"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -65,7 +80,7 @@ export default function LoginPage() {
           </div>
 
           <button type="submit" disabled={loading}>
-            {loading ? "Logging in..." : "Log in"}
+            {loading ? "Signing up..." : "Sign up"}
           </button>
           <button
             type="button"
@@ -76,9 +91,9 @@ export default function LoginPage() {
             Continue with Google
           </button>
           <p>
-            Don't have an account?{" "}
-            <button type="button" onClick={() => router.push("/signup")}>
-              Sign up
+            Already have an account?{" "}
+            <button type="button" onClick={() => router.push("/login")}>
+              Sign in
             </button>
           </p>
         </form>
