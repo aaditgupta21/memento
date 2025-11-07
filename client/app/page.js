@@ -5,13 +5,8 @@ import Account from "./account-page/page.jsx"
 
 
 export default function Home() {
-
-
-
-
-
   return (
     // <Landing />
-    <Account />
+    <Landing />
   );
 }

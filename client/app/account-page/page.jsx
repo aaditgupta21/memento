@@ -5,9 +5,7 @@ import { CameraIcon, UserIcon, SaveIcon } from "lucide-react";
 import s from "./Account.module.css";
 
 export default function Account() {
-    // store and set current profile image
     const [profileImage, setProfileImage] = useState('https://static.clubs.nfl.com/image/upload/t_editorial_landscape_12_desktop/bills/f8kygnccjsnptgeqpqi9')
-
     const [email, setEmail] = useState('joshallen@gmail.com')
     const [currentPassword, setCurrentPassword] = useState('')
     const [newPassword, setNewPassword] = useState('')
@@ -28,6 +26,7 @@ export default function Account() {
         }
     }
 
+    // for now handle submission by reloading component only and delivering success message
     const handleSave = (e) => {
         e.preventDefault()
         alert('Profile updated successfully!')

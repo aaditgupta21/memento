@@ -1,0 +1,29 @@
+/* Feed.module.css */
+.page {
+  min-height: 100vh;
+  background-color: #f5f0eb;
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.title {
+  font-family: serif;
+  font-size: 3rem;
+  font-weight: normal;
+  color: #928a7b;
+  text-align: center;
+  margin-bottom: 2.5rem;
+  letter-spacing: 0.5px;
+}
+
+.endMessage {
+  text-align: center;
+  color: #a49a87;
+  font-size: 0.95rem;
+  margin-top: 2rem;
+  font-family: sans-serif;
+}
