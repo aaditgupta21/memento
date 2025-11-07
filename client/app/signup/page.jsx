@@ -11,6 +11,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // router for navigation
   const router = useRouter();
@@ -20,10 +21,32 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
     try {
-      console.log("Signing up with:", email, password);
-      console.log("Signing up as:", username);
-      // API call here for manual auth
+      const response = await fetch("http://localhost:4000/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Important for cookies
+        body: JSON.stringify({
+          email,
+          password,
+          displayName: username,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Signup failed");
+      }
+
+      // Success - show message and redirect
+      setSuccess("Account created successfully! Redirecting...");
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -40,6 +63,11 @@ export default function SignupPage() {
           {error && (
             <div className="error-message" style={{ color: "red" }}>
               {error}
+            </div>
+          )}
+          {success && (
+            <div className="success-message" style={{ color: "green", fontWeight: "500" }}>
+              {success}
             </div>
           )}
           <div>

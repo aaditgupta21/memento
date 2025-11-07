@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const router = useRouter();
 
@@ -16,9 +17,31 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
     try {
-      console.log("Logging in with:", email, password);
-      // API call here for manual auth
+      const response = await fetch("http://localhost:4000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Important for cookies
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+
+      // Success - show message and redirect
+      setSuccess("Logged in successfully! Redirecting...");
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -35,6 +58,11 @@ export default function LoginPage() {
           {error && (
             <div className="error-message" style={{ color: "red" }}>
               {error}
+            </div>
+          )}
+          {success && (
+            <div className="success-message" style={{ color: "green", fontWeight: "500" }}>
+              {success}
             </div>
           )}
 
