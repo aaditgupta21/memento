@@ -6,7 +6,7 @@ export const mockPosts = [
     caption: "Mountain views never get old 🏔️",
     location: "Aspen, Colorado",
     likes: ["user2", "user3", "user5"],
-    commentCount: 8,
+    commentCount: 2,
     createdAt: "2025-11-05T14:30:00Z",
     author: {
       id: "user1",
@@ -32,7 +32,7 @@ export const mockPosts = [
     caption: "Sunday brunch done right",
     location: "Brooklyn, NY",
     likes: ["user1", "user4", "user6", "user7"],
-    commentCount: 12,
+    commentCount: 1,
     createdAt: "2025-11-05T11:15:00Z",
     author: {
       id: "user4",
@@ -97,7 +97,7 @@ export const mockPosts = [
     caption: "Chasing waterfalls",
     location: "Portland, OR",
     likes: ["user2", "user7"],
-    commentCount: 4,
+    commentCount: 1,
     createdAt: "2025-11-03T13:00:00Z",
     author: {
       id: "user1",
