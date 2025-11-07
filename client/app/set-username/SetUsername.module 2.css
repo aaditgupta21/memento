@@ -1,4 +1,4 @@
-/* LoginPage.module.css */
+/* SetUsername.module.css */
 body {
   background-color: #f5f0eb;
   margin: 0;
@@ -39,8 +39,16 @@ body {
 
 .main form h2 {
   font-size: 20px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   color: #b8a296;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #9a8a7e;
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .main form div {
@@ -80,8 +88,6 @@ body {
   font-size: 14px;
   cursor: pointer;
   transition: transform 0.2s;
-  color: black;
-  border: 1px solid #e8e0d8;
 }
 
 .main button[type="submit"] {
@@ -93,23 +99,9 @@ body {
   transform: scale(1.05);
 }
 
-.main button[type="button"]:first-of-type {
-  background-color: #faf8f6;
-  border: 1px solid #e8e0d8;
-  color: #6b5d54;
+.main button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
-.main p {
-  text-align: center;
-  font-size: 14px;
-  color: #b8a296;
-}
-
-.main p button {
-  background: none;
-  border: none;
-  color: #daa89a;
-  text-decoration: underline;
-  padding: 0;
-  cursor: pointer;
-}

@@ -1,9 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import React from "react";
 import styles from "./Navbar.module.css";
+import { useUser } from "@/context/UserContext";
 
-export default function Navbar({ user }) {
-  if (!user) return null;
+export default function Navbar() {
+  const { user, authenticated, loading } = useUser();
+  if (!authenticated || loading) {
+    return null; // Don't show navbar if not authenticated or still loading
+  }
+
   return (
     <nav className={styles.navbar}>
       <h1 className={styles.logo}>Memento</h1>
