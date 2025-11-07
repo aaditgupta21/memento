@@ -4,7 +4,7 @@ import { mockPosts } from "./mockPosts";
 import Post from "./components/post";
 
 export default function Feed({ posts }) {
-  const tempUser = "user1";
+  const tempUser = { id: "user123", username: "tempUser" };
   return (
     <main>
       <h1>Your Feed</h1>

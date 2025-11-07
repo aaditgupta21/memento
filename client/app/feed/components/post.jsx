@@ -7,6 +7,23 @@ export default function Post({ post, user }) {
 
   const [showComments, setShowComments] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [comments, setComments] = useState(post.comments || []);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const commentText = formData.get("comment");
+    console.log("Submitting comment:", commentText);
+    const newComment = {
+      id: `c${comments.length + 1}`,
+      text: commentText,
+      author: { id: user.id, username: user.username },
+    };
+    setComments((prev) => [...prev, newComment]);
+    e.target.reset();
+    setShowComments(true);
+    // API call to submit comment
+  }
 
   return (
     <article>
@@ -24,6 +41,7 @@ export default function Post({ post, user }) {
         </div>
       </header>
       <img src={post.imageUrl} alt={post.caption} />
+      <h2>{post.caption}</h2>
       {/* like and comment count */}
       <div>
         <strong>{likeCount}</strong> {likeCount === 1 ? "like" : "likes"}
@@ -33,7 +51,23 @@ export default function Post({ post, user }) {
           View all comments
         </button>
       )}
-      <h2>{post.caption}</h2>
+
+      {/* show comments if toggled */}
+      {showComments && (
+        <div>
+          {comments.map((comment) => (
+            <div key={comment.id}>
+              <strong>{comment.author.username}</strong>: {comment.text}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* add comments */}
+      <form onSubmit={handleSubmit}>
+        <input type="text" name="comment" placeholder="Add a comment..." />
+        <button type="submit">Post</button>
+      </form>
 
       {
         /* like button */
@@ -54,17 +88,6 @@ export default function Post({ post, user }) {
           {liked ? "Unlike" : "Like"}
         </button>
       }
-
-      {/* show comments if toggled */}
-      {showComments && (
-        <div>
-          {post.comments.map((comment) => (
-            <div key={comment.id}>
-              <strong>{comment.author.username}</strong>: {comment.text}
-            </div>
-          ))}
-        </div>
-      )}
     </article>
   );
 }
