@@ -13,19 +13,20 @@ passport.use(
       passReqToCallback: true,
     },
     async (request, accessToken, refreshToken, profile, done) => {
-      const newUser = {
-        googleId: profile.id,
-        displayName: profile.displayName,
-        email: profile.emails[0].value,
-        disabled: false,
-      };
-
       try {
         let user = await User.findOne({ googleId: profile.id });
 
         if (user) {
+          // Existing user, just return them
           done(null, user);
         } else {
+          // New user - use email as displayName initially
+          const newUser = {
+            googleId: profile.id,
+            displayName: profile.emails[0].value,
+            email: profile.emails[0].value,
+            disabled: false,
+          };
           user = await User.create(newUser);
           done(null, user);
         }

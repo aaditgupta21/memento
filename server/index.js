@@ -130,9 +130,21 @@ app.get(
 app.get(
   "/google/callback",
   passport.authenticate("google", {
-    successRedirect: process.env.CLIENT_ORIGIN || "http://localhost:3000",
     failureRedirect: "/auth/google/failure",
-  })
+  }),
+  (req, res) => {
+    // Check if user needs to set username
+    const user = req.user;
+    if (user.displayName === user.email) {
+      // User needs to set a username
+      res.redirect(
+        `${process.env.CLIENT_ORIGIN || "http://localhost:3000"}/set-username`
+      );
+    } else {
+      // User already has a username
+      res.redirect(process.env.CLIENT_ORIGIN || "http://localhost:3000");
+    }
+  }
 );
 
 app.get("/logout", (req, res, next) => {
@@ -160,6 +172,47 @@ app.get("/api/me", (req, res) => {
     });
   } else {
     res.json({ authenticated: false });
+  }
+});
+
+// Update username endpoint
+app.post("/api/update-username", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  try {
+    const { displayName } = req.body;
+
+    if (!displayName || displayName.trim() === "") {
+      return res.status(400).json({ error: "Username is required" });
+    }
+
+    // Check if username is already taken
+    const existingUser = await User.findOne({
+      displayName,
+      _id: { $ne: req.user._id },
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ error: "Username already taken" });
+    }
+
+    // Update user's displayName
+    req.user.displayName = displayName;
+    await req.user.save();
+
+    res.json({
+      success: true,
+      user: {
+        id: req.user._id,
+        email: req.user.email,
+        displayName: req.user.displayName,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 

@@ -112,6 +112,7 @@ export default function SignupPage() {
           </button>
           <button
             type="button"
+            style={{ color: "black", border: "1px solid #e8e0d8" }}
             onClick={() => {
               window.location.href = "http://localhost:4000/auth/google";
             }}

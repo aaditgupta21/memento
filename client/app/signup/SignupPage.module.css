@@ -80,6 +80,8 @@ body {
   font-size: 14px;
   cursor: pointer;
   transition: transform 0.2s;
+  color: black;
+  border: 1px solid #e8e0d8;
 }
 
 .main button[type="submit"] {
@@ -110,4 +112,5 @@ body {
   text-decoration: underline;
   padding: 0;
   cursor: pointer;
+
 }
