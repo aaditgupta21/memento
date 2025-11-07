@@ -24,7 +24,7 @@ const user = true;
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body style={{ paddingTop: "16pt" }}>
+      <body>
         <UserProvider>
           <Navbar />
           {children}

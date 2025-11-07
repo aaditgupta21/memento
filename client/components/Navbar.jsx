@@ -27,7 +27,7 @@ export default function Navbar() {
         <Link href="/wrapped" className={styles.navLink}>
           Wrapped
         </Link>
-        <Link href="/account" className={styles.navLink}>
+        <Link href="/account-page" className={styles.navLink}>
           Account
         </Link>
         <button className={styles.logoutBtn}>Logout</button>
