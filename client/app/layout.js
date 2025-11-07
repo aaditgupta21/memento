@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body style={{ paddingTop: "16pt" }}>
         <UserProvider>
-          <Navbar user={user} />
+          <Navbar />
           {children}
         </UserProvider>
       </body>
