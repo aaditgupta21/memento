@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 require("dotenv").config();
 const passport = require("./passport");
+const User = require("./models/User");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -46,7 +47,79 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Auth routes
+// Auth routes - Email/Password
+app.post("/auth/signup", async (req, res) => {
+  try {
+    const { email, password, displayName } = req.body;
+
+    if (!email || !password || !displayName) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // Check if email already exists
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(400).json({ error: "Email already registered" });
+    }
+
+    // Check if username (displayName) already exists
+    const existingUsername = await User.findOne({ displayName });
+    if (existingUsername) {
+      return res.status(400).json({ error: "Username already taken" });
+    }
+
+    // Create new user
+    const user = await User.create({
+      email,
+      password,
+      displayName,
+    });
+
+    // Log the user in
+    req.login(user, (err) => {
+      if (err) {
+        return res.status(500).json({ error: "Login failed after signup" });
+      }
+      res.json({
+        success: true,
+        user: {
+          id: user._id,
+          email: user.email,
+          displayName: user.displayName,
+        },
+      });
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.post("/auth/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      return res.status(500).json({ error: "Server error" });
+    }
+    if (!user) {
+      return res.status(401).json({ error: info.message || "Login failed" });
+    }
+    req.login(user, (err) => {
+      if (err) {
+        return res.status(500).json({ error: "Login failed" });
+      }
+      res.json({
+        success: true,
+        user: {
+          id: user._id,
+          email: user.email,
+          displayName: user.displayName,
+        },
+      });
+    });
+  })(req, res, next);
+});
+
+// Auth routes - Google OAuth
 app.get(
   "/auth/google",
   passport.authenticate("google", {
@@ -57,16 +130,28 @@ app.get(
 app.get(
   "/google/callback",
   passport.authenticate("google", {
-    successRedirect: process.env.CLIENT_ORIGIN || "http://localhost:3000",
     failureRedirect: "/auth/google/failure",
-  })
+  }),
+  (req, res) => {
+    // Check if user needs to set username
+    const user = req.user;
+    if (user.displayName === user.email) {
+      // User needs to set a username
+      res.redirect(
+        `${process.env.CLIENT_ORIGIN || "http://localhost:3000"}/set-username`
+      );
+    } else {
+      // User already has a username
+      res.redirect(process.env.CLIENT_ORIGIN || "http://localhost:3000");
+    }
+  }
 );
 
 app.get("/logout", (req, res, next) => {
   req.logout(req.user, (err) => {
     if (err) return next(err);
     req.session.destroy();
-    res.redirect("/login");
+    res.json({ success: true });
   });
 });
 
@@ -87,6 +172,47 @@ app.get("/api/me", (req, res) => {
     });
   } else {
     res.json({ authenticated: false });
+  }
+});
+
+// Update username endpoint
+app.post("/api/update-username", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  try {
+    const { displayName } = req.body;
+
+    if (!displayName || displayName.trim() === "") {
+      return res.status(400).json({ error: "Username is required" });
+    }
+
+    // Check if username is already taken
+    const existingUser = await User.findOne({
+      displayName,
+      _id: { $ne: req.user._id },
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ error: "Username already taken" });
+    }
+
+    // Update user's displayName
+    req.user.displayName = displayName;
+    await req.user.save();
+
+    res.json({
+      success: true,
+      user: {
+        id: req.user._id,
+        email: req.user.email,
+        displayName: req.user.displayName,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 

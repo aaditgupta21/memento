@@ -2,6 +2,7 @@
 import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 import styles from "./SignupPage.module.css";
 
 export default function SignupPage() {
@@ -11,19 +12,45 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // router for navigation
   const router = useRouter();
+  const { setUser, setAuthenticated } = useUser();
 
   // handle form submission
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
     try {
-      console.log("Signing up with:", email, password);
-      console.log("Signing up as:", username);
-      // API call here for manual auth
+      const response = await fetch("http://localhost:4000/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Important for cookies
+        body: JSON.stringify({
+          email,
+          password,
+          displayName: username,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Signup failed");
+      }
+
+      // Success - update global state and redirect
+      setUser(data.user);
+      setAuthenticated(true);
+      setSuccess("Account created successfully! Redirecting...");
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -40,6 +67,11 @@ export default function SignupPage() {
           {error && (
             <div className="error-message" style={{ color: "red" }}>
               {error}
+            </div>
+          )}
+          {success && (
+            <div className="success-message" style={{ color: "green", fontWeight: "500" }}>
+              {success}
             </div>
           )}
           <div>
@@ -84,6 +116,7 @@ export default function SignupPage() {
           </button>
           <button
             type="button"
+            style={{ color: "black", border: "1px solid #e8e0d8" }}
             onClick={() => {
               window.location.href = "http://localhost:4000/auth/google";
             }}
