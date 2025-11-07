@@ -2,6 +2,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 import styles from "./SetUsername.module.css";
 
 export default function SetUsernamePage() {
@@ -9,35 +10,22 @@ export default function SetUsernamePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [checkingAuth, setCheckingAuth] = useState(true);
 
   const router = useRouter();
+  const { user, authenticated, loading: userLoading, fetchUser } = useUser();
 
   // Check if user is authenticated and needs username
   useEffect(() => {
-    async function checkAuth() {
-      try {
-        const response = await fetch("http://localhost:4000/api/me", {
-          credentials: "include",
-        });
-        const data = await response.json();
-
-        if (!data.authenticated) {
-          // Not logged in, redirect to login
-          router.push("/login");
-        } else if (data.user.displayName && data.user.displayName !== data.user.email) {
-          // Already has username, redirect to home
-          router.push("/");
-        }
-        // Otherwise, show the form
-        setCheckingAuth(false);
-      } catch (err) {
-        console.error(err);
-        setCheckingAuth(false);
+    if (!userLoading) {
+      if (!authenticated) {
+        // Not logged in, redirect to login
+        router.push("/login");
+      } else if (user && user.displayName && user.displayName !== user.email) {
+        // Already has username, redirect to home
+        router.push("/");
       }
     }
-    checkAuth();
-  }, [router]);
+  }, [authenticated, user, userLoading, router]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -63,6 +51,8 @@ export default function SetUsernamePage() {
         throw new Error(data.error || "Failed to set username");
       }
 
+      // Update global user state
+      await fetchUser();
       setSuccess("Username set successfully! Redirecting...");
       setTimeout(() => {
         router.push("/");
@@ -74,7 +64,7 @@ export default function SetUsernamePage() {
     }
   }
 
-  if (checkingAuth) {
+  if (userLoading) {
     return (
       <main className={styles.main}>
         <div>

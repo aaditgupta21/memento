@@ -2,6 +2,7 @@
 import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 import styles from "./LoginPage.module.css";
 
 export default function LoginPage() {
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [success, setSuccess] = useState("");
 
   const router = useRouter();
+  const { setUser, setAuthenticated } = useUser();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -37,7 +39,9 @@ export default function LoginPage() {
         throw new Error(data.error || "Login failed");
       }
 
-      // Success - show message and redirect
+      // Success - update global state and redirect
+      setUser(data.user);
+      setAuthenticated(true);
       setSuccess("Logged in successfully! Redirecting...");
       setTimeout(() => {
         router.push("/");

@@ -2,6 +2,7 @@
 import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 import styles from "./SignupPage.module.css";
 
 export default function SignupPage() {
@@ -15,6 +16,7 @@ export default function SignupPage() {
 
   // router for navigation
   const router = useRouter();
+  const { setUser, setAuthenticated } = useUser();
 
   // handle form submission
   async function handleSubmit(e) {
@@ -42,7 +44,9 @@ export default function SignupPage() {
         throw new Error(data.error || "Signup failed");
       }
 
-      // Success - show message and redirect
+      // Success - update global state and redirect
+      setUser(data.user);
+      setAuthenticated(true);
       setSuccess("Account created successfully! Redirecting...");
       setTimeout(() => {
         router.push("/");
