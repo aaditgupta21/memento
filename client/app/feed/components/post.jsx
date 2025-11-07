@@ -3,26 +3,43 @@ import React from "react";
 import { useState } from "react";
 
 export default function Post({ post, user }) {
-  const likeCount = post.likes.length;
-
+  // necessary use states for like and comment functionality
   const [showComments, setShowComments] = useState(false);
-  const [liked, setLiked] = useState(false);
   const [comments, setComments] = useState(post.comments || []);
+  const [likes, setLikes] = useState(post.likes || []);
+
+  const likeCount = likes.length;
+  const currentUserId = user.id;
+  // automatically determine if current user has liked post
+  const isLiked = likes.includes(currentUserId);
 
   async function handleSubmit(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const commentText = formData.get("comment");
-    console.log("Submitting comment:", commentText);
+    if (!commentText) return;
     const newComment = {
       id: `c${comments.length + 1}`,
       text: commentText,
-      author: { id: user.id, username: user.username },
+      author: { id: currentUserId, username: user.username },
     };
     setComments((prev) => [...prev, newComment]);
     e.target.reset();
     setShowComments(true);
     // API call to submit comment
+  }
+
+  function toggleLike() {
+    setLikes((prevLikes) => {
+      if (isLiked) {
+        // meaning already liked, so we remove like
+        return prevLikes.filter((like) => like !== currentUserId);
+      } else {
+        // add like to array
+        return [...prevLikes, currentUserId];
+      }
+    });
+    // API call to update like status
   }
 
   return (
@@ -71,22 +88,7 @@ export default function Post({ post, user }) {
 
       {
         /* like button */
-        <button
-          onClick={() => {
-            setLiked(!liked);
-            // setLiked updates async, so we use the previous value to update likes array
-            if (!liked) {
-              post.likes.push(user);
-            } else {
-              const index = post.likes.indexOf(user);
-              if (index > -1) {
-                post.likes.splice(index, 1);
-              }
-            }
-          }}
-        >
-          {liked ? "Unlike" : "Like"}
-        </button>
+        <button onClick={toggleLike}>{isLiked ? "Unlike" : "Like"}</button>
       }
     </article>
   );
