@@ -13,25 +13,6 @@ function readFileAsDataURL(file) {
   });
 }
 
-function handleSave() {
-  if (!preview) return;
-  const newPost = {
-    id: String(Date.now()),
-    image: preview, // data URL stored in memory only for now
-    caption: caption.trim(),
-    location: location.trim(),
-    createdAt: new Date().toISOString(),
-  };
-  setUploads((prev) => [newItem, ...prev]);
-  // reset form (transient only)
-  setFile(null);
-  setPreview(null);
-  setCaption("");
-  setLocation("");
-  const input = document.getElementById("upload-file-input");
-  if (input) input.value = "";
-}
-
 export default function Upload() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
