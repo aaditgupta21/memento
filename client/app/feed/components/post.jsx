@@ -23,7 +23,7 @@ export default function Post({ post, user }) {
     const newComment = {
       id: `c${comments.length + 1}`,
       text: commentText,
-      author: { id: currentUserId, username: user.username },
+      author: { id: currentUserId, username: user.displayName },
     };
     setComments((prev) => [...prev, newComment]);
     e.target.reset();
