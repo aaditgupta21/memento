@@ -32,7 +32,7 @@
 
 .fileInput {
   padding: 0.75rem;
-  border: 2px dashed #928a7b;
+  border: 2px solid #928a7b;
   border-radius: 1rem;
   background-color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
