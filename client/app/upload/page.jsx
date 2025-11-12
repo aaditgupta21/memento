@@ -72,40 +72,68 @@ export default function Upload() {
 
   return (
     <main className={styles.page}>
-      <h1>Upload Page</h1>
-      <input
-        id="upload-file-input"
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-      />
-      {preview && (
-        <div className={styles.previewWrap}>
-          <img src={preview} alt="preview" />
-        </div>
-      )}
-      <input
-        type="text"
-        placeholder="Caption"
-        value={caption}
-        onChange={(e) => setCaption(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Location"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-      />
-      <button onClick={handleSave}>Save</button>
+      <h1>Upload a Photo</h1>
 
-      {uploads.map((upload) => (
-        <div key={upload.id} className={styles.uploadItem}>
-          <img src={upload.image} alt={upload.caption} />
-          <p>{upload.caption}</p>
-          <p>{upload.location}</p>
-          <p>{new Date(upload.createdAt).toLocaleString()}</p>
-        </div>
-      ))}
+      <div className={styles.uploadForm}>
+        <input
+          id="upload-file-input"
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className={styles.fileInput}
+        />
+
+        {preview && (
+          <div className={styles.previewWrap}>
+            <img src={preview} alt="preview" />
+          </div>
+        )}
+
+        <input
+          type="text"
+          placeholder="Caption (optional)"
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          className={styles.input}
+        />
+
+        <input
+          type="text"
+          placeholder="Location (optional)"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className={styles.input}
+        />
+
+        <button
+          onClick={handleSave}
+          className={styles.saveBtn}
+          disabled={!preview}
+        >
+          Save Photo
+        </button>
+      </div>
+
+      <section className={styles.uploadsSection}>
+        <h2 className={styles.uploadsTitle}>Recent Uploads</h2>
+        {uploads.length === 0 ? (
+          <p className={styles.emptyMessage}>
+            No uploads yet. Upload your first photo!
+          </p>
+        ) : (
+          uploads.map((upload) => (
+            <div key={upload.id} className={styles.uploadItem}>
+              <img
+                src={upload.image}
+                alt={upload.caption || "Uploaded photo"}
+              />
+              {upload.caption && <p>{upload.caption}</p>}
+              {upload.location && <p> {upload.location}</p>}
+              <p>{new Date(upload.createdAt).toLocaleString()}</p>
+            </div>
+          ))
+        )}
+      </section>
     </main>
   );
 }
