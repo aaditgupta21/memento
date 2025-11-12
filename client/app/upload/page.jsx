@@ -2,6 +2,7 @@
 import React from "react";
 import styles from "./Upload.module.css";
 import { useState } from "react";
+import { useUser } from "@/context/UserContext";
 
 function readFileAsDataURL(file) {
   return new Promise((resolve, reject) => {
@@ -14,9 +15,9 @@ function readFileAsDataURL(file) {
 
 function handleSave() {
   if (!preview) return;
-  const newItem = {
+  const newPost = {
     id: String(Date.now()),
-    image: preview, // data URL stored in memory only
+    image: preview, // data URL stored in memory only for now
     caption: caption.trim(),
     location: location.trim(),
     createdAt: new Date().toISOString(),
@@ -38,6 +39,8 @@ export default function Upload() {
   const [location, setLocation] = useState("");
   const [uploads, setUploads] = useState([]);
 
+  const { user } = useUser();
+
   async function handleFileChange(e) {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -53,14 +56,26 @@ export default function Upload() {
 
   function handleSave() {
     if (!preview) return;
-    const newItem = {
+    const newPost = {
       id: String(Date.now()),
       image: preview, // data URL stored in memory only
       caption: caption.trim(),
       location: location.trim(),
+      likes: [],
       createdAt: new Date().toISOString(),
+      author: {
+        id: user?.id,
+        username: user?.displayName || "user",
+        avatar:
+          user?.avatar || user?.photoURL || "https://i.pravatar.cc/150?img=1",
+      },
     };
-    setUploads((prev) => [newItem, ...prev]);
+    setUploads((prev) => [newPost, ...prev]);
+
+    console.log(newPost);
+
+    // TODO: send to backend
+
     // reset form
     setFile(null);
     setPreview(null);
