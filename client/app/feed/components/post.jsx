@@ -11,7 +11,10 @@ export default function Post({ post, user }) {
 
   const likeCount = likes.length;
   const commentCount = comments.length;
-  const currentUserId = user.id;
+  // no universal state yet, temp state as fallback
+  const currentUserId = user ? user.id : "tempUserId";
+  const currentUsername = user ? user.displayName : "tempUser";
+
   // automatically determine if current user has liked post
   const isLiked = likes.includes(currentUserId);
 
@@ -23,7 +26,7 @@ export default function Post({ post, user }) {
     const newComment = {
       id: `c${comments.length + 1}`,
       text: commentText,
-      author: { id: currentUserId, username: user.username },
+      author: { id: currentUserId, username: currentUsername },
     };
     setComments((prev) => [...prev, newComment]);
     e.target.reset();
