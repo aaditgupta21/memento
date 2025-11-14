@@ -2,12 +2,24 @@
 .page {
     min-height: 100vh;
     background-color: #f5f0eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
 }
 
+
 .container {
+    width: 100%;
     max-width: 80rem;
     margin: 0 auto;
-    padding: 3rem 1.5rem;
+    padding: 3rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 .centerText {
