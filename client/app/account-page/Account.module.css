@@ -95,6 +95,12 @@
     margin-top: 1rem;
 }
 
+.passwordHint {
+    color: rgba(155, 139, 126, 0.6);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
 .form {
     display: flex;
     flex-direction: column;
