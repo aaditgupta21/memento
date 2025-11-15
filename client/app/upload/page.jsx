@@ -1,19 +1,24 @@
 "use client";
 
 import { UploadButton } from "@/utils/uploadthing";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import styles from "./Upload.module.css";
 
 export default function Upload() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
-  const { user } = useUser();
+  const { user, loading } = useUser();
   const router = useRouter();
 
   // Redirect if not authenticated
-  if (!user) {
-    router.push("/login");
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
     return null;
   }
 
