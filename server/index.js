@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 require("dotenv").config();
 const passport = require("./passport");
 const User = require("./models/User");
@@ -26,7 +27,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session configuration
+// Session configuration with MongoDB store for persistence
 app.use(
   session({
     secret:
@@ -34,10 +35,14 @@ app.use(
       "random-secret-key12ojifjerijfjijoejroioinfg",
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      ttl: 60 * 60 * 24 * 7, // 7 days in seconds
+    }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
       sameSite: "lax",
     },
   })
@@ -147,11 +152,29 @@ app.get(
   }
 );
 
-app.get("/logout", (req, res, next) => {
-  req.logout(req.user, (err) => {
-    if (err) return next(err);
-    req.session.destroy();
-    res.json({ success: true });
+app.get("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      console.error("Logout error:", err);
+      return res.status(500).json({ error: "Failed to logout" });
+    }
+
+    // Destroy the session
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Session destroy error:", err);
+        return res.status(500).json({ error: "Failed to destroy session" });
+      }
+
+      // Clear the session cookie
+      res.clearCookie("connect.sid", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
+
+      res.json({ success: true, message: "Logged out successfully" });
+    });
   });
 });
 
