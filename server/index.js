@@ -6,6 +6,7 @@ const MongoStore = require("connect-mongo");
 require("dotenv").config();
 const passport = require("./passport");
 const User = require("./models/User");
+const Post = require("./models/Post");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -236,6 +237,44 @@ app.post("/api/update-username", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Create post endpoint
+app.post("/api/posts", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  try {
+    const { images, caption, location } = req.body;
+
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({ error: "At least one image is required" });
+    }
+
+    // Create post in database
+    const post = await Post.create({
+      images: images.map((img, idx) => ({
+        url: typeof img === "string" ? img : img.url,
+        order:
+          typeof img === "object" && img.order !== undefined ? img.order : idx,
+      })),
+      caption: caption ? caption.trim() : "",
+      location: location ? location.trim() : undefined,
+      author: req.user._id,
+    });
+
+    // Populate author info
+    await post.populate("author", "displayName email");
+
+    res.status(201).json({
+      success: true,
+      post,
+    });
+  } catch (err) {
+    console.error("Error creating post:", err);
+    res.status(500).json({ error: err.message || "Server error" });
   }
 });
 

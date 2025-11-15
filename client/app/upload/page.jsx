@@ -8,6 +8,9 @@ import styles from "./Upload.module.css";
 
 export default function Upload() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [caption, setCaption] = useState("");
+  const [location, setLocation] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, loading } = useUser();
   const router = useRouter();
 
@@ -22,6 +25,50 @@ export default function Upload() {
     return null;
   }
 
+  const handleSubmit = async () => {
+    if (uploadedFiles.length === 0) {
+      alert("Please upload at least one image first");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("http://localhost:4000/api/posts", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          images: uploadedFiles.map((url, idx) => ({
+            url,
+            order: idx,
+          })),
+          caption: caption.trim(),
+          location: location.trim() || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create post");
+      }
+
+      const data = await response.json();
+      alert("Post created successfully!");
+
+      // Reset form
+      setUploadedFiles([]);
+      setCaption("");
+      setLocation("");
+    } catch (error) {
+      console.error("Error creating post:", error);
+      alert(`Error: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <main className={styles.page}>
       <h1>Upload a Photo</h1>
@@ -30,17 +77,14 @@ export default function Upload() {
         <UploadButton
           endpoint="imageUploader"
           onClientUploadComplete={(res) => {
-            // Do something with the response
             console.log("Upload complete! Files:", res);
             if (res && res.length > 0) {
               const urls = res.map((file) => file.url);
               console.log("Uploaded image URLs:", urls);
               setUploadedFiles(urls);
-              alert("Upload Completed! Check console for URLs.");
             }
           }}
           onUploadError={(error) => {
-            // Do something with the error.
             console.error("Upload error:", error);
             alert(`ERROR! ${error.message}`);
           }}
@@ -51,11 +95,34 @@ export default function Upload() {
             {uploadedFiles.map((url, idx) => (
               <div key={idx}>
                 <img src={url} alt={`preview ${idx + 1}`} />
-                <p>URL: {url}</p>
               </div>
             ))}
           </div>
         )}
+
+        <input
+          type="text"
+          placeholder="Caption (optional)"
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          className={styles.input}
+        />
+
+        <input
+          type="text"
+          placeholder="Location (optional)"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className={styles.input}
+        />
+
+        <button
+          onClick={handleSubmit}
+          className={styles.saveBtn}
+          disabled={uploadedFiles.length === 0 || isSubmitting}
+        >
+          {isSubmitting ? "Creating Post..." : "Create Post"}
+        </button>
       </div>
     </main>
   );
