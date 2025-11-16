@@ -278,6 +278,30 @@ app.post("/api/posts", async (req, res) => {
   }
 });
 
+// Get all posts for a specific user
+app.get("/api/users/:userId/posts", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid user id" });
+    }
+
+    const posts = await Post.find({ author: userId })
+      .sort({ createdAt: -1 })
+      .populate("author", "displayName email");
+
+    return res.json({
+      success: true,
+      count: posts.length,
+      posts,
+    });
+  } catch (err) {
+    console.error("Error fetching user posts:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
