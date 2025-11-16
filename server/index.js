@@ -247,10 +247,36 @@ app.post("/api/posts", async (req, res) => {
   }
 
   try {
-    const { images, caption, location } = req.body;
+    const { images, caption, location, categories } = req.body;
 
     if (!images || !Array.isArray(images) || images.length === 0) {
       return res.status(400).json({ error: "At least one image is required" });
+    }
+
+    // Validate categories if provided
+    const allowedCategories = [
+      "Travel",
+      "Sports",
+      "Gaming",
+      "Lifestyle",
+      "Food",
+      "Fitness",
+      "Fashion",
+      "Beauty",
+      "Wellness",
+      "Home",
+      "Family",
+      "Art",
+      "Music",
+      "Photography",
+      "Nature",
+    ];
+
+    let safeCategories = [];
+    if (Array.isArray(categories)) {
+      safeCategories = categories
+        .map((c) => (typeof c === "string" ? c.trim() : ""))
+        .filter((c) => allowedCategories.includes(c));
     }
 
     // Create post in database
@@ -262,6 +288,7 @@ app.post("/api/posts", async (req, res) => {
       })),
       caption: caption ? caption.trim() : "",
       location: location ? location.trim() : undefined,
+      categories: safeCategories,
       author: req.user._id,
     });
 

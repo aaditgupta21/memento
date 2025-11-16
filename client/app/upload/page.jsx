@@ -10,9 +10,28 @@ export default function Upload() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [caption, setCaption] = useState("");
   const [location, setLocation] = useState("");
+  const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, loading } = useUser();
   const router = useRouter();
+
+  const availableCategories = [
+    "Travel",
+    "Sports",
+    "Gaming",
+    "Lifestyle",
+    "Food",
+    "Fitness",
+    "Fashion",
+    "Beauty",
+    "Wellness",
+    "Home",
+    "Family",
+    "Art",
+    "Music",
+    "Photography",
+    "Nature",
+  ];
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -46,6 +65,7 @@ export default function Upload() {
           })),
           caption: caption.trim(),
           location: location.trim() || undefined,
+          categories,
         }),
       });
 
@@ -61,6 +81,7 @@ export default function Upload() {
       setUploadedFiles([]);
       setCaption("");
       setLocation("");
+      setCategories([]);
     } catch (error) {
       console.error("Error creating post:", error);
       alert(`Error: ${error.message}`);
@@ -99,6 +120,31 @@ export default function Upload() {
             ))}
           </div>
         )}
+
+        <div className={styles.categoriesWrap}>
+          <p>Select categories (optional):</p>
+          <div className={styles.categoriesGrid}>
+            {availableCategories.map((cat) => {
+              const checked = categories.includes(cat);
+              return (
+                <label key={cat} className={styles.categoryItem}>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setCategories((prev) => [...prev, cat]);
+                      } else {
+                        setCategories((prev) => prev.filter((c) => c !== cat));
+                      }
+                    }}
+                  />
+                  <span>{cat}</span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
 
         <input
           type="text"

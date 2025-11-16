@@ -29,6 +29,28 @@ const postSchema = new mongoose.Schema({
       },
     },
   ],
+  categories: [
+    {
+      type: String,
+      enum: [
+        "Travel",
+        "Sports",
+        "Gaming",
+        "Lifestyle",
+        "Food",
+        "Fitness",
+        "Fashion",
+        "Beauty",
+        "Wellness",
+        "Home",
+        "Family",
+        "Art",
+        "Music",
+        "Photography",
+        "Nature",
+      ],
+    },
+  ],
   caption: {
     type: String,
     required: false,
