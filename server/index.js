@@ -305,6 +305,24 @@ app.post("/api/posts", async (req, res) => {
   }
 });
 
+// Get all posts
+app.get("/api/posts", async (req, res) => {
+  try {
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate("author", "displayName email");
+
+    return res.json({
+      success: true,
+      count: posts.length,
+      posts,
+    });
+  } catch (err) {
+    console.error("Error fetching posts:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Get all posts for a specific user
 app.get("/api/users/:userId/posts", async (req, res) => {
   const { userId } = req.params;
