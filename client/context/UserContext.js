@@ -17,6 +17,7 @@ export function UserProvider({ children }) {
     try {
       const response = await fetch("http://localhost:4000/api/me", {
         credentials: "include",
+        cache: "no-store", // Prevent caching to always check current session
       });
       const data = await response.json();
 
@@ -38,14 +39,28 @@ export function UserProvider({ children }) {
 
   async function logout() {
     try {
-      await fetch("http://localhost:4000/logout", {
+      const response = await fetch("http://localhost:4000/logout", {
         method: "GET",
         credentials: "include",
       });
+
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+
+      const data = await response.json();
       setUser(null);
       setAuthenticated(false);
+
+      // Redirect to home page after logout
+      if (typeof window !== "undefined") {
+        window.location.href = "/";
+      }
     } catch (error) {
       console.error("Error logging out:", error);
+      // Still clear local state even if request fails
+      setUser(null);
+      setAuthenticated(false);
     }
   }
 

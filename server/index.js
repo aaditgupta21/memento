@@ -2,9 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 require("dotenv").config();
 const passport = require("./passport");
 const User = require("./models/User");
+const Post = require("./models/Post");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -26,7 +28,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Session configuration
+// Session configuration with MongoDB store for persistence
 app.use(
   session({
     secret:
@@ -34,10 +36,14 @@ app.use(
       "random-secret-key12ojifjerijfjijoejroioinfg",
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      ttl: 60 * 60 * 24 * 7, // 7 days in seconds
+    }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
       sameSite: "lax",
     },
   })
@@ -147,11 +153,29 @@ app.get(
   }
 );
 
-app.get("/logout", (req, res, next) => {
-  req.logout(req.user, (err) => {
-    if (err) return next(err);
-    req.session.destroy();
-    res.json({ success: true });
+app.get("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      console.error("Logout error:", err);
+      return res.status(500).json({ error: "Failed to logout" });
+    }
+
+    // Destroy the session
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Session destroy error:", err);
+        return res.status(500).json({ error: "Failed to destroy session" });
+      }
+
+      // Clear the session cookie
+      res.clearCookie("connect.sid", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
+
+      res.json({ success: true, message: "Logged out successfully" });
+    });
   });
 });
 
@@ -213,6 +237,68 @@ app.post("/api/update-username", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Create post endpoint
+app.post("/api/posts", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  try {
+    const { images, caption, location } = req.body;
+
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({ error: "At least one image is required" });
+    }
+
+    // Create post in database
+    const post = await Post.create({
+      images: images.map((img, idx) => ({
+        url: typeof img === "string" ? img : img.url,
+        order:
+          typeof img === "object" && img.order !== undefined ? img.order : idx,
+      })),
+      caption: caption ? caption.trim() : "",
+      location: location ? location.trim() : undefined,
+      author: req.user._id,
+    });
+
+    // Populate author info
+    await post.populate("author", "displayName email");
+
+    res.status(201).json({
+      success: true,
+      post,
+    });
+  } catch (err) {
+    console.error("Error creating post:", err);
+    res.status(500).json({ error: err.message || "Server error" });
+  }
+});
+
+// Get all posts for a specific user
+app.get("/api/users/:userId/posts", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid user id" });
+    }
+
+    const posts = await Post.find({ author: userId })
+      .sort({ createdAt: -1 })
+      .populate("author", "displayName email");
+
+    return res.json({
+      success: true,
+      count: posts.length,
+      posts,
+    });
+  } catch (err) {
+    console.error("Error fetching user posts:", err);
+    return res.status(500).json({ error: "Server error" });
   }
 });
 

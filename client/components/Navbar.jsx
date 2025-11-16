@@ -6,7 +6,7 @@ import styles from "./Navbar.module.css";
 import { useUser } from "@/context/UserContext";
 
 export default function Navbar() {
-  const { user, authenticated, loading } = useUser();
+  const { user, authenticated, loading, logout } = useUser();
   if (!authenticated || loading) {
     return null; // Don't show navbar if not authenticated or still loading
   }
@@ -27,10 +27,12 @@ export default function Navbar() {
         <Link href="/wrapped" className={styles.navLink}>
           Wrapped
         </Link>
-        <Link href="/account-page" className={styles.navLink}>
+        <Link href="/account" className={styles.navLink}>
           Account
         </Link>
-        <button className={styles.logoutBtn}>Logout</button>
+        <button className={styles.logoutBtn} onClick={logout}>
+          Logout
+        </button>
       </div>
     </nav>
   );

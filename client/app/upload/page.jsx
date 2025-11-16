@@ -1,87 +1,102 @@
 "use client";
-import React from "react";
-import styles from "./Upload.module.css";
-import { useState } from "react";
-import { useUser } from "@/context/UserContext";
 
-function readFileAsDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const fr = new FileReader();
-    fr.onload = () => resolve(fr.result);
-    fr.onerror = reject;
-    fr.readAsDataURL(file);
-  });
-}
+import { UploadButton } from "@/utils/uploadthing";
+import { useState, useEffect } from "react";
+import { useUser } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
+import styles from "./Upload.module.css";
 
 export default function Upload() {
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
   const [caption, setCaption] = useState("");
   const [location, setLocation] = useState("");
-  const [uploads, setUploads] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user, loading } = useUser();
+  const router = useRouter();
 
-  const { user } = useUser();
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
 
-  async function handleFileChange(e) {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    if (!f.type.startsWith("image/")) {
-      alert("Please select an image file.");
-      e.target.value = "";
+  if (loading || !user) {
+    return null;
+  }
+
+  const handleSubmit = async () => {
+    if (uploadedFiles.length === 0) {
+      alert("Please upload at least one image first");
       return;
     }
-    const dataUrl = await readFileAsDataURL(f);
-    setFile(f);
-    setPreview(dataUrl);
-  }
 
-  function handleSave() {
-    if (!preview) return;
-    const newPost = {
-      id: String(Date.now()),
-      image: preview, // data URL stored in memory only
-      caption: caption.trim(),
-      location: location.trim(),
-      likes: [],
-      createdAt: new Date().toISOString(),
-      author: {
-        id: user?.id,
-        username: user?.displayName || "user",
-        avatar:
-          user?.avatar || user?.photoURL || "https://i.pravatar.cc/150?img=1",
-      },
-    };
-    setUploads((prev) => [newPost, ...prev]);
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("http://localhost:4000/api/posts", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          images: uploadedFiles.map((url, idx) => ({
+            url,
+            order: idx,
+          })),
+          caption: caption.trim(),
+          location: location.trim() || undefined,
+        }),
+      });
 
-    console.log(newPost);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create post");
+      }
 
-    // TODO: send to backend
+      const data = await response.json();
+      alert("Post created successfully!");
 
-    // reset form
-    setFile(null);
-    setPreview(null);
-    setCaption("");
-    setLocation("");
-    const input = document.getElementById("upload-file-input");
-    if (input) input.value = "";
-  }
+      // Reset form
+      setUploadedFiles([]);
+      setCaption("");
+      setLocation("");
+    } catch (error) {
+      console.error("Error creating post:", error);
+      alert(`Error: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <main className={styles.page}>
       <h1>Upload a Photo</h1>
 
       <div className={styles.uploadForm}>
-        <input
-          id="upload-file-input"
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className={styles.fileInput}
+        <UploadButton
+          endpoint="imageUploader"
+          onClientUploadComplete={(res) => {
+            console.log("Upload complete! Files:", res);
+            if (res && res.length > 0) {
+              const urls = res.map((file) => file.url);
+              console.log("Uploaded image URLs:", urls);
+              setUploadedFiles(urls);
+            }
+          }}
+          onUploadError={(error) => {
+            console.error("Upload error:", error);
+            alert(`ERROR! ${error.message}`);
+          }}
         />
 
-        {preview && (
+        {uploadedFiles.length > 0 && (
           <div className={styles.previewWrap}>
-            <img src={preview} alt="preview" />
+            {uploadedFiles.map((url, idx) => (
+              <div key={idx}>
+                <img src={url} alt={`preview ${idx + 1}`} />
+              </div>
+            ))}
           </div>
         )}
 
@@ -102,34 +117,13 @@ export default function Upload() {
         />
 
         <button
-          onClick={handleSave}
+          onClick={handleSubmit}
           className={styles.saveBtn}
-          disabled={!preview}
+          disabled={uploadedFiles.length === 0 || isSubmitting}
         >
-          Save Photo
+          {isSubmitting ? "Creating Post..." : "Create Post"}
         </button>
       </div>
-
-      <section className={styles.uploadsSection}>
-        <h2 className={styles.uploadsTitle}>Recent Uploads</h2>
-        {uploads.length === 0 ? (
-          <p className={styles.emptyMessage}>
-            No uploads yet. Upload your first photo!
-          </p>
-        ) : (
-          uploads.map((upload) => (
-            <div key={upload.id} className={styles.uploadItem}>
-              <img
-                src={upload.image}
-                alt={upload.caption || "Uploaded photo"}
-              />
-              {upload.caption && <p>{upload.caption}</p>}
-              {upload.location && <p> {upload.location}</p>}
-              <p>{new Date(upload.createdAt).toLocaleString()}</p>
-            </div>
-          ))
-        )}
-      </section>
     </main>
   );
 }
