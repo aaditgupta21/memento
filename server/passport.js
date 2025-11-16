@@ -26,6 +26,7 @@ passport.use(
             displayName: profile.emails[0].value,
             email: profile.emails[0].value,
             disabled: false,
+            profilePicture: profile.photos[0].value,
           };
           user = await User.create(newUser);
           done(null, user);

@@ -302,6 +302,24 @@ app.get("/api/users/:userId/posts", async (req, res) => {
   }
 });
 
+// Get all usernames with profile photos
+app.get("/api/users/usernames", async (req, res) => {
+  try {
+    const users = await User.find({}, "displayName profilePicture").sort({
+      displayName: 1,
+    });
+
+    return res.json({
+      success: true,
+      count: users.length,
+      users,
+    });
+  } catch (err) {
+    console.error("Error fetching usernames:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
