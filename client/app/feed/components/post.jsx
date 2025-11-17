@@ -96,13 +96,15 @@ export default function Post({ post, user }) {
       <header className={styles.header}>
         <img
           src={post.author.avatar}
-          alt={post.author.username}
+          alt={post.author.displayName}
           width={40}
           height={40}
           className={styles.avatar}
         />
         <div>
-          <p className={styles.username}>{post.author.displayName}</p>
+          <a className={styles.username} href={`/profile/${post.author._id}`}>
+            {post.author.displayName}
+          </a>
           {post.location && <p className={styles.postInfo}>{post.location}</p>}
           <p className={styles.postInfo}>
             {new Date(post.createdAt).toLocaleDateString("en-US", {

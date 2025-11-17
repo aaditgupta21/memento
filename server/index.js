@@ -325,6 +325,7 @@ app.get("/api/posts", async (req, res) => {
 
 // Get all posts for a specific user
 app.get("/api/users/:userId/posts", async (req, res) => {
+  console.log("Received request for user posts:", req.params.userId);
   const { userId } = req.params;
 
   try {
@@ -456,6 +457,34 @@ app.post("/api/posts/:postId/comments", async (req, res) => {
     return res.status(201).json({ success: true, comments: post.comments });
   } catch (err) {
     console.error("Error adding comment:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// get user object from userID
+app.get("/api/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    // Return all fields EXCEPT password
+    const user = await User.findById(userId).select(
+      "displayName profilePicture"
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    console.error("Error fetching user:", err);
     return res.status(500).json({ error: "Server error" });
   }
 });
