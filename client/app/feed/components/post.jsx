@@ -1,9 +1,11 @@
 "use client";
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./Post.module.css";
 
 export default function Post({ post, user }) {
+  const router = useRouter();
   // necessary use states for like and comment functionality
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState(post.comments || []);
@@ -15,6 +17,13 @@ export default function Post({ post, user }) {
   const currentUsername = user?.displayName ?? null;
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+
+  // Redirect if no user
+  useEffect(() => {
+    if (!user) {
+      router.push("/"); // send to home page
+    }
+  }, [user, router]);
 
   // automatically determine if current user has liked post
   const isLiked = likes.includes(currentUserId);
