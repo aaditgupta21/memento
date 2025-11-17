@@ -365,6 +365,67 @@ app.get("/api/users/usernames", async (req, res) => {
   }
 });
 
+// like a post
+app.post("/api/posts/:postId/like", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const { postId } = req.params;
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const userId = req.user._id.toString();
+    const index = post.likes.findIndex((id) => id.toString() === userId);
+
+    if (index === -1) {
+      post.likes.push(userId);
+    } else {
+      post.likes.splice(index, 1);
+    }
+
+    await post.save();
+
+    res.json({ success: true, likes: post.likes });
+  } catch (err) {
+    console.error("Error liking post:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// unlike a post
+app.delete("/api/posts/:postId/like", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const { postId } = req.params;
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const userId = req.user._id.toString();
+    const index = post.likes.findIndex((id) => id.toString() === userId);
+
+    if (index !== -1) {
+      post.likes.splice(index, 1);
+      await post.save();
+    }
+
+    res.json({ success: true, likes: post.likes });
+  } catch (err) {
+    console.error("Error unliking post:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
