@@ -310,7 +310,7 @@ app.get("/api/posts", async (req, res) => {
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate("author", "displayName email");
+      .populate("author", "displayName email profilePicture");
 
     return res.json({
       success: true,
@@ -335,7 +335,7 @@ app.get("/api/users/:userId/posts", async (req, res) => {
 
     const posts = await Post.find({ author: userId })
       .sort({ createdAt: -1 })
-      .populate("author", "displayName email");
+      .populate("author", "displayName email profilePicture");
 
     return res.json({
       success: true,

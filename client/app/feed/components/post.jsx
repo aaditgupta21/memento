@@ -2,7 +2,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./post.module.css";
+import styles from "./Post.module.css";
 import PostHeader from "./postHeader";
 import PostImage from "./postImage";
 import PostActions from "./postActions";

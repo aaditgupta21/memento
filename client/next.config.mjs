@@ -9,6 +9,18 @@ const nextConfig = {
   /* config options here */
   turbopack: { root: __dirname },
   reactCompiler: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+      {
+        protocol: "http",
+        hostname: "**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

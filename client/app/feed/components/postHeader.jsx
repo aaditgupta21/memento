@@ -1,14 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import styles from "./postHeader.module.css";
 
 export default function PostHeader({ author, location, createdAt }) {
+  const profilePicture = author?.profilePicture || author?.avatar || "/default.jpeg";
+
   return (
     <header className={styles.header}>
-      {/* later have a default pfp if none exists */}
-      <img
-        src={author.avatar}
-        alt={author.displayName}
+      <Image
+        src={profilePicture}
+        alt={author?.displayName || "User"}
         width={40}
         height={40}
         className={styles.avatar}
