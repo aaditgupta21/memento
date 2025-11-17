@@ -9,6 +9,7 @@ import PostActions from "./postActions";
 import ToggleCommentsButton from "./toggleCommentButton";
 import CommentsList from "./commentsList";
 import CommentForm from "./commentForm";
+import LikesDialog from "./likesDialog";
 
 export default function Post({ post, user }) {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function Post({ post, user }) {
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState(post.comments || []);
   const [likes, setLikes] = useState(post.likes || []);
+  const [showLikesDialog, setShowLikesDialog] = useState(false);
 
   const likeCount = likes.length;
   const commentCount = comments.length;
@@ -32,40 +34,58 @@ export default function Post({ post, user }) {
   // }, [user, router]);
 
   // automatically determine if current user has liked post
-  const isLiked = likes.includes(currentUserId);
+  const isLiked = likes.some(
+    (like) =>
+      (typeof like === "object" ? like._id?.toString() : like?.toString()) ===
+      currentUserId?.toString()
+  );
 
   async function handleCommentSubmit(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const commentText = formData.get("comment");
     if (!commentText) return;
-    const newComment = {
-      id: `c${comments.length + 1}`,
+
+    if (!post._id) {
+      console.error("No _id on post, cannot comment.");
+      return;
+    }
+
+    // Optimistic update
+    const tempComment = {
+      _id: `temp-${Date.now()}`,
       text: commentText,
-      author: { id: currentUserId, username: currentUsername },
+      author: {
+        _id: currentUserId,
+        displayName: currentUsername,
+      },
+      createdAt: new Date(),
     };
-    setComments((prev) => [...prev, newComment]);
+    setComments((prev) => [...prev, tempComment]);
     e.target.reset();
     setShowComments(true);
 
-    // API call to submit comment
-    // const res = await fetch(`${API_BASE}/api/posts/${post._id}/comments`, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   credentials: "include",
-    //   body: JSON.stringify({ text: commentText }),
-    // });
-    // if (!post._id) {
-    //   console.error("No _id on post, cannot comment.");
-    //   return;
-    // }
+    try {
+      const res = await fetch(`${API_BASE}/api/posts/${post._id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ text: commentText }),
+      });
 
-    // if (!res.ok) {
-    //   console.error("Failed to submit comment");
-    // } else {
-    //   const data = await res.json();
-    //   setComments(data.comments);
-    // }
+      if (!res.ok) {
+        // Revert optimistic update on error
+        setComments((prev) => prev.filter((c) => c._id !== tempComment._id));
+        console.error("Failed to submit comment");
+      } else {
+        const data = await res.json();
+        setComments(data.comments);
+      }
+    } catch (err) {
+      // Revert optimistic update on error
+      setComments((prev) => prev.filter((c) => c._id !== tempComment._id));
+      console.error("Error submitting comment:", err);
+    }
   }
 
   // toggle like/unlike on both frontend (optimistic update for speed) and backend (adjusting frontend if needed, but simple logic so shouldn't fail)
@@ -78,9 +98,14 @@ export default function Post({ post, user }) {
     setLikes((prevLikes) => {
       if (wasLiked) {
         // meaning already liked, so we remove like
-        return prevLikes.filter((like) => like !== currentUserId);
+        return prevLikes.filter(
+          (like) =>
+            (typeof like === "object"
+              ? like._id?.toString()
+              : like?.toString()) !== currentUserId?.toString()
+        );
       } else {
-        // add like to array
+        // add like to array (as ID for now, will be populated on next fetch)
         return [...prevLikes, currentUserId];
       }
     });
@@ -97,11 +122,22 @@ export default function Post({ post, user }) {
             (prev) =>
               wasLiked
                 ? [...prev, currentUserId] // re-add if we removed
-                : prev.filter((id) => id !== currentUserId) // remove if we added
+                : prev.filter(
+                    (like) =>
+                      (typeof like === "object"
+                        ? like._id?.toString()
+                        : like?.toString()) !== currentUserId?.toString()
+                  ) // remove if we added
           );
           throw new Error("Failed to toggle like");
         }
         return res.json();
+      })
+      .then((data) => {
+        // Update likes with populated data from server
+        if (data.likes) {
+          setLikes(data.likes);
+        }
       })
       .catch((err) => console.error("Like error:", err));
   }
@@ -126,6 +162,15 @@ export default function Post({ post, user }) {
         isLiked={isLiked}
         likeCount={likes.length}
         onToggleLike={toggleLike}
+        onLikeCountClick={() => setShowLikesDialog(true)}
+      />
+
+      {/* likes dialog */}
+      <LikesDialog
+        isOpen={showLikesDialog}
+        onClose={() => setShowLikesDialog(false)}
+        likes={likes}
+        postId={post._id}
       />
 
       {/* toggle comments button */}

@@ -310,7 +310,15 @@ app.get("/api/posts", async (req, res) => {
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate("author", "displayName email profilePicture");
+      .populate("author", "displayName email profilePicture")
+      .populate({
+        path: "comments.author",
+        select: "displayName email profilePicture",
+      })
+      .populate({
+        path: "likes",
+        select: "displayName email profilePicture",
+      });
 
     return res.json({
       success: true,
@@ -335,7 +343,15 @@ app.get("/api/users/:userId/posts", async (req, res) => {
 
     const posts = await Post.find({ author: userId })
       .sort({ createdAt: -1 })
-      .populate("author", "displayName email profilePicture");
+      .populate("author", "displayName email profilePicture")
+      .populate({
+        path: "comments.author",
+        select: "displayName email profilePicture",
+      })
+      .populate({
+        path: "likes",
+        select: "displayName email profilePicture",
+      });
 
     return res.json({
       success: true,
@@ -380,8 +396,10 @@ app.post("/api/posts/:postId/like", async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    const userId = req.user._id.toString();
-    const index = post.likes.findIndex((id) => id.toString() === userId);
+    const userId = req.user._id;
+    const index = post.likes.findIndex(
+      (id) => id.toString() === userId.toString()
+    );
 
     if (index === -1) {
       post.likes.push(userId);
@@ -390,6 +408,12 @@ app.post("/api/posts/:postId/like", async (req, res) => {
     }
 
     await post.save();
+
+    // Populate likes with user info
+    await post.populate({
+      path: "likes",
+      select: "displayName email profilePicture",
+    });
 
     res.json({ success: true, likes: post.likes });
   } catch (err) {
@@ -412,13 +436,21 @@ app.delete("/api/posts/:postId/like", async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    const userId = req.user._id.toString();
-    const index = post.likes.findIndex((id) => id.toString() === userId);
+    const userId = req.user._id;
+    const index = post.likes.findIndex(
+      (id) => id.toString() === userId.toString()
+    );
 
     if (index !== -1) {
       post.likes.splice(index, 1);
       await post.save();
     }
+
+    // Populate likes with user info
+    await post.populate({
+      path: "likes",
+      select: "displayName email profilePicture",
+    });
 
     res.json({ success: true, likes: post.likes });
   } catch (err) {
@@ -443,17 +475,21 @@ app.post("/api/posts/:postId/comments", async (req, res) => {
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ error: "Post not found" });
 
+    // Create comment using proper schema structure
     const newComment = {
-      id: `c${Date.now()}`,
       text,
-      author: {
-        id: req.user._id.toString(),
-        username: req.user.displayName || req.user.email || "user",
-      },
+      author: req.user._id,
     };
 
     post.comments.push(newComment);
     await post.save();
+
+    // Populate author info for all comments
+    await post.populate({
+      path: "comments.author",
+      select: "displayName email profilePicture",
+    });
+
     return res.status(201).json({ success: true, comments: post.comments });
   } catch (err) {
     console.error("Error adding comment:", err);

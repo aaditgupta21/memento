@@ -26,4 +26,14 @@
   font-size: 0.9rem;
   color: #a49a87;
   font-weight: 600;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.likeCount:hover {
+  color: #da8d72;
+  text-decoration: underline;
 }
