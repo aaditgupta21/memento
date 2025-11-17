@@ -2,7 +2,13 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./Post.module.css";
+import styles from "./post.module.css";
+import PostHeader from "./postHeader";
+import PostImage from "./postImage";
+import PostActions from "./postActions";
+import ToggleCommentsButton from "./toggleCommentButton";
+import CommentsList from "./commentsList";
+import CommentForm from "./commentForm";
 
 export default function Post({ post, user }) {
   const router = useRouter();
@@ -19,11 +25,11 @@ export default function Post({ post, user }) {
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
 
   // Redirect if no user
-  useEffect(() => {
-    if (!user) {
-      router.push("/"); // send to home page
-    }
-  }, [user, router]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     router.push("/"); // send to home page
+  //   }
+  // }, [user, router]);
 
   // automatically determine if current user has liked post
   const isLiked = likes.includes(currentUserId);
@@ -102,86 +108,40 @@ export default function Post({ post, user }) {
 
   return (
     <article className={styles.post}>
-      <header className={styles.header}>
-        <img
-          src={post.author.avatar}
-          alt={post.author.displayName}
-          width={40}
-          height={40}
-          className={styles.avatar}
-        />
-        <div>
-          <a className={styles.username} href={`/profile/${post.author._id}`}>
-            {post.author.displayName}
-          </a>
-          {post.location && <p className={styles.postInfo}>{post.location}</p>}
-          <p className={styles.postInfo}>
-            {new Date(post.createdAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
-        </div>
-      </header>
-
-      <img
-        src={post.images[0].url}
-        alt={post.caption}
-        className={styles.postImage}
+      {/* post header with author info */}
+      <PostHeader
+        author={post.author}
+        location={post.location}
+        createdAt={post.createdAt}
       />
 
-      {post.caption && <h2 className={styles.caption}>{post.caption}</h2>}
+      {/* post image(s) */}
+      <PostImage
+        imageUrls={post.images.map((image) => image.url)}
+        caption={post.caption}
+      />
 
       {/* like and comment count */}
-      <div className={styles.actions}>
-        <button onClick={toggleLike} className={styles.likeBtn}>
-          {isLiked ? "Unlike" : "Like"}
-        </button>
-        <span className={styles.likeCount}>
-          <strong>{likeCount}</strong> {likeCount === 1 ? "like" : "likes"}
-        </span>
-      </div>
+      <PostActions
+        isLiked={isLiked}
+        likeCount={likes.length}
+        onToggleLike={toggleLike}
+      />
 
+      {/* toggle comments button */}
       {commentCount > 0 && (
-        <button
+        <ToggleCommentsButton
+          show={showComments}
+          count={commentCount}
           onClick={() => setShowComments(!showComments)}
-          className={styles.viewCommentsBtn}
-        >
-          {showComments
-            ? "Hide comments"
-            : `View ${commentCount} ${
-                commentCount === 1 ? "comment" : "comments"
-              }`}
-        </button>
+        />
       )}
 
       {/* show comments if toggled */}
-      {showComments && (
-        <div className={styles.comments}>
-          {comments.map((comment) => (
-            <div key={comment.id} className={styles.comment}>
-              <span className={styles.commentAuthor}>
-                {comment.author.username}
-              </span>
-              : {comment.text}
-            </div>
-          ))}
-        </div>
-      )}
+      {showComments && <CommentsList comments={comments} />}
 
       {/* add comments */}
-      <form onSubmit={handleCommentSubmit} className={styles.addCommentForm}>
-        <input
-          type="text"
-          name="comment"
-          placeholder="Add a comment..."
-          className={styles.commentInput}
-        />
-        <button type="submit" className={styles.postBtn}>
-          Post
-        </button>
-      </form>
+      <CommentForm onSubmit={handleCommentSubmit} />
     </article>
   );
 }

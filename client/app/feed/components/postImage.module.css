@@ -1,0 +1,13 @@
+.postImage {
+  width: 100%;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  object-fit: cover;
+}
+
+.caption {
+  font-size: 0.95rem;
+  color: #938976;
+  margin-bottom: 0.75rem;
+  line-height: 1;
+}
