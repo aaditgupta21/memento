@@ -11,8 +11,7 @@ export default function Post({ post, user }) {
 
   const likeCount = likes.length;
   const commentCount = comments.length;
-  // no universal state yet, temp state as fallback
-  const currentUserId = user?._id ?? null;
+  const currentUserId = user?.id ?? null;
   const currentUsername = user?.displayName ?? null;
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
@@ -35,11 +34,30 @@ export default function Post({ post, user }) {
     setShowComments(true);
 
     // API call to submit comment
+    // const res = await fetch(`${API_BASE}/api/posts/${post._id}/comments`, {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   credentials: "include",
+    //   body: JSON.stringify({ text: commentText }),
+    // });
+    // if (!post._id) {
+    //   console.error("No _id on post, cannot comment.");
+    //   return;
+    // }
+
+    // if (!res.ok) {
+    //   console.error("Failed to submit comment");
+    // } else {
+    //   const data = await res.json();
+    //   setComments(data.comments);
+    // }
   }
 
   // toggle like/unlike on both frontend (optimistic update for speed) and backend (adjusting frontend if needed, but simple logic so shouldn't fail)
   function toggleLike() {
-    if (!currentUserId) return; // Prevent liking if no user ID
+    if (!currentUserId) {
+      return; // Prevent liking if no user ID
+    }
     const wasLiked = isLiked; // capture current state before updating
 
     setLikes((prevLikes) => {

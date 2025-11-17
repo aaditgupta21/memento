@@ -426,6 +426,40 @@ app.delete("/api/posts/:postId/like", async (req, res) => {
   }
 });
 
+// add comment to a post
+app.post("/api/posts/:postId/comments", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
+
+  const { postId } = req.params;
+  if (!mongoose.isValidObjectId(postId)) {
+    return res.status(400).json({ error: "Invalid post ID" });
+  }
+
+  const text = (req.body.text || "").trim();
+  if (!text) return res.status(400).json({ error: "Comment text required" });
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    const newComment = {
+      id: `c${Date.now()}`,
+      text,
+      author: {
+        id: req.user._id.toString(),
+        username: req.user.displayName || req.user.email || "user",
+      },
+    };
+
+    post.comments.push(newComment);
+    await post.save();
+    return res.status(201).json({ success: true, comments: post.comments });
+  } catch (err) {
+    console.error("Error adding comment:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
