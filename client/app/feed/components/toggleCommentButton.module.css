@@ -1,0 +1,16 @@
+.viewCommentsBtn {
+  /* background-color: rgba(217, 213, 213, 0.594); */
+  color: #928a7b;
+  border: none;
+  border-radius: 1.5rem;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.viewCommentsBtn:hover {
+  transform: scale(1.05);
+}

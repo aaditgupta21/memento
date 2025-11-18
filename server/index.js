@@ -310,7 +310,15 @@ app.get("/api/posts", async (req, res) => {
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate("author", "displayName email");
+      .populate("author", "displayName email profilePicture")
+      .populate({
+        path: "comments.author",
+        select: "displayName email profilePicture",
+      })
+      .populate({
+        path: "likes",
+        select: "displayName email profilePicture",
+      });
 
     return res.json({
       success: true,
@@ -325,6 +333,7 @@ app.get("/api/posts", async (req, res) => {
 
 // Get all posts for a specific user
 app.get("/api/users/:userId/posts", async (req, res) => {
+  console.log("Received request for user posts:", req.params.userId);
   const { userId } = req.params;
 
   try {
@@ -334,7 +343,15 @@ app.get("/api/users/:userId/posts", async (req, res) => {
 
     const posts = await Post.find({ author: userId })
       .sort({ createdAt: -1 })
-      .populate("author", "displayName email");
+      .populate("author", "displayName email profilePicture")
+      .populate({
+        path: "comments.author",
+        select: "displayName email profilePicture",
+      })
+      .populate({
+        path: "likes",
+        select: "displayName email profilePicture",
+      });
 
     return res.json({
       success: true,
@@ -361,6 +378,149 @@ app.get("/api/users/usernames", async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching usernames:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// like a post
+app.post("/api/posts/:postId/like", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const { postId } = req.params;
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const userId = req.user._id;
+    const index = post.likes.findIndex(
+      (id) => id.toString() === userId.toString()
+    );
+
+    if (index === -1) {
+      post.likes.push(userId);
+    } else {
+      post.likes.splice(index, 1);
+    }
+
+    await post.save();
+
+    // Populate likes with user info
+    await post.populate({
+      path: "likes",
+      select: "displayName email profilePicture",
+    });
+
+    res.json({ success: true, likes: post.likes });
+  } catch (err) {
+    console.error("Error liking post:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// unlike a post
+app.delete("/api/posts/:postId/like", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const { postId } = req.params;
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const userId = req.user._id;
+    const index = post.likes.findIndex(
+      (id) => id.toString() === userId.toString()
+    );
+
+    if (index !== -1) {
+      post.likes.splice(index, 1);
+      await post.save();
+    }
+
+    // Populate likes with user info
+    await post.populate({
+      path: "likes",
+      select: "displayName email profilePicture",
+    });
+
+    res.json({ success: true, likes: post.likes });
+  } catch (err) {
+    console.error("Error unliking post:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// add comment to a post
+app.post("/api/posts/:postId/comments", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
+
+  const { postId } = req.params;
+  if (!mongoose.isValidObjectId(postId)) {
+    return res.status(400).json({ error: "Invalid post ID" });
+  }
+
+  const text = (req.body.text || "").trim();
+  if (!text) return res.status(400).json({ error: "Comment text required" });
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    // Create comment using proper schema structure
+    const newComment = {
+      text,
+      author: req.user._id,
+    };
+
+    post.comments.push(newComment);
+    await post.save();
+
+    // Populate author info for all comments
+    await post.populate({
+      path: "comments.author",
+      select: "displayName email profilePicture",
+    });
+
+    return res.status(201).json({ success: true, comments: post.comments });
+  } catch (err) {
+    console.error("Error adding comment:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// get user object from userID
+app.get("/api/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    // Return all fields EXCEPT password
+    const user = await User.findById(userId).select(
+      "displayName profilePicture"
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    console.error("Error fetching user:", err);
     return res.status(500).json({ error: "Server error" });
   }
 });
