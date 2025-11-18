@@ -53,6 +53,17 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Reserved usernames that conflict with routes
+const RESERVED_USERNAMES = [
+  "feed",
+  "upload",
+  "wrapped",
+  "account",
+  "login",
+  "set-username",
+  "signup",
+];
+
 // Auth routes - Email/Password
 app.post("/auth/signup", async (req, res) => {
   try {
@@ -60,6 +71,11 @@ app.post("/auth/signup", async (req, res) => {
 
     if (!email || !password || !displayName) {
       return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // Check if username is reserved
+    if (RESERVED_USERNAMES.includes(displayName.toLowerCase())) {
+      return res.status(400).json({ error: "This username is reserved" });
     }
 
     // Check if email already exists
@@ -210,6 +226,11 @@ app.post("/api/update-username", async (req, res) => {
 
     if (!displayName || displayName.trim() === "") {
       return res.status(400).json({ error: "Username is required" });
+    }
+
+    // Check if username is reserved
+    if (RESERVED_USERNAMES.includes(displayName.toLowerCase())) {
+      return res.status(400).json({ error: "This username is reserved" });
     }
 
     // Check if username is already taken
