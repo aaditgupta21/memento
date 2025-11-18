@@ -1,5 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import styles from "./gallery.module.css";
 import Post from "@/app/feed/components/post";
 import { useEffect, useState } from "react";
@@ -85,7 +86,12 @@ export default function UserProfilePage() {
     <main className={styles.page}>
       <h1>{profileUser?.displayName}'s Profile</h1>
       {profileUser?.profilePicture && (
-        <img src={profileUser.profilePicture} alt={profileUser.displayName} />
+        <Image
+          src={profileUser.profilePicture}
+          alt={profileUser.displayName}
+          width={100}
+          height={100}
+        />
       )}
       <h2>Posts</h2>
       {posts.length === 0 ? (
