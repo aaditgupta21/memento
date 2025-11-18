@@ -1,12 +1,12 @@
 "use client";
 import { useParams } from "next/navigation";
-import styles from "./profile.module.css";
+import styles from "./gallery.module.css";
 import Post from "@/app/feed/components/post";
 import { useEffect, useState } from "react";
 import { useUser } from "@/context/UserContext";
 
 export default function UserProfilePage() {
-  const { userID } = useParams();
+  const { username } = useParams();
   const { user } = useUser();
   const [posts, setPosts] = useState([]);
   const [profileUser, setProfileUser] = useState(null);
@@ -18,20 +18,36 @@ export default function UserProfilePage() {
 
     async function fetchData() {
       try {
-        // Fetch user and posts in parallel
-        const [userRes, postsRes] = await Promise.all([
-          fetch(`${API_BASE}/api/users/${userID}`, { credentials: "include" }),
-          fetch(`${API_BASE}/api/users/${userID}/posts`, {
+        // Fetch user first to check if it exists
+        const userRes = await fetch(`${API_BASE}/api/users/username/${username}`, {
+          credentials: "include",
+        });
+
+        if (!userRes.ok) {
+          if (userRes.status === 404) {
+            if (mounted) {
+              setProfileUser(null);
+              setPosts([]);
+              setLoading(false);
+            }
+            return;
+          }
+          throw new Error("Fetch failed");
+        }
+
+        const userData = await userRes.json();
+
+        // If user exists, fetch their posts
+        const postsRes = await fetch(
+          `${API_BASE}/api/users/username/${username}/posts`,
+          {
             credentials: "include",
-          }),
-        ]);
+          }
+        );
 
-        if (!userRes.ok || !postsRes.ok) throw new Error("Fetch failed");
+        if (!postsRes.ok) throw new Error("Failed to fetch posts");
 
-        const [userData, postsData] = await Promise.all([
-          userRes.json(),
-          postsRes.json(),
-        ]);
+        const postsData = await postsRes.json();
 
         if (mounted) {
           setProfileUser(userData.user);
@@ -39,6 +55,10 @@ export default function UserProfilePage() {
         }
       } catch (error) {
         console.error(error);
+        if (mounted) {
+          setProfileUser(null);
+          setPosts([]);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
@@ -48,9 +68,18 @@ export default function UserProfilePage() {
     return () => {
       mounted = false;
     };
-  }, [userID]);
+  }, [username]);
 
   if (loading) return <main className={styles.page}>Loading...</main>;
+
+  if (!profileUser) {
+    return (
+      <main className={styles.page}>
+        <h1>404 - User Not Found</h1>
+        <p>The user "{username}" does not exist.</p>
+      </main>
+    );
+  }
 
   return (
     <main className={styles.page}>
@@ -67,3 +96,4 @@ export default function UserProfilePage() {
     </main>
   );
 }
+

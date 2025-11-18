@@ -18,7 +18,7 @@ export default function Navbar() {
         <Link href="/feed" className={styles.navLink}>
           Feed
         </Link>
-        <Link href={`/profile/${user.id}`} className={styles.navLink}>
+        <Link href={`/${user.displayName}`} className={styles.navLink}>
           My Gallery
         </Link>
         <Link href="/upload" className={styles.navLink}>

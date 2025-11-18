@@ -525,6 +525,63 @@ app.get("/api/users/:userId", async (req, res) => {
   }
 });
 
+// get user object from username (displayName)
+app.get("/api/users/username/:username", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const user = await User.findOne({ displayName: username }).select(
+      "displayName profilePicture _id"
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    console.error("Error fetching user by username:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// get posts by username (displayName)
+app.get("/api/users/username/:username/posts", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    // First find the user by username
+    const user = await User.findOne({ displayName: username });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const posts = await Post.find({ author: user._id })
+      .sort({ createdAt: -1 })
+      .populate("author", "displayName email profilePicture")
+      .populate({
+        path: "comments.author",
+        select: "displayName email profilePicture",
+      })
+      .populate({
+        path: "likes",
+        select: "displayName email profilePicture",
+      });
+
+    return res.json({
+      success: true,
+      count: posts.length,
+      posts,
+    });
+  } catch (err) {
+    console.error("Error fetching user posts by username:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
