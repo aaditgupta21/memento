@@ -7,11 +7,16 @@ export default function PostActions({
   likeCount,
   onToggleLike,
   onLikeCountClick,
+  isLiking = false,
 }) {
   return (
     <div className={styles.actions}>
-      <button onClick={onToggleLike} className={styles.likeBtn}>
-        {isLiked ? "Unlike" : "Like"}
+      <button
+        onClick={onToggleLike}
+        className={styles.likeBtn}
+        disabled={isLiking}
+      >
+        {isLiking ? "..." : isLiked ? "Unlike" : "Like"}
       </button>
 
       {likeCount > 0 ? (

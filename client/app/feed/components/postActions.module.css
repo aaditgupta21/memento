@@ -18,8 +18,13 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.likeBtn:hover {
+.likeBtn:hover:not(:disabled) {
   transform: scale(1.05);
+}
+
+.likeBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .likeCount {

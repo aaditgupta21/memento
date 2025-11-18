@@ -18,6 +18,7 @@ export default function Post({ post, user }) {
   const [comments, setComments] = useState(post.comments || []);
   const [likes, setLikes] = useState(post.likes || []);
   const [showLikesDialog, setShowLikesDialog] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
 
   const likeCount = likes.length;
   const commentCount = comments.length;
@@ -90,9 +91,11 @@ export default function Post({ post, user }) {
 
   // toggle like/unlike on both frontend (optimistic update for speed) and backend (adjusting frontend if needed, but simple logic so shouldn't fail)
   function toggleLike() {
-    if (!currentUserId) {
-      return; // Prevent liking if no user ID
+    if (!currentUserId || isLiking) {
+      return; // Prevent liking if no user ID or already processing
     }
+
+    setIsLiking(true);
     const wasLiked = isLiked; // capture current state before updating
 
     setLikes((prevLikes) => {
@@ -109,7 +112,6 @@ export default function Post({ post, user }) {
         return [...prevLikes, currentUserId];
       }
     });
-    console.log(likes);
 
     fetch(`${API_BASE}/api/posts/${post._id}/like`, {
       method: wasLiked ? "DELETE" : "POST",
@@ -139,7 +141,10 @@ export default function Post({ post, user }) {
           setLikes(data.likes);
         }
       })
-      .catch((err) => console.error("Like error:", err));
+      .catch((err) => console.error("Like error:", err))
+      .finally(() => {
+        setIsLiking(false);
+      });
   }
 
   return (
@@ -163,6 +168,7 @@ export default function Post({ post, user }) {
         likeCount={likes.length}
         onToggleLike={toggleLike}
         onLikeCountClick={() => setShowLikesDialog(true)}
+        isLiking={isLiking}
       />
 
       {/* likes dialog */}
