@@ -1,6 +1,6 @@
 "use client";
 
-import { UploadButton } from "@/utils/uploadthing";
+import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
 import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
@@ -95,8 +95,9 @@ export default function Upload() {
       <h1>Upload a Photo</h1>
 
       <div className={styles.uploadForm}>
-        <UploadButton
+        <UploadDropzone
           endpoint="imageUploader"
+          className={styles.dropzone}
           onClientUploadComplete={(res) => {
             console.log("Upload complete! Files:", res);
             if (res && res.length > 0) {
