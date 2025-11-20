@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./postHeader.module.css";
 
 export default function PostHeader({ author, location, createdAt }) {
@@ -8,13 +9,15 @@ export default function PostHeader({ author, location, createdAt }) {
 
   return (
     <header className={styles.header}>
-      <Image
-        src={profilePicture}
-        alt={author?.displayName || "User"}
-        width={40}
-        height={40}
-        className={styles.avatar}
-      />
+      <Link href={`/${author?.displayName}`} className={styles.avatarLink}>
+        <Image
+          src={profilePicture}
+          alt={author?.displayName || "User"}
+          width={40}
+          height={40}
+          className={styles.avatar}
+        />
+      </Link>
       <div>
         <a className={styles.username} href={`/${author.displayName}`}>
           {author.displayName}

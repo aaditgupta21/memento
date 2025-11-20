@@ -5,6 +5,8 @@ import styles from "./gallery.module.css";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useUser } from "@/context/UserContext";
 import PostModal from "./components/PostModal";
+import ProfileHeader from "./components/ProfileHeader";
+import GallerySection from "./components/GallerySection";
 
 export default function UserProfilePage() {
   const { username } = useParams();
@@ -13,6 +15,7 @@ export default function UserProfilePage() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [profileUser, setProfileUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // local host for now
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
 
   useEffect(() => {
@@ -88,63 +91,15 @@ export default function UserProfilePage() {
 
   return (
     <main className={styles.page}>
-      {/* Profile Header */}
-      <section className={styles.profileHeader}>
-        <div className={styles.avatarContainer}>
-          <Image
-            src={profileUser.profilePicture || "/default.jpeg"}
-            alt={profileUser.displayName}
-            width={140}
-            height={140}
-            className={styles.avatar}
-            priority
-          />
-        </div>
-        <div className={styles.profileInfo}>
-          <h1 className={styles.displayName}>
-            {profileUser?.displayName}'s Memories
-          </h1>
-          <div className={styles.stats}>
-            <div className={styles.statItem}>
-              <span className={styles.statNumber}>{posts.length}</span>
-              <span className={styles.statLabel}>
-                {posts.length === 1 ? "Memory" : "Memories"}
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className={styles.gallerySection}>
-        <div className={styles.gridContainer}>
-          {posts.length === 0 ? (
-            <p>No posts yet.</p>
-          ) : (
-            posts.map((post) => {
-              const firstImg = post.images[0];
-              return (
-                <div
-                  key={post._id}
-                  className={styles.thumb}
-                  onClick={() => setSelectedPost(post)}
-                  style={{ cursor: "pointer" }}
-                >
-                  {firstImg ? (
-                    <img
-                      src={firstImg.url}
-                      alt={post.caption || "Post image"}
-                      className={styles.thumbImg}
-                    />
-                  ) : (
-                    <div className={styles.thumbPlaceholder}>No Image</div>
-                  )}
-                </div>
-              );
-            })
-          )}
-        </div>
-      </section>
+      {/* Profile Header with user information */}
+      <ProfileHeader profileUser={profileUser} postsCount={posts.length} />
 
-      {/* Modal overlay for selected post */}
+      {/* Actual mapping of the gallery */}
+      <GallerySection
+        posts={posts}
+        onPostClick={(post) => setSelectedPost(post)}
+      />
+      {/* Modal overlay for selected post, only renders if selectPost exists */}
       <PostModal
         selectedPost={selectedPost}
         user={user}

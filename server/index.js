@@ -210,6 +210,8 @@ app.get("/api/me", (req, res) => {
         id: req.user._id,
         email: req.user.email,
         displayName: req.user.displayName,
+        googleId: req.user.googleId || null,
+        profilePicture: req.user.profilePicture || null,
       },
     });
   } else {
@@ -259,6 +261,58 @@ app.post("/api/update-username", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Update password endpoint
+app.post("/api/update-password", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  // Don't allow password changes for Google OAuth users
+  if (req.user.googleId) {
+    return res.status(400).json({
+      error: "Password changes are not available for Google accounts",
+    });
+  }
+
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ error: "Current password and new password are required" });
+    }
+
+    // Verify current password
+    const isMatch = await req.user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    // Validate new password strength
+    // const strongPassword =
+    //   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    // if (!strongPassword.test(newPassword)) {
+    //   return res.status(400).json({
+    //     error:
+    //       "Password must be 8+ characters and include a letter, number, and special character (!@#$%^&*)",
+    //   });
+    // }
+
+    // Update password (the pre-save hook will hash it)
+    req.user.password = newPassword;
+    await req.user.save();
+
+    res.json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (err) {
+    console.error("Error updating password:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
