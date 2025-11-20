@@ -58,7 +58,6 @@ export default function UserProfilePage() {
         if (mounted) {
           setProfileUser(userData.user);
           setPosts(postsData.posts || []);
-          console.log(postsData.posts);
         }
       } catch (error) {
         console.error(error);
@@ -93,20 +92,14 @@ export default function UserProfilePage() {
       {/* Profile Header */}
       <section className={styles.profileHeader}>
         <div className={styles.avatarContainer}>
-          {profileUser?.profilePicture ? (
-            <Image
-              src={profileUser.profilePicture}
-              alt={profileUser.displayName}
-              width={140}
-              height={140}
-              className={styles.avatar}
-              priority
-            />
-          ) : (
-            <div className={styles.avatarPlaceholder}>
-              {profileUser?.displayName?.charAt(0).toUpperCase()}
-            </div>
-          )}
+          <Image
+            src={profileUser.profilePicture || "/default.jpeg"}
+            alt={profileUser.displayName}
+            width={140}
+            height={140}
+            className={styles.avatar}
+            priority
+          />
         </div>
         <div className={styles.profileInfo}>
           <h1 className={styles.displayName}>
@@ -122,9 +115,7 @@ export default function UserProfilePage() {
           </div>
         </div>
       </section>
-
       <section className={styles.gallerySection}>
-        <h2 className={styles.sectionTitle}>Gallery</h2>
         <div className={styles.gridContainer}>
           {posts.length === 0 ? (
             <p>No posts yet.</p>

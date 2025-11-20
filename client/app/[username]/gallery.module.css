@@ -83,15 +83,6 @@
   margin: 0 auto;
 }
 
-.sectionTitle {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #2c2420;
-  margin: 0 0 1.5rem;
-  font-family: Georgia, serif;
-  letter-spacing: -0.3px;
-}
-
 .gridContainer {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* 3 per row */
