@@ -74,10 +74,11 @@ export default function Account() {
                     throw new Error("Please enter your current password.");
                 }
 
-                const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-                if (!strongPassword.test(newPassword)) {
-                    throw new Error("Password must be 8+ characters and include a letter, number, and special character (!@#$%^&*)");
-                }
+                // Strong password validation disabled for now
+                // const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+                // if (!strongPassword.test(newPassword)) {
+                //     throw new Error("Password must be 8+ characters and include a letter, number, and special character (!@#$%^&*)");
+                // }
 
                 if (newPassword !== confirmPassword) {
                     throw new Error("New passwords do not match.");
@@ -112,7 +113,7 @@ export default function Account() {
 
             if (!isGoogleUser && newPassword) {
                 // send the requested password change to the backend
-                const pwUpdate = await fetch("http://localhost:4000/account/updatePassword", {
+                const pwUpdate = await fetch("http://localhost:4000/api/update-password", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
@@ -127,6 +128,11 @@ export default function Account() {
                     throw new Error(pwUpdateData.error || "Failed to update password.");
                 }
                 passwordChanged = true;
+
+                // Clear password fields after successful update
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
             }
 
             // Provide specific feedback based on what was updated
@@ -249,7 +255,7 @@ export default function Account() {
                             <div className={s.passwordSection}>
                                 <h3 className={s.sectionTitle}>Change Password</h3>
                                 <p className={s.passwordHint}>
-                                    Must be 8+ characters and include a letter, number, and special character (!@#$%^&*)
+                                    Enter your current password and choose a new password.
                                 </p>
                                 <div className={s.passwordFields}>
                                     <div className={s.formGroup}>
