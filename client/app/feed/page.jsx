@@ -5,6 +5,7 @@ import { mockPosts } from "./mockPosts";
 import Post from "./components/post";
 import styles from "./Feed.module.css";
 import { useUser } from "@/context/UserContext";
+import { UseEmblaCarouselType } from "embla-carousel-react";
 
 export default function Feed() {
   const { user } = useUser();
