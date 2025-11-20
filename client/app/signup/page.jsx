@@ -9,6 +9,8 @@ export default function SignupPage() {
   // use states for user signing up to track relevant info
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -70,19 +72,33 @@ export default function SignupPage() {
             </div>
           )}
           {success && (
-            <div className="success-message" style={{ color: "green", fontWeight: "500" }}>
+            <div
+              className="success-message"
+              style={{ color: "green", fontWeight: "500" }}
+            >
               {success}
             </div>
           )}
           <div>
-            <label htmlFor="username">Username</label>
+            <label htmlFor="firstName">First Name</label>
             <input
-              id="username"
-              name="username"
+              id="firstName"
+              name="firstName"
               type="text"
               required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="lastName">Last Name</label>
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
             />
           </div>
 
@@ -95,6 +111,18 @@ export default function SignupPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
 
