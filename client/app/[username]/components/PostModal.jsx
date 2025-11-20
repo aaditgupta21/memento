@@ -6,7 +6,9 @@ export default function PostModal({ selectedPost, user, onClose }) {
   if (!selectedPost) return null;
 
   return (
+    // close post if user clicks outside the box
     <div className={styles.modalOverlay} onClick={onClose}>
+      {/* stopPropagation allows user to click inside post without it closing */}
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <button
           className={styles.modalClose}
