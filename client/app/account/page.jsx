@@ -1,16 +1,20 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from 'react'
+import Image from "next/image";
+import React, { useState, useEffect } from 'react'
 import { CameraIcon, UserIcon, SaveIcon } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 import s from "./Account.module.css";
 
 export default function Account() {
-    const [profileImage, setProfileImage] = useState('https://static.clubs.nfl.com/image/upload/t_editorial_landscape_12_desktop/bills/f8kygnccjsnptgeqpqi9');
-    const [email, setEmail] = useState('joshallen@gmail.com');
+    const { user, loading: userLoading } = useUser();
+    const [profileImage, setProfileImage] = useState('');
+    const [email, setEmail] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [username, setUsername] = useState('joshallengoat');
+    const [username, setUsername] = useState('');
+    const [isGoogleUser, setIsGoogleUser] = useState(false);
 
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -31,21 +35,15 @@ export default function Account() {
     }
 
 
-    // UNCOMMENT WHEN API IS MADE
-    // useEffect(() => {
-    //     const getUser = async () => {
-    //       const response = await fetch("http://localhost:4000/auth/me", {
-    //         credentials: "include"
-    //       });
-
-    //       const data = await response.json();
-    //       setEmail(data.email);
-    //       setUsername(data.username);
-    //       setProfileImage(data.profileImage);
-    //     };
-
-    //     getUser();
-    //   }, []);
+    // Initialize form fields from UserContext
+    useEffect(() => {
+        if (user) {
+            setEmail(user.email || '');
+            setUsername(user.displayName || '');
+            setProfileImage(user.profilePicture || '');
+            setIsGoogleUser(!!user.googleId);
+        }
+    }, [user]);
 
 
     // for now handle submission by reloading component only and delivering success message
@@ -56,13 +54,6 @@ export default function Account() {
         setLoading(true);
 
         try {
-            // check for correct email format
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                throw new Error("Please enter valid email address");
-            }
-
-
             // check that username is at least 1 character long, all lowercase letters
             const usernameRegex = /^[a-z0-9_.]+$/;
 
@@ -74,10 +65,10 @@ export default function Account() {
                 throw new Error("Username can only contain lowercase letters, numbers, underscores, and periods");
             }
 
-            
 
-            // check that passwords entered were valid
-            if (currentPassword || newPassword || confirmPassword) {
+
+            // check that passwords entered were valid (only for non-Google users)
+            if (!isGoogleUser && (currentPassword || newPassword || confirmPassword)) {
 
                 if (!currentPassword) {
                     throw new Error("Please enter your current password.");
@@ -94,13 +85,13 @@ export default function Account() {
 
             }
 
-            // send the profile updates to the backend
+            // send the profile updates to the backend (email is not included since it can't be changed)
             const profileUpdate = await fetch("http://localhost:4000/account/updateProfile", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
                 body: JSON.stringify({
-                    email, username, profileImage
+                    username, profileImage
                 })
             });
 
@@ -111,7 +102,7 @@ export default function Account() {
             }
 
 
-            if (newPassword) {
+            if (!isGoogleUser && newPassword) {
                 // send the requested password change to the backend
                 const pwUpdate = await fetch("http://localhost:4000/account/updatePassword", {
                     method: "POST",
@@ -140,6 +131,19 @@ export default function Account() {
 
     }
 
+    if (userLoading) {
+        return (
+            <div className={s.container}>
+                <div className={s.content}>
+                    <h1 className={s.title}>Account Settings</h1>
+                    <div className={s.card}>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={s.container}>
             <div className={s.content}>
@@ -149,7 +153,13 @@ export default function Account() {
                         <div className={s.profileImageWrapper}>
                             <div className={s.profileImage}>
                                 {profileImage ? (
-                                    <img src={profileImage} alt="Profile" />
+                                    <Image
+                                        src={profileImage}
+                                        alt="Profile"
+                                        width={128}
+                                        height={128}
+                                        className={s.profileImageImg}
+                                    />
                                 ) : (
                                     <div className={s.profileImagePlaceholder}>
                                         <UserIcon size={48} />
@@ -171,12 +181,12 @@ export default function Account() {
 
                     <form onSubmit={handleSave} className={s.form}>
                         <div className={s.formGroup}>
-                            <h3 className={s.sectionTitle}>Change Email</h3>
+                            <h3 className={s.sectionTitle}>Email Address</h3>
                             <label className={s.label}>Email Address</label>
                             <input
                                 type="email"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                disabled
                                 className={s.input}
                                 placeholder="youremail@gmail.com"
                             />
@@ -193,41 +203,50 @@ export default function Account() {
                                 placeholder="Your username"
                             />
                         </div>
-                        <div className={s.passwordSection}>
-                            <h3 className={s.sectionTitle}>Change Password</h3>
-                            <p className={s.passwordHint}>
-                                Must be 8+ characters and include a letter, number, and special character (!@#$%^&*)
-                            </p>
-                            <div className={s.passwordFields}>
-                                <div className={s.formGroup}>
-                                    <label className={s.label}>Current Password</label>
-                                    <input
-                                        type="password"
-                                        onChange={(e) => setCurrentPassword(e.target.value)}
-                                        className={s.input}
-                                        placeholder="Enter current password"
-                                    />
-                                </div>
-                                <div className={s.formGroup}>
-                                    <label className={s.label}>New Password</label>
-                                    <input
-                                        type="password"
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                        className={s.input}
-                                        placeholder="Enter new password"
-                                    />
-                                </div>
-                                <div className={s.formGroup}>
-                                    <label className={s.label}>Confirm New Password</label>
-                                    <input
-                                        type="password"
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className={s.input}
-                                        placeholder="Confirm new password"
-                                    />
+                        {isGoogleUser ? (
+                            <div className={s.passwordSection}>
+                                <h3 className={s.sectionTitle}>Account Type</h3>
+                                <p className={s.passwordHint}>
+                                    You are signed in with a Google account. Password changes are not available for Google accounts.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className={s.passwordSection}>
+                                <h3 className={s.sectionTitle}>Change Password</h3>
+                                <p className={s.passwordHint}>
+                                    Must be 8+ characters and include a letter, number, and special character (!@#$%^&*)
+                                </p>
+                                <div className={s.passwordFields}>
+                                    <div className={s.formGroup}>
+                                        <label className={s.label}>Current Password</label>
+                                        <input
+                                            type="password"
+                                            onChange={(e) => setCurrentPassword(e.target.value)}
+                                            className={s.input}
+                                            placeholder="Enter current password"
+                                        />
+                                    </div>
+                                    <div className={s.formGroup}>
+                                        <label className={s.label}>New Password</label>
+                                        <input
+                                            type="password"
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className={s.input}
+                                            placeholder="Enter new password"
+                                        />
+                                    </div>
+                                    <div className={s.formGroup}>
+                                        <label className={s.label}>Confirm New Password</label>
+                                        <input
+                                            type="password"
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            className={s.input}
+                                            placeholder="Confirm new password"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
                         <button type="submit" className={s.saveButton}>
                             <SaveIcon size={20} />
                             Save Changes

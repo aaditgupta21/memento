@@ -208,6 +208,8 @@ app.get("/api/me", (req, res) => {
         id: req.user._id,
         email: req.user.email,
         displayName: req.user.displayName,
+        googleId: req.user.googleId || null,
+        profilePicture: req.user.profilePicture || null,
       },
     });
   } else {
