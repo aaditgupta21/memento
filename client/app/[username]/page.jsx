@@ -4,8 +4,7 @@ import Image from "next/image";
 import styles from "./gallery.module.css";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { useUser } from "@/context/UserContext";
-const Post = lazy(() => import("@/app/feed/components/post"));
-// import Post from "@/app/feed/components/post";
+import PostModal from "./components/PostModal";
 
 export default function UserProfilePage() {
   const { username } = useParams();
@@ -144,26 +143,13 @@ export default function UserProfilePage() {
           )}
         </div>
       </section>
+
       {/* Modal overlay for selected post */}
-      {selectedPost && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setSelectedPost(null)}
-        >
-          <div
-            className={styles.modalContent}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className={styles.modalClose}
-              onClick={() => setSelectedPost(null)}
-            >
-              ×
-            </button>
-            <Post post={selectedPost} user={user} />
-          </div>
-        </div>
-      )}
+      <PostModal
+        selectedPost={selectedPost}
+        user={user}
+        onClose={() => setSelectedPost(null)}
+      />
     </main>
   );
 }
