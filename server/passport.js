@@ -25,6 +25,8 @@ passport.use(
             googleId: profile.id,
             displayName: profile.emails[0].value,
             email: profile.emails[0].value,
+            firstName: profile.name?.givenName || "",
+            lastName: profile.name?.familyName || "",
             disabled: false,
             profilePicture: profile.photos[0].value,
           };

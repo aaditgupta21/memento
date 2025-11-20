@@ -37,6 +37,8 @@ export default function SignupPage() {
           email,
           password,
           displayName: username,
+          firstName,
+          lastName,
         }),
       });
 

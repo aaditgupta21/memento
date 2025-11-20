@@ -67,7 +67,7 @@ const RESERVED_USERNAMES = [
 // Auth routes - Email/Password
 app.post("/auth/signup", async (req, res) => {
   try {
-    const { email, password, displayName } = req.body;
+    const { email, password, displayName, firstName, lastName } = req.body;
 
     if (!email || !password || !displayName) {
       return res.status(400).json({ error: "All fields are required" });
@@ -95,6 +95,8 @@ app.post("/auth/signup", async (req, res) => {
       email,
       password,
       displayName,
+      firstName,
+      lastName,
     });
 
     // Log the user in
