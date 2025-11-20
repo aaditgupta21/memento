@@ -110,6 +110,8 @@ app.post("/auth/signup", async (req, res) => {
           id: user._id,
           email: user.email,
           displayName: user.displayName,
+          firstName: user.firstName || null,
+          lastName: user.lastName || null,
         },
       });
     });
@@ -210,6 +212,8 @@ app.get("/api/me", (req, res) => {
         id: req.user._id,
         email: req.user.email,
         displayName: req.user.displayName,
+        firstName: req.user.firstName || null,
+        lastName: req.user.lastName || null,
       },
     });
   } else {
