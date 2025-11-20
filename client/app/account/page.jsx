@@ -7,7 +7,7 @@ import { useUser } from "@/context/UserContext";
 import s from "./Account.module.css";
 
 export default function Account() {
-    const { user, loading: userLoading } = useUser();
+    const { user, loading: userLoading, fetchUser } = useUser();
     const [profileImage, setProfileImage] = useState('');
     const [email, setEmail] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
@@ -85,20 +85,28 @@ export default function Account() {
 
             }
 
-            // send the profile updates to the backend (email is not included since it can't be changed)
-            const profileUpdate = await fetch("http://localhost:4000/account/updateProfile", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify({
-                    username, profileImage
-                })
-            });
+            let usernameChanged = false;
+            let passwordChanged = false;
 
-            // check if the updates were successful
-            const profileUpdateData = await profileUpdate.json()
-            if (!profileUpdate.ok) {
-                throw new Error(profileUpdateData.error || "Failed to update profile.")
+            // Update username if it changed
+            if (username !== user.displayName) {
+                const usernameUpdate = await fetch("http://localhost:4000/api/update-username", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        displayName: username
+                    })
+                });
+
+                const usernameUpdateData = await usernameUpdate.json();
+                if (!usernameUpdate.ok) {
+                    throw new Error(usernameUpdateData.error || "Failed to update username.");
+                }
+
+                usernameChanged = true;
+                // Refresh user data in context after username change
+                await fetchUser();
             }
 
 
@@ -118,9 +126,26 @@ export default function Account() {
                 if (!pwUpdate.ok) {
                     throw new Error(pwUpdateData.error || "Failed to update password.");
                 }
+                passwordChanged = true;
             }
 
-            setSuccess("Account updated successfully!");
+            // Provide specific feedback based on what was updated
+            if (usernameChanged && passwordChanged) {
+                setSuccess(`Username changed to "${username}" and password updated successfully!`);
+            } else if (usernameChanged) {
+                setSuccess(`Username changed to "${username}" successfully!`);
+            } else if (passwordChanged) {
+                setSuccess("Password updated successfully!");
+            } else {
+                setSuccess("No changes to save.");
+            }
+
+            // Clear success message after 5 seconds
+            if (usernameChanged || passwordChanged) {
+                setTimeout(() => {
+                    setSuccess("");
+                }, 5000);
+            }
         } catch (err) {
             console.error(err);
             setError(err.message || "Something went wrong. Please try again.");
@@ -179,6 +204,16 @@ export default function Account() {
                         <p className={s.profileHint}>Click the camera icon to update your profile picture</p>
                     </div>
 
+                    {error && (
+                        <div className={s.errorMessage}>
+                            {error}
+                        </div>
+                    )}
+                    {success && (
+                        <div className={s.successMessage}>
+                            {success}
+                        </div>
+                    )}
                     <form onSubmit={handleSave} className={s.form}>
                         <div className={s.formGroup}>
                             <h3 className={s.sectionTitle}>Email Address</h3>

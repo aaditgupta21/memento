@@ -184,3 +184,23 @@
     background-color: rgba(232, 155, 143, 0.9);
     transform: scale(1.05);
 }
+
+.successMessage {
+    color: #0a5;
+    background-color: #e6ffe6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #0a5;
+    font-weight: 500;
+}
+
+.errorMessage {
+    color: #b00;
+    background-color: #ffe6e6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #b00;
+    font-weight: 500;
+}
