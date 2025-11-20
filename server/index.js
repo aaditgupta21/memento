@@ -612,7 +612,7 @@ app.get("/api/users/username/:username", async (req, res) => {
 
   try {
     const user = await User.findOne({ displayName: username }).select(
-      "displayName profilePicture _id"
+      "displayName profilePicture _id firstName lastName"
     );
 
     if (!user) {

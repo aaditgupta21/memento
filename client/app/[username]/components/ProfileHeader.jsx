@@ -17,8 +17,9 @@ export default function ProfileHeader({ profileUser, postsCount }) {
       </div>
       <div className={styles.profileInfo}>
         <h1 className={styles.displayName}>
-          {profileUser?.displayName}'s Memories
+          {profileUser?.firstName}'s Memories
         </h1>
+        <span className={styles.username}>@{profileUser.displayName}</span>
         <div className={styles.stats}>
           <div className={styles.statItem}>
             <span className={styles.statNumber}>{postsCount}</span>

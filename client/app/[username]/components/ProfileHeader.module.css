@@ -70,3 +70,11 @@
   color: #9a8d7f;
   font-weight: 500;
 }
+
+.username {
+  font-size: 0.95rem;
+  color: #9a8d7f;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
