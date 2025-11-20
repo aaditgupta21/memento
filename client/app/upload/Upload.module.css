@@ -145,3 +145,37 @@
   font-size: 0.95rem;
   padding: 2rem;
 }
+
+.dropzone {
+  border: 4px dashed #d1d5db; /* Tailwind gray-300 */
+  border-radius: 1rem;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #374151; /* gray-700 */
+  transition: all 0.3s ease;
+}
+
+.dropzone:hover {
+  border-color: #da8d72;
+  background-color: rgba(218, 141, 114, 0.2);
+}
+
+.dropzone svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  color: #da8d72; /* blue */
+}
+
+.dropzone p {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 600;
+}
+
+.dropzone.active {
+  border-color: #da8d72; /* darker blue on drag */
+  background-color: rgba(218, 141, 114, 0.2);
+}

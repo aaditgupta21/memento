@@ -53,6 +53,17 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Reserved usernames that conflict with routes
+const RESERVED_USERNAMES = [
+  "feed",
+  "upload",
+  "wrapped",
+  "account",
+  "login",
+  "set-username",
+  "signup",
+];
+
 // Auth routes - Email/Password
 app.post("/auth/signup", async (req, res) => {
   try {
@@ -60,6 +71,11 @@ app.post("/auth/signup", async (req, res) => {
 
     if (!email || !password || !displayName) {
       return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // Check if username is reserved
+    if (RESERVED_USERNAMES.includes(displayName.toLowerCase())) {
+      return res.status(400).json({ error: "This username is reserved" });
     }
 
     // Check if email already exists
@@ -210,6 +226,11 @@ app.post("/api/update-username", async (req, res) => {
 
     if (!displayName || displayName.trim() === "") {
       return res.status(400).json({ error: "Username is required" });
+    }
+
+    // Check if username is reserved
+    if (RESERVED_USERNAMES.includes(displayName.toLowerCase())) {
+      return res.status(400).json({ error: "This username is reserved" });
     }
 
     // Check if username is already taken
@@ -521,6 +542,63 @@ app.get("/api/users/:userId", async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching user:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// get user object from username (displayName)
+app.get("/api/users/username/:username", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const user = await User.findOne({ displayName: username }).select(
+      "displayName profilePicture _id"
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    console.error("Error fetching user by username:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// get posts by username (displayName)
+app.get("/api/users/username/:username/posts", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    // First find the user by username
+    const user = await User.findOne({ displayName: username });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const posts = await Post.find({ author: user._id })
+      .sort({ createdAt: -1 })
+      .populate("author", "displayName email profilePicture")
+      .populate({
+        path: "comments.author",
+        select: "displayName email profilePicture",
+      })
+      .populate({
+        path: "likes",
+        select: "displayName email profilePicture",
+      });
+
+    return res.json({
+      success: true,
+      count: posts.length,
+      posts,
+    });
+  } catch (err) {
+    console.error("Error fetching user posts by username:", err);
     return res.status(500).json({ error: "Server error" });
   }
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { UploadButton } from "@/utils/uploadthing";
+import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
 import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
@@ -95,8 +95,9 @@ export default function Upload() {
       <h1>Upload a Photo</h1>
 
       <div className={styles.uploadForm}>
-        <UploadButton
+        <UploadDropzone
           endpoint="imageUploader"
+          className={styles.dropzone}
           onClientUploadComplete={(res) => {
             console.log("Upload complete! Files:", res);
             if (res && res.length > 0) {
@@ -109,6 +110,28 @@ export default function Upload() {
             console.error("Upload error:", error);
             alert(`ERROR! ${error.message}`);
           }}
+          render={({ isDragActive }) => (
+            <div
+              className={`${styles.dropzone} ${
+                isDragActive ? styles.active : ""
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12v8M8 16l4-4 4 4" />
+              </svg>
+              <p>
+                {isDragActive
+                  ? "Release to upload your images"
+                  : "Drag and drop up to 10 images here, or click to select files."}
+              </p>
+            </div>
+          )}
         />
 
         {uploadedFiles.length > 0 && (

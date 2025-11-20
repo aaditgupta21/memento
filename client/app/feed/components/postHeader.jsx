@@ -16,7 +16,7 @@ export default function PostHeader({ author, location, createdAt }) {
         className={styles.avatar}
       />
       <div>
-        <a className={styles.username} href={`/profile/${author._id}`}>
+        <a className={styles.username} href={`/${author.displayName}`}>
           {author.displayName}
         </a>
         {location && <p className={styles.postInfo}>{location}</p>}
