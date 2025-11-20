@@ -162,3 +162,20 @@
   border-color: #da8d72;
   background-color: rgba(218, 141, 114, 0.2);
 }
+
+.dropzone svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  color: #da8d72; /* blue */
+}
+
+.dropzone p {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 600;
+}
+
+.dropzone.active {
+  border-color: #da8d72; /* darker blue on drag */
+  background-color: rgba(218, 141, 114, 0.2);
+}
