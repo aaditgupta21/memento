@@ -2,16 +2,20 @@
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import styles from "./gallery.module.css";
-import Post from "@/app/feed/components/post";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { useUser } from "@/context/UserContext";
+import PostModal from "./components/PostModal";
+import ProfileHeader from "./components/ProfileHeader";
+import GallerySection from "./components/GallerySection";
 
 export default function UserProfilePage() {
   const { username } = useParams();
   const { user } = useUser();
   const [posts, setPosts] = useState([]);
+  const [selectedPost, setSelectedPost] = useState(null);
   const [profileUser, setProfileUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // local host for now
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
 
   useEffect(() => {
@@ -20,9 +24,12 @@ export default function UserProfilePage() {
     async function fetchData() {
       try {
         // Fetch user first to check if it exists
-        const userRes = await fetch(`${API_BASE}/api/users/username/${username}`, {
-          credentials: "include",
-        });
+        const userRes = await fetch(
+          `${API_BASE}/api/users/username/${username}`,
+          {
+            credentials: "include",
+          }
+        );
 
         if (!userRes.ok) {
           if (userRes.status === 404) {
@@ -84,22 +91,20 @@ export default function UserProfilePage() {
 
   return (
     <main className={styles.page}>
-      <h1>{profileUser?.displayName}'s Profile</h1>
-      {profileUser?.profilePicture && (
-        <Image
-          src={profileUser.profilePicture}
-          alt={profileUser.displayName}
-          width={100}
-          height={100}
-        />
-      )}
-      <h2>Posts</h2>
-      {posts.length === 0 ? (
-        <p>No posts yet.</p>
-      ) : (
-        posts.map((post) => <Post key={post._id} post={post} user={user} />)
-      )}
+      {/* Profile Header with user information */}
+      <ProfileHeader profileUser={profileUser} postsCount={posts.length} />
+
+      {/* Actual mapping of the gallery */}
+      <GallerySection
+        posts={posts}
+        onPostClick={(post) => setSelectedPost(post)}
+      />
+      {/* Modal overlay for selected post, only renders if selectPost exists */}
+      <PostModal
+        selectedPost={selectedPost}
+        user={user}
+        onClose={() => setSelectedPost(null)}
+      />
     </main>
   );
 }
-
