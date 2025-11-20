@@ -13,11 +13,10 @@ export default function Navbar() {
 
   return (
     <nav className={styles.navbar}>
-      <h1 className={styles.logo}>Memento</h1>
+      <Link href="/feed" className={styles.logo}>
+        Memento
+      </Link>
       <div className={styles.navLinks}>
-        <Link href="/feed" className={styles.navLink}>
-          Feed
-        </Link>
         <Link href={`/${user.displayName}`} className={styles.navLink}>
           My Gallery
         </Link>
