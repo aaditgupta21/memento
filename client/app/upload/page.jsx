@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import styles from "./Upload.module.css";
+import { UseEmblaCarouselType } from "embla-carousel-react";
 
 export default function Upload() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
