@@ -2,6 +2,8 @@
 
 import styles from "./ScrapbookCard.module.css";
 
+// SCRAPBOOK COVER IMAGE/DETAILS
+
 export default function ScrapbookCard({ title, coverImage, postCount }) {
   return (
     <div className={styles.card}>

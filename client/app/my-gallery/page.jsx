@@ -10,6 +10,9 @@ import { useSearchParams } from "next/navigation";
 import { mockPosts } from "@/mock/posts";
 import { mockScrapbooks } from "@/mock/scrapbooks";
 
+// GALLERY PAGE THAT SHOWS UP WHEN FIRST CLICKED
+
+// Simple tab ids for the gallery switcher
 const TABS = {
   POSTS: "posts",
   SCRAPBOOKS: "scrapbooks",
@@ -25,6 +28,7 @@ export default function MyGalleryPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
 
+  // Build a new scrapbook object and prepend it to the list
   const handleCreateScrapbook = (payload) => {
     const newScrapbook = {
       id: `s-${Date.now()}`,
@@ -45,6 +49,7 @@ export default function MyGalleryPage() {
           <p className={styles.subtitle}>
             Keep your favorite posts together with soft, keepsake-ready sets.
           </p>
+          {/* Manual tab buttons; we keep local state only to avoid routing changes */}
           <div className={styles.tabRow}>
             <button
               className={`${styles.tabButton} ${activeTab === TABS.POSTS ? styles.tabActive : ""
@@ -79,16 +84,17 @@ export default function MyGalleryPage() {
                 key={post.id}
                 type="button"
                 className={styles.postCard}
+                // Set the current post for the detail modal
                 onClick={() => setSelectedPost(post)}
               >
-                <div className={styles.imageWrap}>
-                  <img src={post.image} alt={post.title} />
-                  <div className={styles.postOverlay}>
-                    <span className={styles.postLocation}>{post.location}</span>
+                <div className={styles.polaroidFrame}>
+                  <div className={styles.imageWrap}>
+                    <img src={post.image} alt={post.title} />
                   </div>
-                </div>
-                <div className={styles.postFooter}>
-                  <span className={styles.dateLabel}>{post.date}</span>
+                  <div className={styles.polaroidFooter}>
+                    <span className={styles.postLocation}>{post.location}</span>
+                    <span className={styles.dateLabel}>{post.date}</span>
+                  </div>
                 </div>
               </button>
             ))}
@@ -114,6 +120,7 @@ export default function MyGalleryPage() {
                 key={scrapbook.id}
                 href={`/scrapbooks/${scrapbook.id}`}
                 className={styles.cardLink}
+                // Keep using a Link for client-side navigation to detail pages
               >
                 <ScrapbookCard
                   title={scrapbook.title}

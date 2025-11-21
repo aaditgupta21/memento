@@ -2,6 +2,10 @@
 
 import styles from "./PostDetailModal.module.css";
 
+// NEW EXPANDED POST MODAL (CAN CHANGE LATER)
+
+
+// Lightweight modal to show a single post's details
 export default function PostDetailModal({ post, onClose }) {
   if (!post) return null;
 

@@ -113,27 +113,52 @@
 
 .postsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
 }
 
 .postCard {
-  background: #fff;
-  border: 1px solid rgba(146, 138, 123, 0.18);
-  border-radius: 1.25rem;
-  overflow: hidden;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+  background: transparent;
+  border: none;
   display: flex;
   flex-direction: column;
   cursor: pointer;
-  padding: 0;
-  border: none;
+  padding: 0.2rem;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  transform-origin: center;
+}
+
+.postCard:nth-child(odd) {
+  transform: rotate(-2.2deg);
+}
+
+.postCard:nth-child(even) {
+  transform: rotate(1.8deg);
+}
+
+.postCard:hover {
+  transform: translateY(-4px) scale(1.02);
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.16));
+}
+
+.polaroidFrame {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  padding: 0.8rem 0.8rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .imageWrap {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1.05;
   overflow: hidden;
+  border-radius: 0.65rem;
+  background: #f6f1e8;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
 }
 
 .imageWrap img {
@@ -141,49 +166,31 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: saturate(1.05);
-  transition: transform 0.3s ease;
-}
-
-.imageWrap:hover img {
-  transform: scale(1.05);
-}
-
-.postOverlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.0) 40%, rgba(0, 0, 0, 0.55) 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 0.9rem;
-  color: #fdf9f3;
+  filter: saturate(1.02);
 }
 
 .postLocation {
-  background: rgba(255, 255, 255, 0.7);
-  color: #7a6e60;
-  padding: 0.25rem 0.65rem;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 0.85rem;
-  align-self: flex-start;
+  display: block;
+  color: #6d5f51;
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-align: center;
 }
 
-.postFooter {
+.polaroidFooter {
   display: flex;
-  justify-content: space-between;
-  padding: 0.85rem 1rem;
-  color: #7a6e60;
+  flex-direction: column;
+  gap: 0.2rem;
+  align-items: center;
 }
 
 .dateLabel {
-  background: rgba(218, 141, 114, 0.15);
-  color: #c47d64;
-  padding: 0.35rem 0.7rem;
-  border-radius: 0.8rem;
+  background: rgba(109, 95, 81, 0.08);
+  color: #7a6e60;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.6rem;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
 }
 
 .primaryButton {

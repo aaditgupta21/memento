@@ -8,11 +8,16 @@ import { mockPosts } from "@/mock/posts";
 import { mockScrapbooks } from "@/mock/scrapbooks";
 import PostDetailModal from "@/components/PostDetailModal";
 
+// PAGE THAT SHOWS UP WHEN YOU CLICK A SCRAPBOOK
+
 export default function ScrapbookDetailPage() {
+  // Grab the scrapbook id from the dynamic route
   const { id } = useParams();
   const [selectedPost, setSelectedPost] = useState(null);
+  // Find the scrapbook the page should render
   const scrapbook = mockScrapbooks.find((item) => item.id === id);
 
+  // Resolve the posts belonging to this scrapbook
   const scrapbookPosts = useMemo(() => {
     if (!scrapbook) return [];
     return scrapbook.postIds
@@ -78,16 +83,17 @@ export default function ScrapbookDetailPage() {
               key={post.id}
               type="button"
               className={styles.postCard}
+              // Clicking a post opens it in the shared detail modal
               onClick={() => setSelectedPost(post)}
             >
-              <div className={styles.imageWrap}>
-                <img src={post.image} alt={post.title} />
-                <div className={styles.postOverlay}>
-                  <span className={styles.postLocation}>{post.location}</span>
+              <div className={styles.polaroidFrame}>
+                <div className={styles.imageWrap}>
+                  <img src={post.image} alt={post.title} />
                 </div>
-              </div>
-              <div className={styles.postFooter}>
-                <span className={styles.dateLabel}>{post.date}</span>
+                <div className={styles.polaroidFooter}>
+                  <span className={styles.postLocation}>{post.location}</span>
+                  <span className={styles.dateLabel}>{post.date}</span>
+                </div>
               </div>
             </button>
           ))}

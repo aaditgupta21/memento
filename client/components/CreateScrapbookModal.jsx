@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./CreateScrapbookModal.module.css";
 import { mockPosts } from "@/mock/posts";
 
+// CREATE NEW SCRAPBOOK
+
 export default function CreateScrapbookModal({
   isOpen,
   onClose,
