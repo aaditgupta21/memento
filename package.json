@@ -17,5 +17,8 @@
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "embla-carousel-react": "^8.6.0"
   }
 }

@@ -33,12 +33,6 @@ A full-stack web application with **Vite + React** frontend and **Express** back
 1. Install all dependencies (client, server, and root):
 
 ```bash
-npm run install-all
-```
-
-Or install individually:
-
-```bash
 # Install root dependencies
 npm install
 

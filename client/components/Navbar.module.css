@@ -43,20 +43,34 @@
 .navLinks {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .navLink {
   color: #928a7b;
   text-decoration: none;
   font-family: sans-serif;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
   transition: color 0.2s ease;
 }
 
 .navLink:hover {
   color: #da8d72;
+}
+
+.active {
+  color: #da8d72;
+}
+
+.navLinkContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navIcon {
+  stroke: currentColor;
 }
 
 .logoutBtn {

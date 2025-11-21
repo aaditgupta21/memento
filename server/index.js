@@ -53,6 +53,17 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Reserved usernames that conflict with routes
+const RESERVED_USERNAMES = [
+  "feed",
+  "upload",
+  "wrapped",
+  "account",
+  "login",
+  "set-username",
+  "signup",
+];
+
 // Auth routes - Email/Password
 app.post("/auth/signup", async (req, res) => {
   try {
@@ -60,6 +71,11 @@ app.post("/auth/signup", async (req, res) => {
 
     if (!email || !password || !displayName) {
       return res.status(400).json({ error: "All fields are required" });
+    }
+
+    // Check if username is reserved
+    if (RESERVED_USERNAMES.includes(displayName.toLowerCase())) {
+      return res.status(400).json({ error: "This username is reserved" });
     }
 
     // Check if email already exists
@@ -192,6 +208,8 @@ app.get("/api/me", (req, res) => {
         id: req.user._id,
         email: req.user.email,
         displayName: req.user.displayName,
+        googleId: req.user.googleId || null,
+        profilePicture: req.user.profilePicture || null,
       },
     });
   } else {
@@ -210,6 +228,11 @@ app.post("/api/update-username", async (req, res) => {
 
     if (!displayName || displayName.trim() === "") {
       return res.status(400).json({ error: "Username is required" });
+    }
+
+    // Check if username is reserved
+    if (RESERVED_USERNAMES.includes(displayName.toLowerCase())) {
+      return res.status(400).json({ error: "This username is reserved" });
     }
 
     // Check if username is already taken
@@ -236,6 +259,58 @@ app.post("/api/update-username", async (req, res) => {
     });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Update password endpoint
+app.post("/api/update-password", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  // Don't allow password changes for Google OAuth users
+  if (req.user.googleId) {
+    return res.status(400).json({
+      error: "Password changes are not available for Google accounts",
+    });
+  }
+
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ error: "Current password and new password are required" });
+    }
+
+    // Verify current password
+    const isMatch = await req.user.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Current password is incorrect" });
+    }
+
+    // Validate new password strength
+    // const strongPassword =
+    //   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    // if (!strongPassword.test(newPassword)) {
+    //   return res.status(400).json({
+    //     error:
+    //       "Password must be 8+ characters and include a letter, number, and special character (!@#$%^&*)",
+    //   });
+    // }
+
+    // Update password (the pre-save hook will hash it)
+    req.user.password = newPassword;
+    await req.user.save();
+
+    res.json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (err) {
+    console.error("Error updating password:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -310,7 +385,15 @@ app.get("/api/posts", async (req, res) => {
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate("author", "displayName email");
+      .populate("author", "displayName email profilePicture")
+      .populate({
+        path: "comments.author",
+        select: "displayName email profilePicture",
+      })
+      .populate({
+        path: "likes",
+        select: "displayName email profilePicture",
+      });
 
     return res.json({
       success: true,
@@ -325,6 +408,7 @@ app.get("/api/posts", async (req, res) => {
 
 // Get all posts for a specific user
 app.get("/api/users/:userId/posts", async (req, res) => {
+  console.log("Received request for user posts:", req.params.userId);
   const { userId } = req.params;
 
   try {
@@ -334,7 +418,15 @@ app.get("/api/users/:userId/posts", async (req, res) => {
 
     const posts = await Post.find({ author: userId })
       .sort({ createdAt: -1 })
-      .populate("author", "displayName email");
+      .populate("author", "displayName email profilePicture")
+      .populate({
+        path: "comments.author",
+        select: "displayName email profilePicture",
+      })
+      .populate({
+        path: "likes",
+        select: "displayName email profilePicture",
+      });
 
     return res.json({
       success: true,
@@ -361,6 +453,206 @@ app.get("/api/users/usernames", async (req, res) => {
     });
   } catch (err) {
     console.error("Error fetching usernames:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// like a post
+app.post("/api/posts/:postId/like", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const { postId } = req.params;
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const userId = req.user._id;
+    const index = post.likes.findIndex(
+      (id) => id.toString() === userId.toString()
+    );
+
+    if (index === -1) {
+      post.likes.push(userId);
+    } else {
+      post.likes.splice(index, 1);
+    }
+
+    await post.save();
+
+    // Populate likes with user info
+    await post.populate({
+      path: "likes",
+      select: "displayName email profilePicture",
+    });
+
+    res.json({ success: true, likes: post.likes });
+  } catch (err) {
+    console.error("Error liking post:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// unlike a post
+app.delete("/api/posts/:postId/like", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const { postId } = req.params;
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const userId = req.user._id;
+    const index = post.likes.findIndex(
+      (id) => id.toString() === userId.toString()
+    );
+
+    if (index !== -1) {
+      post.likes.splice(index, 1);
+      await post.save();
+    }
+
+    // Populate likes with user info
+    await post.populate({
+      path: "likes",
+      select: "displayName email profilePicture",
+    });
+
+    res.json({ success: true, likes: post.likes });
+  } catch (err) {
+    console.error("Error unliking post:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// add comment to a post
+app.post("/api/posts/:postId/comments", async (req, res) => {
+  if (!req.user) return res.status(401).json({ error: "Not authenticated" });
+
+  const { postId } = req.params;
+  if (!mongoose.isValidObjectId(postId)) {
+    return res.status(400).json({ error: "Invalid post ID" });
+  }
+
+  const text = (req.body.text || "").trim();
+  if (!text) return res.status(400).json({ error: "Comment text required" });
+
+  try {
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    // Create comment using proper schema structure
+    const newComment = {
+      text,
+      author: req.user._id,
+    };
+
+    post.comments.push(newComment);
+    await post.save();
+
+    // Populate author info for all comments
+    await post.populate({
+      path: "comments.author",
+      select: "displayName email profilePicture",
+    });
+
+    return res.status(201).json({ success: true, comments: post.comments });
+  } catch (err) {
+    console.error("Error adding comment:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// get user object from userID
+app.get("/api/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    // Return all fields EXCEPT password
+    const user = await User.findById(userId).select(
+      "displayName profilePicture"
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// get user object from username (displayName)
+app.get("/api/users/username/:username", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const user = await User.findOne({ displayName: username }).select(
+      "displayName profilePicture _id"
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    console.error("Error fetching user by username:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// get posts by username (displayName)
+app.get("/api/users/username/:username/posts", async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    // First find the user by username
+    const user = await User.findOne({ displayName: username });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const posts = await Post.find({ author: user._id })
+      .sort({ createdAt: -1 })
+      .populate("author", "displayName email profilePicture")
+      .populate({
+        path: "comments.author",
+        select: "displayName email profilePicture",
+      })
+      .populate({
+        path: "likes",
+        select: "displayName email profilePicture",
+      });
+
+    return res.json({
+      success: true,
+      count: posts.length,
+      posts,
+    });
+  } catch (err) {
+    console.error("Error fetching user posts by username:", err);
     return res.status(500).json({ error: "Server error" });
   }
 });

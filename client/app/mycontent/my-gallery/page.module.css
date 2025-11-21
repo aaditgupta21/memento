@@ -1,0 +1,236 @@
+.page {
+  min-height: 100vh;
+  background: radial-gradient(circle at 20% 20%, #fdf7f0 0%, #f7eee4 40%, #f2e7db 100%);
+  padding: 6rem 1.25rem 3rem;
+  color: #51473d;
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+}
+
+.hero {
+  max-width: 1100px;
+  margin: 0 auto 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(146, 138, 123, 0.25);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+}
+
+.eyebrow {
+  color: #b19c85;
+  letter-spacing: 0.1em;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  margin: 0 0 0.2rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 2rem;
+  font-family: "Playfair Display", "Georgia", serif;
+  color: #7a6e60;
+}
+
+.subtitle {
+  margin: 0.35rem 0 0.85rem;
+  color: #7a6e60;
+  max-width: 560px;
+}
+
+.tabRow {
+  display: inline-flex;
+  background: rgba(146, 138, 123, 0.1);
+  padding: 0.35rem;
+  border-radius: 999px;
+  border: 1px solid rgba(146, 138, 123, 0.2);
+  gap: 0.35rem;
+}
+
+.tabButton {
+  border: none;
+  background: transparent;
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  color: #7a6e60;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tabButton:hover {
+  color: #da8d72;
+}
+
+.tabActive {
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  color: #da8d72;
+}
+
+.section {
+  max-width: 1100px;
+  margin: 0 auto 2rem;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(146, 138, 123, 0.2);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.muted {
+  margin: 0;
+  color: #a18f7f;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.82rem;
+}
+
+.sectionTitle {
+  margin: 0.2rem 0 0;
+  font-family: "Playfair Display", "Georgia", serif;
+  color: #7a6e60;
+}
+
+.badge {
+  background: rgba(146, 138, 123, 0.12);
+  border: 1px solid rgba(146, 138, 123, 0.2);
+  color: #7a6e60;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.postsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.postCard {
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 0.2rem;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  transform-origin: center;
+}
+
+.postCard:nth-child(odd) {
+  transform: rotate(-2.2deg);
+}
+
+.postCard:nth-child(even) {
+  transform: rotate(1.8deg);
+}
+
+.postCard:hover {
+  transform: translateY(-4px) scale(1.02);
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.16));
+}
+
+.polaroidFrame {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  padding: 0.8rem 0.8rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.imageWrap {
+  position: relative;
+  aspect-ratio: 1 / 1.05;
+  overflow: hidden;
+  border-radius: 0.65rem;
+  background: #f6f1e8;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+
+.imageWrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.02);
+}
+
+.postLocation {
+  display: block;
+  color: #6d5f51;
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.polaroidFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  align-items: center;
+}
+
+.dateLabel {
+  background: rgba(109, 95, 81, 0.08);
+  color: #7a6e60;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.6rem;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, #da8d72, #e7a182);
+  color: #fffaf3;
+  border: none;
+  padding: 0.65rem 1rem;
+  border-radius: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(218, 141, 114, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.primaryButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(218, 141, 114, 0.35);
+}
+
+.scrapbookGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.cardLink {
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tabRow {
+    width: 100%;
+  }
+}

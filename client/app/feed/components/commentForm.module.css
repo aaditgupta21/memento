@@ -1,0 +1,40 @@
+.addCommentForm {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.commentInput {
+  flex: 1;
+  border: 1px solid rgba(146, 138, 123, 0.3);
+  border-radius: 1.5rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  color: #938976;
+  background-color: rgba(0, 0, 0, 0.05);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.commentInput:focus {
+  border-color: #da8d72;
+}
+
+.postBtn {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #928a7b;
+  border: none;
+  border-radius: 1.5rem;
+  padding: 0.6rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.postBtn:hover {
+  background-color: white;
+  transform: scale(1.05);
+}
