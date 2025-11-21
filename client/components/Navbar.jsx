@@ -12,7 +12,7 @@ import {
   ImageIcon,
   UserIcon,
   SparklesIcon,
-} from 'lucide-react'
+} from "lucide-react";
 
 export default function Navbar() {
   const { user, authenticated, loading, logout } = useUser();
@@ -29,7 +29,9 @@ export default function Navbar() {
 
   return (
     <nav className={styles.navbar}>
-      <h1 className={styles.logo}>Memento</h1>
+      <Link href="/feed" className={styles.logo}>
+        Memento
+      </Link>
       <div className={styles.navLinks}>
         <Link
           href="/feed"
