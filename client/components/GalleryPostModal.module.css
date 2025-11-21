@@ -1,0 +1,105 @@
+.headerWrap {
+  margin-bottom: 1rem;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1rem;
+}
+
+.media {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  min-height: 280px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+.media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: #51473d;
+}
+
+.location {
+  margin: 0;
+  color: #b19c85;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.title {
+  margin: 0;
+  font-family: "Playfair Display", "Georgia", serif;
+  color: #7a6e60;
+}
+
+.date {
+  margin: 0;
+  color: #7a6e60;
+}
+
+.description {
+  margin: 0.25rem 0 0.5rem;
+  color: #5a5044;
+}
+
+.stats {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pill {
+  background: rgba(146, 138, 123, 0.12);
+  color: #7a6e60;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 700;
+  border: 1px solid rgba(146, 138, 123, 0.2);
+}
+
+.comments {
+  margin-top: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.comment {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(146, 138, 123, 0.16);
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.9rem;
+}
+
+.commentUser {
+  font-weight: 800;
+  color: #7a6e60;
+}
+
+.commentText {
+  color: #5a5044;
+}
+
+@media (max-width: 800px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+
+  .media {
+    min-height: 220px;
+  }
+}

@@ -10,6 +10,22 @@ const CELL_GAP = 3;
 const MONTH_GAP = 12; // horizontal gap between months (px)
 
 // Color scale
+const getDateKey = (date, timeZone) =>
+    new Intl.DateTimeFormat("en-CA", {
+        timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    }).format(date);
+
+const getDateLabel = (date, timeZone) =>
+    date.toLocaleDateString("en-US", {
+        timeZone,
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    });
+
 function getColor(count, maxCount) {
     if (!count || maxCount === 0) return "#f5ebe7";
     const ratio = count / maxCount;
@@ -26,6 +42,10 @@ export default function ActivityHeatmap({
 }) {
     const [tooltip, setTooltip] = useState(null);
     const wrapperRef = useRef(null);
+    const timeZone = useMemo(
+        () => Intl.DateTimeFormat().resolvedOptions().timeZone,
+        []
+    );
 
     const { monthBlocks, maxCount, svgWidth, svgHeight } = useMemo(() => {
         const countsMap = {};
@@ -34,8 +54,9 @@ export default function ActivityHeatmap({
             const raw = post?.createdAt;
             if (!raw) return;
             const d = new Date(raw);
-            if (isNaN(d) || d.getFullYear() !== year) return;
-            const key = d.toISOString().slice(0, 10);
+            if (isNaN(d)) return;
+            const key = getDateKey(d, timeZone);
+            if (!key.startsWith(`${year}-`)) return;
             countsMap[key] = (countsMap[key] || 0) + 1;
         });
 
@@ -49,7 +70,7 @@ export default function ActivityHeatmap({
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, m, day);
-                const key = date.toISOString().slice(0, 10);
+                const key = getDateKey(date, timeZone);
 
                 monthDays.push({
                     date,
@@ -98,7 +119,7 @@ export default function ActivityHeatmap({
         const svgHeight = 7 * (CELL_SIZE + CELL_GAP) + 20;
 
         return { monthBlocks, maxCount, svgWidth, svgHeight };
-    }, [posts, year]);
+    }, [posts, year, timeZone]);
 
 
     // Empty states
@@ -184,6 +205,7 @@ export default function ActivityHeatmap({
                                                 if (!wrapper) return;
                                                 const cellRect = e.currentTarget.getBoundingClientRect();
                                                 const wrapperRect = wrapper.getBoundingClientRect();
+                                                const dayLabel = getDateLabel(day.date, timeZone);
                                                 setTooltip({
                                                     x:
                                                         cellRect.left -
@@ -195,20 +217,13 @@ export default function ActivityHeatmap({
                                                         wrapperRect.top +
                                                         wrapper.scrollTop -
                                                         8,
-                                                    label: `${day.count} submission${day.count === 1 ? "" : "s"} on ${day.date.toLocaleDateString(
-                                                        "en-US",
-                                                        {
-                                                            month: "short",
-                                                            day: "numeric",
-                                                            year: "numeric",
-                                                        }
-                                                    )}`,
+                                                    label: `${day.count} submission${day.count === 1 ? "" : "s"} on ${dayLabel}`,
                                                 });
                                             }}
                                             onMouseLeave={() => setTooltip(null)}
                                         >
                                             <title>
-                                                {`${day.date.toDateString()}: ${day.count
+                                                {`${getDateLabel(day.date, timeZone)}: ${day.count
                                                     } memorie${day.count === 1 ? "" : "s"}`}
                                             </title>
                                         </rect>
