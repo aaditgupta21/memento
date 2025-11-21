@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 import ScrapbookCard from "../components/ScrapbookCard";
@@ -18,7 +18,7 @@ const TABS = {
   SCRAPBOOKS: "scrapbooks",
 };
 
-export default function MyGalleryPage() {
+function MyGalleryContent() {
   const searchParams = useSearchParams();
   const initialTab =
     searchParams.get("tab") === TABS.SCRAPBOOKS ? TABS.SCRAPBOOKS : TABS.POSTS;
@@ -144,5 +144,14 @@ export default function MyGalleryPage() {
         onClose={() => setSelectedPost(null)}
       />
     </main>
+  );
+}
+
+export default function MyGalleryPage() {
+  // Wrap useSearchParams usage to satisfy Next.js CSR bailout requirement
+  return (
+    <Suspense fallback={<main className={styles.page}>Loading...</main>}>
+      <MyGalleryContent />
+    </Suspense>
   );
 }

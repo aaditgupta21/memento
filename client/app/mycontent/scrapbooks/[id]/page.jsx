@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import styles from "./page.module.css";
 import { mockPosts } from "@/mock/posts";
@@ -10,7 +10,7 @@ import PostDetailModal from "../../components/PostDetailModal";
 
 // PAGE THAT SHOWS UP WHEN YOU CLICK A SCRAPBOOK
 
-export default function ScrapbookDetailPage() {
+function ScrapbookDetailContent() {
   // Grab the scrapbook id from the dynamic route
   const { id } = useParams();
   const [selectedPost, setSelectedPost] = useState(null);
@@ -107,5 +107,14 @@ export default function ScrapbookDetailPage() {
         onClose={() => setSelectedPost(null)}
       />
     </main>
+  );
+}
+
+export default function ScrapbookDetailPage() {
+  // Wrap useParams usage to satisfy Next.js CSR bailout requirement
+  return (
+    <Suspense fallback={<main className={styles.page}>Loading...</main>}>
+      <ScrapbookDetailContent />
+    </Suspense>
   );
 }
