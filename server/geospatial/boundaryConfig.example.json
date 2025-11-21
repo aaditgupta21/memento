@@ -1,0 +1,39 @@
+{
+  "levels": [
+    {
+      "level": "city",
+      "featureCollection": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {
+              "id": "sample-sf",
+              "name": "Sample San Francisco Boundary",
+              "code": "SF-SAMPLE"
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [-122.52, 37.70],
+                  [-122.52, 37.84],
+                  [-122.35, 37.84],
+                  [-122.35, 37.70],
+                  [-122.52, 37.70]
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "level": "state",
+      "file": "/absolute/path/to/us_states.geojson",
+      "idProperty": "STUSPS",
+      "nameProperty": "NAME",
+      "codeProperty": "STUSPS"
+    }
+  ]
+}
