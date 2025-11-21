@@ -397,3 +397,92 @@
   cursor: pointer;
   accent-color: #da8d72;
 }
+
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.step {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e5ddd2;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  background: #da8d72;
+  color: white;
+}
+
+.stepLine {
+  flex: 1;
+  height: 2px;
+  background: #e5ddd2;
+  max-width: 60px;
+  transition: all 0.3s ease;
+}
+
+.stepLine.active {
+  background: #da8d72;
+}
+
+.stepButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
+
+.backBtn {
+  background-color: #a89f97;
+  color: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-family: sans-serif;
+}
+
+.backBtn:hover {
+  background-color: rgba(168, 159, 151, 0.8);
+  transform: scale(1.05);
+}
+
+.reviewContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.reviewSection {
+  padding: 1.5rem;
+  background: #faf8f6;
+  border-radius: 1rem;
+  border: 1px solid #e5ddd2;
+}
+
+.reviewSection h3 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  color: #2c2420;
+}
+
+.reviewSection p {
+  margin: 0;
+  color: #666;
+}
