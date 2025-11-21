@@ -179,6 +179,7 @@ export default function Upload() {
       <div className={styles.uploadForm}>
         {/* Progress indicator */}
         <div className={styles.stepIndicator}>
+          {/* conditional classes based on stage */}
           <div className={`${styles.step} ${stage >= 1 ? styles.active : ""}`}>
             1
           </div>
