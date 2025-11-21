@@ -1,110 +1,157 @@
 "use client";
-import { useParams } from "next/navigation";
-import Image from "next/image";
+
+import { Suspense, useState } from "react";
+import Link from "next/link";
 import styles from "./gallery.module.css";
-import { useEffect, useState, lazy, Suspense } from "react";
-import { useUser } from "@/context/UserContext";
-import PostModal from "./components/PostModal";
-import ProfileHeader from "./components/ProfileHeader";
-import GallerySection from "./components/GallerySection";
+import ScrapbookCard from "./components/ScrapbookCard";
+import CreateScrapbookModal from "./components/CreateScrapbookModal";
+import PostDetailModal from "./components/PostDetailModal";
+import { useSearchParams } from "next/navigation";
+import { mockPosts } from "@/mock/posts";
+import { mockScrapbooks } from "@/mock/scrapbooks";
 
-export default function UserProfilePage() {
-  const { username } = useParams();
-  const { user } = useUser();
-  const [posts, setPosts] = useState([]);
+// GALLERY PAGE THAT SHOWS UP WHEN FIRST CLICKED
+
+// Simple tab ids for the gallery switcher
+const TABS = {
+  POSTS: "posts",
+  SCRAPBOOKS: "scrapbooks",
+};
+
+function GalleryContent() {
+  const searchParams = useSearchParams();
+  const initialTab =
+    searchParams.get("tab") === TABS.SCRAPBOOKS ? TABS.SCRAPBOOKS : TABS.POSTS;
+
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const [scrapbooks, setScrapbooks] = useState(mockScrapbooks);
+  const [modalOpen, setModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [profileUser, setProfileUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  // local host for now
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
 
-  useEffect(() => {
-    let mounted = true;
-
-    async function fetchData() {
-      try {
-        // Fetch user first to check if it exists
-        const userRes = await fetch(
-          `${API_BASE}/api/users/username/${username}`,
-          {
-            credentials: "include",
-          }
-        );
-
-        if (!userRes.ok) {
-          if (userRes.status === 404) {
-            if (mounted) {
-              setProfileUser(null);
-              setPosts([]);
-              setLoading(false);
-            }
-            return;
-          }
-          throw new Error("Fetch failed");
-        }
-
-        const userData = await userRes.json();
-
-        // If user exists, fetch their posts
-        const postsRes = await fetch(
-          `${API_BASE}/api/users/username/${username}/posts`,
-          {
-            credentials: "include",
-          }
-        );
-
-        if (!postsRes.ok) throw new Error("Failed to fetch posts");
-
-        const postsData = await postsRes.json();
-
-        if (mounted) {
-          setProfileUser(userData.user);
-          setPosts(postsData.posts || []);
-        }
-      } catch (error) {
-        console.error(error);
-        if (mounted) {
-          setProfileUser(null);
-          setPosts([]);
-        }
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-
-    fetchData();
-    return () => {
-      mounted = false;
+  // Build a new scrapbook object and prepend it to the list
+  const handleCreateScrapbook = (payload) => {
+    const newScrapbook = {
+      id: `s-${Date.now()}`,
+      title: payload.title || "Untitled Scrapbook",
+      description: payload.description || "",
+      coverImage: payload.coverImage || mockPosts[0]?.image,
+      postIds: payload.postIds || [],
     };
-  }, [username]);
-
-  if (loading) return <main className={styles.page}>Loading...</main>;
-
-  if (!profileUser) {
-    return (
-      <main className={styles.page}>
-        <h1>404 - User Not Found</h1>
-        <p>The user "{username}" does not exist.</p>
-      </main>
-    );
-  }
+    setScrapbooks((prev) => [newScrapbook, ...prev]);
+  };
 
   return (
     <main className={styles.page}>
-      {/* Profile Header with user information */}
-      <ProfileHeader profileUser={profileUser} postsCount={posts.length} />
+      <section className={styles.hero}>
+        <div>
+          <p className={styles.eyebrow}>My Gallery</p>
+          <h1 className={styles.title}>Memories & Scrapbooks</h1>
+          <p className={styles.subtitle}>
+            Keep your favorite posts together with soft, keepsake-ready sets.
+          </p>
+          {/* Manual tab buttons; we keep local state only to avoid routing changes */}
+          <div className={styles.tabRow}>
+            <button
+              className={`${styles.tabButton} ${activeTab === TABS.POSTS ? styles.tabActive : ""
+                }`}
+              onClick={() => setActiveTab(TABS.POSTS)}
+            >
+              Posts
+            </button>
+            <button
+              className={`${styles.tabButton} ${activeTab === TABS.SCRAPBOOKS ? styles.tabActive : ""
+                }`}
+              onClick={() => setActiveTab(TABS.SCRAPBOOKS)}
+            >
+              Scrapbooks
+            </button>
+          </div>
+        </div>
+      </section>
 
-      {/* Actual mapping of the gallery */}
-      <GallerySection
-        posts={posts}
-        onPostClick={(post) => setSelectedPost(post)}
+      {activeTab === TABS.POSTS ? (
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <p className={styles.muted}>Daily memories</p>
+              <h2 className={styles.sectionTitle}>All Posts</h2>
+            </div>
+            <span className={styles.badge}>{mockPosts.length} items</span>
+          </div>
+          <div className={styles.postsGrid}>
+            {mockPosts.map((post) => (
+              <button
+                key={post.id}
+                type="button"
+                className={styles.postCard}
+                // Set the current post for the detail modal
+                onClick={() => setSelectedPost(post)}
+              >
+                <div className={styles.polaroidFrame}>
+                  <div className={styles.imageWrap}>
+                    <img src={post.image} alt={post.title} />
+                  </div>
+                  <div className={styles.polaroidFooter}>
+                    <span className={styles.postLocation}>{post.location}</span>
+                    <span className={styles.dateLabel}>{post.date}</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <p className={styles.muted}>Curated sets</p>
+              <h2 className={styles.sectionTitle}>Scrapbooks</h2>
+            </div>
+            <button
+              className={styles.primaryButton}
+              onClick={() => setModalOpen(true)}
+            >
+              + Create Scrapbook
+            </button>
+          </div>
+          <div className={styles.scrapbookGrid}>
+            {scrapbooks.map((scrapbook) => (
+              <Link
+                key={scrapbook.id}
+                href={`/mycontent/scrapbooks/${scrapbook.id}`}
+                className={styles.cardLink}
+                // Keep using a Link for client-side navigation to detail pages
+              >
+                <ScrapbookCard
+                  title={scrapbook.title}
+                  coverImage={scrapbook.coverImage}
+                  postCount={(scrapbook.postIds || []).length}
+                />
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <CreateScrapbookModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onCreate={handleCreateScrapbook}
+        posts={mockPosts}
       />
-      {/* Modal overlay for selected post, only renders if selectPost exists */}
-      <PostModal
-        selectedPost={selectedPost}
-        user={user}
+      <PostDetailModal
+        post={selectedPost}
         onClose={() => setSelectedPost(null)}
       />
     </main>
+  );
+}
+
+export default function GalleryPage() {
+  // Wrap useSearchParams usage to satisfy Next.js CSR bailout requirement
+  return (
+    <Suspense fallback={<main className={styles.page}>Loading...</main>}>
+      <GalleryContent />
+    </Suspense>
   );
 }
