@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 import ScrapbookCard from "@/components/ScrapbookCard";
 import CreateScrapbookModal from "@/components/CreateScrapbookModal";
-import GalleryPostModal from "@/components/GalleryPostModal";
+import PostDetailModal from "@/components/PostDetailModal";
+import { useSearchParams } from "next/navigation";
 import { mockPosts } from "@/mock/posts";
 import { mockScrapbooks } from "@/mock/scrapbooks";
 
@@ -15,21 +16,22 @@ const TABS = {
 };
 
 export default function MyGalleryPage() {
-  const [activeTab, setActiveTab] = useState(TABS.POSTS);
+  const searchParams = useSearchParams();
+  const initialTab =
+    searchParams.get("tab") === TABS.SCRAPBOOKS ? TABS.SCRAPBOOKS : TABS.POSTS;
+
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [scrapbooks, setScrapbooks] = useState(mockScrapbooks);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
-
-  const featuredPost = useMemo(() => mockPosts[0], []);
 
   const handleCreateScrapbook = (payload) => {
     const newScrapbook = {
       id: `s-${Date.now()}`,
       title: payload.title || "Untitled Scrapbook",
       description: payload.description || "",
-      coverImage: payload.coverImage || featuredPost?.image,
+      coverImage: payload.coverImage || mockPosts[0]?.image,
       postIds: payload.postIds || [],
-      postCount: (payload.postIds || []).length || 1,
     };
     setScrapbooks((prev) => [newScrapbook, ...prev]);
   };
@@ -45,36 +47,21 @@ export default function MyGalleryPage() {
           </p>
           <div className={styles.tabRow}>
             <button
-              className={`${styles.tabButton} ${
-                activeTab === TABS.POSTS ? styles.tabActive : ""
-              }`}
+              className={`${styles.tabButton} ${activeTab === TABS.POSTS ? styles.tabActive : ""
+                }`}
               onClick={() => setActiveTab(TABS.POSTS)}
             >
               Posts
             </button>
             <button
-              className={`${styles.tabButton} ${
-                activeTab === TABS.SCRAPBOOKS ? styles.tabActive : ""
-              }`}
+              className={`${styles.tabButton} ${activeTab === TABS.SCRAPBOOKS ? styles.tabActive : ""
+                }`}
               onClick={() => setActiveTab(TABS.SCRAPBOOKS)}
             >
               Scrapbooks
             </button>
           </div>
         </div>
-        {featuredPost && (
-          <div className={styles.heroBadge}>
-            <img
-              src={featuredPost.image}
-              alt={featuredPost.title}
-              className={styles.heroImage}
-            />
-            <div className={styles.heroMeta}>
-              <span className={styles.heroLabel}>Featured</span>
-              <p className={styles.heroText}>{featuredPost.title}</p>
-            </div>
-          </div>
-        )}
       </section>
 
       {activeTab === TABS.POSTS ? (
@@ -98,7 +85,6 @@ export default function MyGalleryPage() {
                   <img src={post.image} alt={post.title} />
                   <div className={styles.postOverlay}>
                     <span className={styles.postLocation}>{post.location}</span>
-                    <p className={styles.postTitle}>{post.title}</p>
                   </div>
                 </div>
                 <div className={styles.postFooter}>
@@ -132,7 +118,7 @@ export default function MyGalleryPage() {
                 <ScrapbookCard
                   title={scrapbook.title}
                   coverImage={scrapbook.coverImage}
-                  postCount={scrapbook.postCount}
+                  postCount={(scrapbook.postIds || []).length}
                 />
               </Link>
             ))}
@@ -146,7 +132,7 @@ export default function MyGalleryPage() {
         onCreate={handleCreateScrapbook}
         posts={mockPosts}
       />
-      <GalleryPostModal
+      <PostDetailModal
         post={selectedPost}
         onClose={() => setSelectedPost(null)}
       />

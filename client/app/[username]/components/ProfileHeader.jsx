@@ -2,29 +2,16 @@
 import Image from "next/image";
 import styles from "./ProfileHeader.module.css";
 
-export default function ProfileHeader({
-  profileUser,
-  postsCount,
-  variant = "default",
-}) {
-  const headerClass =
-    variant === "modal"
-      ? `${styles.profileHeader} ${styles.modalVariant}`
-      : styles.profileHeader;
-  const avatarClass =
-    variant === "modal"
-      ? `${styles.avatar} ${styles.modalAvatar}`
-      : styles.avatar;
-
+export default function ProfileHeader({ profileUser, postsCount }) {
   return (
-    <section className={headerClass}>
+    <section className={styles.profileHeader}>
       <div className={styles.avatarContainer}>
         <Image
           src={profileUser.profilePicture || "/default.jpeg"}
           alt={profileUser.displayName}
           width={140}
           height={140}
-          className={avatarClass}
+          className={styles.avatar}
           priority
         />
       </div>

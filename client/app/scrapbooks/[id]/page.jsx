@@ -1,16 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import styles from "./page.module.css";
 import { mockPosts } from "@/mock/posts";
 import { mockScrapbooks } from "@/mock/scrapbooks";
-import GalleryPostModal from "@/components/GalleryPostModal";
+import PostDetailModal from "@/components/PostDetailModal";
 
 export default function ScrapbookDetailPage() {
   const { id } = useParams();
-  const scrapbook = mockScrapbooks.find((item) => item.id === id);
   const [selectedPost, setSelectedPost] = useState(null);
+  const scrapbook = mockScrapbooks.find((item) => item.id === id);
 
   const scrapbookPosts = useMemo(() => {
     if (!scrapbook) return [];
@@ -38,6 +39,11 @@ export default function ScrapbookDetailPage() {
 
   return (
     <main className={styles.page}>
+      <div className={styles.backRow}>
+        <Link href="/my-gallery?tab=scrapbooks" className={styles.backLink}>
+          ← Back to scrapbooks
+        </Link>
+      </div>
       <section className={styles.hero}>
         <div className={styles.heroText}>
           <p className={styles.eyebrow}>Scrapbook</p>
@@ -78,7 +84,6 @@ export default function ScrapbookDetailPage() {
                 <img src={post.image} alt={post.title} />
                 <div className={styles.postOverlay}>
                   <span className={styles.postLocation}>{post.location}</span>
-                  <p className={styles.postTitle}>{post.title}</p>
                 </div>
               </div>
               <div className={styles.postFooter}>
@@ -88,7 +93,7 @@ export default function ScrapbookDetailPage() {
           ))}
         </div>
       </section>
-      <GalleryPostModal
+      <PostDetailModal
         post={selectedPost}
         onClose={() => setSelectedPost(null)}
       />
