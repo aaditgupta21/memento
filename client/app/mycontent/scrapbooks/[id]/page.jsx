@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import styles from "./page.module.css";
 import { mockPosts } from "@/mock/posts";
 import { mockScrapbooks } from "@/mock/scrapbooks";
-import PostDetailModal from "@/components/PostDetailModal";
+import PostDetailModal from "../../components/PostDetailModal";
 
 // PAGE THAT SHOWS UP WHEN YOU CLICK A SCRAPBOOK
 
@@ -45,7 +45,10 @@ export default function ScrapbookDetailPage() {
   return (
     <main className={styles.page}>
       <div className={styles.backRow}>
-        <Link href="/my-gallery?tab=scrapbooks" className={styles.backLink}>
+        <Link
+          href="/mycontent/my-gallery?tab=scrapbooks"
+          className={styles.backLink}
+        >
           ← Back to scrapbooks
         </Link>
       </div>

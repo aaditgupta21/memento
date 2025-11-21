@@ -3,9 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
-import ScrapbookCard from "@/components/ScrapbookCard";
-import CreateScrapbookModal from "@/components/CreateScrapbookModal";
-import PostDetailModal from "@/components/PostDetailModal";
+import ScrapbookCard from "../components/ScrapbookCard";
+import CreateScrapbookModal from "../components/CreateScrapbookModal";
+import PostDetailModal from "../components/PostDetailModal";
 import { useSearchParams } from "next/navigation";
 import { mockPosts } from "@/mock/posts";
 import { mockScrapbooks } from "@/mock/scrapbooks";
@@ -118,7 +118,7 @@ export default function MyGalleryPage() {
             {scrapbooks.map((scrapbook) => (
               <Link
                 key={scrapbook.id}
-                href={`/scrapbooks/${scrapbook.id}`}
+                href={`/mycontent/scrapbooks/${scrapbook.id}`}
                 className={styles.cardLink}
                 // Keep using a Link for client-side navigation to detail pages
               >
