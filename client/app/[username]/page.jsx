@@ -28,11 +28,12 @@ function GalleryContent() {
     searchParams.get("tab") === TABS.SCRAPBOOKS ? TABS.SCRAPBOOKS : TABS.POSTS;
 
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [scrapbooks, setScrapbooks] = useState(mockScrapbooks);
+  const [scrapbooks, setScrapbooks] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingScrapbooks, setLoadingScrapbooks] = useState(true);
   const [profileUser, setProfileUser] = useState(null);
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
@@ -91,15 +92,33 @@ function GalleryContent() {
         const postsData = await postsRes.json();
         const fetchedPosts = postsData.posts || [];
 
+        // Fetch scrapbooks
+        const scrapbooksRes = await fetch(
+          `${API_BASE}/api/users/username/${username}/scrapbooks`,
+          {
+            credentials: "include",
+          }
+        );
+
+        let fetchedScrapbooks = [];
+        if (scrapbooksRes.ok) {
+          const scrapbooksData = await scrapbooksRes.json();
+          fetchedScrapbooks = scrapbooksData.scrapbooks || [];
+        }
+
         if (mounted) {
           setProfileUser(userData.user);
           setPosts(fetchedPosts);
+          setScrapbooks(fetchedScrapbooks);
+          setLoadingScrapbooks(false);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
         if (mounted) {
           setProfileUser(null);
           setPosts([]);
+          setScrapbooks([]);
+          setLoadingScrapbooks(false);
         }
       } finally {
         if (mounted) setLoading(false);
@@ -112,15 +131,9 @@ function GalleryContent() {
     };
   }, [username, API_BASE]);
 
-  // Build a new scrapbook object and prepend it to the list
-  const handleCreateScrapbook = (payload) => {
-    const newScrapbook = {
-      id: `s-${Date.now()}`,
-      title: payload.title || "Untitled Scrapbook",
-      description: payload.description || "",
-      coverImage: payload.coverImage || posts[0]?.images?.[0]?.url || "",
-      postIds: payload.postIds || [],
-    };
+  // Handle new scrapbook creation (called from modal after API success)
+  const handleCreateScrapbook = (newScrapbook) => {
+    // The scrapbook is already created in the backend, just add it to the list
     setScrapbooks((prev) => [newScrapbook, ...prev]);
   };
 
@@ -252,20 +265,26 @@ function GalleryContent() {
             </button>
           </div>
           <div className={styles.scrapbookGrid}>
-            {scrapbooks.map((scrapbook) => (
-              <Link
-                key={scrapbook.id}
-                href={`/mycontent/scrapbooks/${scrapbook.id}`}
-                className={styles.cardLink}
-                // Keep using a Link for client-side navigation to detail pages
-              >
-                <ScrapbookCard
-                  title={scrapbook.title}
-                  coverImage={scrapbook.coverImage}
-                  postCount={(scrapbook.postIds || []).length}
-                />
-              </Link>
-            ))}
+            {scrapbooks.map((scrapbook) => {
+              const scrapbookId = scrapbook._id || scrapbook.id;
+              const postCount = scrapbook.posts?.length || scrapbook.postIds?.length || 0;
+              // Use coverImage from scrapbook, fallback to first post image only if coverImage is missing
+              const coverImage = scrapbook.coverImage || scrapbook.posts?.[0]?.images?.[0]?.url || "";
+              return (
+                <Link
+                  key={scrapbookId}
+                  href={`/scrapbooks/${scrapbookId}`}
+                  className={styles.cardLink}
+                  // Keep using a Link for client-side navigation to detail pages
+                >
+                  <ScrapbookCard
+                    title={scrapbook.title}
+                    coverImage={coverImage}
+                    postCount={postCount}
+                  />
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}
@@ -274,7 +293,7 @@ function GalleryContent() {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onCreate={handleCreateScrapbook}
-        posts={posts.map(transformPost)}
+        posts={posts}
       />
       <PostDetailModal
         post={selectedPost}

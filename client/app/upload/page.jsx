@@ -160,6 +160,9 @@ export default function Upload() {
       setCaption("");
       setLocation("");
       setCategories([]);
+
+      // Redirect to feed page
+      router.push("/feed");
     } catch (error) {
       console.error("Error creating post:", error);
       alert(`Error: ${error.message}`);

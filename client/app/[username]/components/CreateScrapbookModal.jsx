@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./CreateScrapbookModal.module.css";
 import { mockPosts } from "@/mock/posts";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+
 // CREATE NEW SCRAPBOOK
 
 export default function CreateScrapbookModal({
@@ -16,13 +18,16 @@ export default function CreateScrapbookModal({
   const [description, setDescription] = useState("");
   const [coverImage, setCoverImage] = useState(posts[0]?.image || "");
   const [selectedPosts, setSelectedPosts] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setTitle("");
       setDescription("");
       setSelectedPosts([]);
-      setCoverImage(posts[0]?.image || "");
+      // Set cover image from first post if available
+      const firstPostImage = posts[0]?.images?.[0]?.url || posts[0]?.image || "";
+      setCoverImage(firstPostImage);
     }
   }, [isOpen, posts]);
 
@@ -36,14 +41,63 @@ export default function CreateScrapbookModal({
     );
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const payload = { title, description, coverImage, postIds: selectedPosts };
-    console.log("Scrapbook created:", payload);
-    if (onCreate) {
-      onCreate(payload);
+
+    if (!title.trim()) {
+      alert("Please enter a title");
+      return;
     }
-    onClose();
+
+    if (!description.trim()) {
+      alert("Please enter a description");
+      return;
+    }
+
+    if (!coverImage.trim()) {
+      alert("Please provide a cover image");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        title: title.trim(),
+        description: description.trim(),
+        coverImage: coverImage.trim(),
+        postIds: selectedPosts,
+      };
+
+      console.log("Creating scrapbook with payload:", payload);
+
+      const response = await fetch(`${API_BASE}/api/scrapbooks`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create scrapbook");
+      }
+
+      const data = await response.json();
+
+      // Call the onCreate callback with the created scrapbook
+      if (onCreate) {
+        onCreate(data.scrapbook);
+      }
+
+      onClose();
+    } catch (error) {
+      console.error("Error creating scrapbook:", error);
+      alert(`Error: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -111,27 +165,38 @@ export default function CreateScrapbookModal({
 
           <div className={styles.grid}>
             {posts.map((post) => {
-              const isSelected = selectedPosts.includes(post.id);
+              // Use _id for API posts, fallback to id for mock posts
+              const postId = post._id || post.id;
+              const postImage = post.images?.[0]?.url || post.image || "";
+              const postTitle = post.caption || post.title || "Untitled";
+              const postLocation = post.location || "";
+
+              const isSelected = selectedPosts.includes(postId);
               return (
                 <button
-                  key={post.id}
+                  key={postId}
                   type="button"
                   className={`${styles.postTile} ${
                     isSelected ? styles.postTileSelected : ""
                   }`}
                   onClick={() => {
-                    togglePost(post.id);
-                    setCoverImage(post.image);
+                    togglePost(postId);
+                    // Don't automatically override cover image if user has manually entered a URL
+                    // Only set it if the current value is empty or matches the default first post image
+                    const defaultImage = posts[0]?.images?.[0]?.url || posts[0]?.image || "";
+                    if (!coverImage || coverImage === defaultImage) {
+                      setCoverImage(postImage);
+                    }
                   }}
                 >
                   <img
-                    src={post.image}
-                    alt={post.title}
+                    src={postImage}
+                    alt={postTitle}
                     className={styles.postImage}
                   />
                   <div className={styles.postOverlay}>
-                    <span className={styles.postTitle}>{post.title}</span>
-                    <span className={styles.location}>{post.location}</span>
+                    <span className={styles.postTitle}>{postTitle}</span>
+                    <span className={styles.location}>{postLocation}</span>
                   </div>
                   {isSelected && <div className={styles.checkmark}>✓</div>}
                 </button>
@@ -147,8 +212,12 @@ export default function CreateScrapbookModal({
             >
               Cancel
             </button>
-            <button type="submit" className={styles.primaryButton}>
-              Create Scrapbook
+            <button
+              type="submit"
+              className={styles.primaryButton}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating..." : "Create Scrapbook"}
             </button>
           </div>
         </form>
