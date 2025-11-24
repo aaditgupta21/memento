@@ -19,6 +19,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Memento",
   description: "Capture. Reflect. Relive.",
+  icons: {
+    icon: [{ url: "/M.png", type: "image/png" }],
+  },
 };
 
 // Dummy user for layout purposes
