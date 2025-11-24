@@ -1,5 +1,5 @@
 "use client";
-import styles from "../Upload.module.css";
+import styles from "./StepIndicator.module.css";
 
 export default function StepIndicator({ stage }) {
   return (

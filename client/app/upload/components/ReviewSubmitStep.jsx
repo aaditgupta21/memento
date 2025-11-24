@@ -1,7 +1,7 @@
 "use client";
 import useEmblaCarousel from "embla-carousel-react";
 import { useEffect, useState } from "react";
-import styles from "../Upload.module.css";
+import styles from "./ReviewSubmitStep.module.css";
 
 export default function ReviewSubmitStep({
   uploadedFiles,

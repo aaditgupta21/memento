@@ -1,6 +1,6 @@
 "use client";
 import { prepareFlightRouterStateForRequest } from "next/dist/client/flight-data-helpers";
-import styles from "../Upload.module.css";
+import styles from "./CaptionLocationStep.module.css";
 import { useEffect, useRef, useState } from "react";
 
 export default function CaptionLocationStep({
