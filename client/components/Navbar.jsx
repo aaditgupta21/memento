@@ -45,9 +45,9 @@ export default function Navbar() {
           </span>
         </Link>
         <Link
-          href="/mycontent/my-gallery"
+          href={user?.displayName ? `/${user.displayName}` : "#"}
           className={`${styles.navLink} ${
-            isActive("/mycontent/my-gallery") ? styles.active : ""
+            user?.displayName && isActive(`/${user.displayName}`) ? styles.active : ""
           }`}
         >
           <span className={styles.navLinkContent}>
