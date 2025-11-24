@@ -41,6 +41,10 @@ export default function UploadImagesStep({
         config={{ mode: "auto" }}
         onClientUploadComplete={(res) => {
           if (res && res.length > 0) {
+            if (uploadedFiles.length + res.length > 10) {
+              alert("You can upload a maximum of 10 photos.");
+              return;
+            }
             const urls = res.map((f) => f.url);
             setUploadedFiles((prev) => [...prev, ...urls]);
           }
