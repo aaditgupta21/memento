@@ -15,7 +15,7 @@ export function UserProvider({ children }) {
 
   async function fetchUser() {
     try {
-      const response = await fetch("http://localhost:4000/api/me", {
+      const response = await fetch("http://localhost:4000/api/users/me", {
         credentials: "include",
         cache: "no-store", // Prevent caching to always check current session
       });
