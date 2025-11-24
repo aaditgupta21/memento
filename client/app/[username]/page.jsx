@@ -43,6 +43,9 @@ function GalleryContent() {
     ? profileUser.displayName.split(" ")[0]
     : username || "My";
 
+  // Check if current user is viewing their own gallery
+  const isOwnGallery = user?.displayName === username;
+
   // Fetch user profile and posts based on URL username
   useEffect(() => {
     let mounted = true;
@@ -257,12 +260,14 @@ function GalleryContent() {
               <p className={styles.muted}>Curated sets</p>
               <h2 className={styles.sectionTitle}>Scrapbooks</h2>
             </div>
-            <button
-              className={styles.primaryButton}
-              onClick={() => setModalOpen(true)}
-            >
-              + Create Scrapbook
-            </button>
+            {isOwnGallery && (
+              <button
+                className={styles.primaryButton}
+                onClick={() => setModalOpen(true)}
+              >
+                + Create Scrapbook
+              </button>
+            )}
           </div>
           <div className={styles.scrapbookGrid}>
             {scrapbooks.map((scrapbook) => {
@@ -289,12 +294,14 @@ function GalleryContent() {
         </section>
       )}
 
-      <CreateScrapbookModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onCreate={handleCreateScrapbook}
-        posts={posts}
-      />
+      {isOwnGallery && (
+        <CreateScrapbookModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onCreate={handleCreateScrapbook}
+          posts={posts}
+        />
+      )}
       <PostDetailModal
         post={selectedPost}
         onClose={() => setSelectedPost(null)}
