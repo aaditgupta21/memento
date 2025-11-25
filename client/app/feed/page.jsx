@@ -12,6 +12,7 @@ export default function Feed() {
   const [feedPosts, setFeedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [numRendered, setNumRendered] = useState(10); // start with 10 posts
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
 
@@ -43,20 +44,36 @@ export default function Feed() {
     };
   }, []);
 
+  const handleLoadMore = () => {
+    setNumRendered((prev) => prev + 10);
+  };
+
+  const visiblePosts = feedPosts.slice(0, numRendered);
+  const hasMore = numRendered < feedPosts.length;
+
   return (
     <main className={styles.page}>
       <div className={styles.container}>
         <h1 className={styles.title}>Your Feed</h1>
-        {loading && <p>Loading...</p>}
+        {loading && <p className={styles.loadingText}>Loading...</p>}
         {error && (
           <p style={{ color: "#b00" }}>Error: {error}. Showing fallback.</p>
         )}
-        {feedPosts.map((post) => (
+        {visiblePosts.map((post) => (
           <Post key={post._id ?? post.id} post={post} user={user} />
         ))}
         <p className={styles.endMessage}>
           {!loading && !feedPosts.length ? "No more memories." : null}
         </p>
+        {hasMore && !loading && (
+          <button onClick={handleLoadMore} className={styles.loadMoreBtn}>
+            Load More
+          </button>
+        )}
+
+        {!hasMore && feedPosts.length > 0 && (
+          <p className={styles.endMessage}>You've reached the end!</p>
+        )}
       </div>
     </main>
   );
