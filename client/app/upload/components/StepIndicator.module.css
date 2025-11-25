@@ -1,0 +1,37 @@
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.step {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e5ddd2;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  background: #da8d72;
+  color: white;
+}
+
+.stepLine {
+  flex: 1;
+  height: 2px;
+  background: #e5ddd2;
+  max-width: 60px;
+  transition: all 0.3s ease;
+}
+
+.stepLine.active {
+  background: #da8d72;
+}

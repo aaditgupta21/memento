@@ -1,16 +1,14 @@
 "use client";
 
 import styles from "./PostDetailModal.module.css";
-
-// NEW EXPANDED POST MODAL (CAN CHANGE LATER)
-
+import PostImage from "../../feed/components/postImage";
 
 // Lightweight modal to show a single post's details
 export default function PostDetailModal({ post, onClose }) {
   if (!post) return null;
 
   // Handle both API format and transformed format for backward compatibility
-  const imageUrl = post.images?.[0]?.url || post.image || "";
+  const imageUrls = post.images?.map((img) => img.url) || [post.image] || [];
   const title = post.caption || post.title || "Untitled";
   const description = post.caption || post.description || "";
   const location = post.location || "";
@@ -34,7 +32,8 @@ export default function PostDetailModal({ post, onClose }) {
         </button>
         <div className={styles.content}>
           <div className={styles.media}>
-            <img src={imageUrl} alt={title} />
+            {/* caption null because shown in detail section */}
+            <PostImage imageUrls={imageUrls} caption={null} />
           </div>
           <div className={styles.detail}>
             <p className={styles.eyebrow}>{location || "No location"}</p>

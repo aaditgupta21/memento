@@ -193,4 +193,61 @@ router.post("/:postId/comments", async (req, res) => {
   }
 });
 
+// Location search endpoint
+router.get("/locations/search", async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query || query.trim().length < 2) {
+      return res
+        .status(400)
+        .json({ error: "Query must be at least 2 characters" });
+    }
+
+    const nominatimUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+      query
+    )}&format=json&limit=5&addressdetails=1`;
+
+    const response = await fetch(nominatimUrl, {
+      headers: {
+        "User-Agent": "Memento-App/1.0",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch from Nominatim");
+    }
+
+    const data = await response.json();
+
+    const locations = data.map((item) => ({
+      placeId: item.place_id,
+      displayName: item.display_name,
+      name: item.name || item.display_name.split(",")[0],
+      lat: item.lat,
+      lon: item.lon,
+      type: item.type,
+      address: {
+        city:
+          item.address?.city ||
+          item.address?.town ||
+          item.address?.village ||
+          item.address?.hamlet ||
+          null,
+        state: item.address?.state,
+        country: item.address?.country,
+      },
+    }));
+
+    res.json({
+      success: true,
+      count: locations.length,
+      locations,
+    });
+  } catch (err) {
+    console.error("Error fetching locations:", err);
+    res.status(500).json({ error: "Failed to fetch location suggestions" });
+  }
+});
+
 module.exports = router;

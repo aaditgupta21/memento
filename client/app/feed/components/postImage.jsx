@@ -31,6 +31,8 @@ export default function PostImage({ imageUrls, caption }) {
     return (
       <div>
         <img src={imageUrls[0]} alt="image-0" className={styles.postImage} />
+        {/* fix issue of padding for single image posts */}
+        <div style={{ padding: "0.5rem 0" }}></div>
         {caption && <h2 className={styles.caption}>{caption}</h2>}
       </div>
     );
