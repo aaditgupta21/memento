@@ -184,3 +184,29 @@
     border-bottom: 1px solid rgba(146, 138, 123, 0.18);
   }
 }
+
+.deleteBtn {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 0.5rem 1.25rem;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.deleteBtn:hover {
+  background: #b71c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(211, 47, 47, 0.3);
+}
+
+.deleteBtn:active {
+  transform: translateY(0);
+}

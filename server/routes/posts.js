@@ -250,4 +250,42 @@ router.get("/locations/search", async (req, res) => {
   }
 });
 
+// delete a post
+router.delete("/:postId", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const { postId } = req.params;
+
+  if (!mongoose.isValidObjectId(postId)) {
+    return res.status(400).json({ error: "Invalid post ID" });
+  }
+
+  try {
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    // Check if the user is the author of the post
+    if (post.author.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to delete this post" });
+    }
+
+    await Post.findByIdAndDelete(postId);
+
+    res.json({
+      success: true,
+      message: "Post deleted successfully",
+    });
+  } catch (err) {
+    console.error("Error deleting post:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = router;

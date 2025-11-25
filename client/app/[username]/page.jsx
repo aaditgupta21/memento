@@ -183,15 +183,17 @@ function GalleryContent() {
           {/* Manual tab buttons; we keep local state only to avoid routing changes */}
           <div className={styles.tabRow}>
             <button
-              className={`${styles.tabButton} ${activeTab === TABS.POSTS ? styles.tabActive : ""
-                }`}
+              className={`${styles.tabButton} ${
+                activeTab === TABS.POSTS ? styles.tabActive : ""
+              }`}
               onClick={() => setActiveTab(TABS.POSTS)}
             >
               Posts
             </button>
             <button
-              className={`${styles.tabButton} ${activeTab === TABS.SCRAPBOOKS ? styles.tabActive : ""
-                }`}
+              className={`${styles.tabButton} ${
+                activeTab === TABS.SCRAPBOOKS ? styles.tabActive : ""
+              }`}
               onClick={() => setActiveTab(TABS.SCRAPBOOKS)}
             >
               Scrapbooks
@@ -272,9 +274,13 @@ function GalleryContent() {
           <div className={styles.scrapbookGrid}>
             {scrapbooks.map((scrapbook) => {
               const scrapbookId = scrapbook._id || scrapbook.id;
-              const postCount = scrapbook.posts?.length || scrapbook.postIds?.length || 0;
+              const postCount =
+                scrapbook.posts?.length || scrapbook.postIds?.length || 0;
               // Use coverImage from scrapbook, fallback to first post image only if coverImage is missing
-              const coverImage = scrapbook.coverImage || scrapbook.posts?.[0]?.images?.[0]?.url || "";
+              const coverImage =
+                scrapbook.coverImage ||
+                scrapbook.posts?.[0]?.images?.[0]?.url ||
+                "";
               return (
                 <Link
                   key={scrapbookId}
