@@ -39,7 +39,7 @@ export function UserProvider({ children }) {
 
   async function logout() {
     try {
-      const response = await fetch("http://localhost:4000/logout", {
+      const response = await fetch("http://localhost:4000/auth/logout", {
         method: "GET",
         credentials: "include",
       });
