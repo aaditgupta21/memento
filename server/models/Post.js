@@ -60,6 +60,10 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  geolocation: {
+    lat: Number,
+    lng: Number,
+  },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
