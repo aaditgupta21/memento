@@ -19,21 +19,49 @@ import styles from "./Help.module.css";
 
 const faqItems = [
   {
-    question: "How many photos can I upload at once?",
-    answer: "You can add up to 10 photos to a single post.",
+    question: "What happens if I accidentally upload the wrong photo?",
+    answer: "You can delete the photo from your Gallery at any time, or replace it when editing a scrapbook.",
   },
   {
-    question: "Are my posts private?",
-    answer: "Your memories stay private unless you explicitly set them to public.",
+    question: "Do my photos keep their original quality?",
+    answer: "Yes. Memento stores photos in high quality so your memories stay crisp and clear.",
   },
   {
-    question: "Can I delete a post?",
-    answer: "Yes. Open your Gallery, choose the post, and select Delete.",
+    question: "Can I change a post from private to public later?",
+    answer: "Absolutely. Just open the post settings and toggle the privacy option anytime.",
   },
   {
-    question: "How do I edit a scrapbook?",
-    answer: "Open the scrapbook, click Edit, adjust the posts or cover, then save.",
+    question: "How does the Wrapped feature work?",
+    answer: "Wrapped automatically analyzes your uploads, dates, and tags to generate personalized yearly stats.",
   },
+  {
+    question: "Can I edit a caption after uploading the photo?",
+    answer: "Yes. Open the post and click Edit Caption to update it.",
+  },
+  {
+    question: "What types of files can I upload?",
+    answer: "Memento currently supports JPG, PNG, and HEIC image formats.",
+  },
+  {
+    question: "Will my scrapbooks be visible to others?",
+    answer: "Your scrapbooks are private by default. You can choose to make one public when sharing.",
+  },
+  {
+    question: "Can I restore a deleted post?",
+    answer: "No, deleted posts are permanently removed to protect your privacy and storage space.",
+  },
+  {
+    question: "Why can't I upload more than 10 photos at once?",
+    answer: "To keep uploads fast and avoid server issues, posts are limited to 10 photos each.",
+  },
+  {
+    question: "Is there a limit to how many scrapbooks I can create?",
+    answer: "Nope! You can create as many scrapbooks as you want.",
+  },
+  {
+    question: "Do photo tags affect anything?",
+    answer: "Tags help you search, filter, and organize your photos more easily in your gallery.",
+  }
 ];
 
 const postSteps = [
@@ -46,7 +74,7 @@ const postSteps = [
   {
     title: "Drag and drop up to 10 photos into the upload box.",
     detail: "Reorder them to tell the story the way you remember it.",
-    imageSrc: "/uploadstep.png",
+    imageSrc: "/upload.png",
     alt: "Upload photos",
   },
   {
@@ -74,25 +102,25 @@ const scrapbookSteps = [
   {
     title: "Navigate to your Gallery.",
     detail: "Switch from feed to your personal gallery to manage content.",
-    imageSrc: "/file.svg",
+    imageSrc: "/gallerybutton.png",
     alt: "Gallery view",
   },
   {
     title: "Switch to the “Scrapbooks” tab.",
     detail: "See existing books and the option to make a new one.",
-    imageSrc: "/file.svg",
+    imageSrc: "/scrapbooktab.png",
     alt: "Scrapbooks tab",
   },
   {
     title: "Click “Create Scrapbook”.",
     detail: "Choose a theme or occasion to keep things organized.",
-    imageSrc: "/file.svg",
+    imageSrc: "/createbutton.png",
     alt: "Create scrapbook",
   },
   {
     title: "Select posts, choose a title + cover, and save it.",
     detail: "You can rearrange pages anytime to refine the story.",
-    imageSrc: "/file.svg",
+    imageSrc: "/createscrapbook.png",
     alt: "Select posts and save",
   },
 ];
@@ -143,9 +171,8 @@ export default function HelpPage() {
                     <p className={styles.stepText}>{step.title}</p>
                     <button
                       type="button"
-                      className={`${styles.toggleButton} ${
-                        openSteps[idx] ? styles.toggleOpen : ""
-                      }`}
+                      className={`${styles.toggleButton} ${openSteps[idx] ? styles.toggleOpen : ""
+                        }`}
                       onClick={() => toggleStep(idx)}
                     >
                       <ChevronDown className={styles.toggleIcon} size={16} />
@@ -173,7 +200,7 @@ export default function HelpPage() {
           <div className={styles.sectionHeader}>
             <BookMarked className={styles.iconAccent} />
             <div>
-              <h2>How to Create a Scrapbook</h2>
+              <h2>Create a Scrapbook</h2>
               <p className={styles.sectionCopy}>
                 Group multiple posts into a themed scrapbook to tell a longer
                 story.
@@ -190,9 +217,8 @@ export default function HelpPage() {
                     <p className={styles.stepText}>{step.title}</p>
                     <button
                       type="button"
-                      className={`${styles.toggleButton} ${
-                        openScrapSteps[idx] ? styles.toggleOpen : ""
-                      }`}
+                      className={`${styles.toggleButton} ${openScrapSteps[idx] ? styles.toggleOpen : ""
+                        }`}
                       onClick={() => toggleScrapStep(idx)}
                     >
                       <ChevronDown className={styles.toggleIcon} size={16} />
@@ -216,103 +242,6 @@ export default function HelpPage() {
           </ol>
         </section>
 
-        <section className={styles.card}>
-          <div className={styles.sectionHeader}>
-            <Settings className={styles.iconAccent} />
-            <div>
-              <h2>Editing Your Account Settings</h2>
-              <p className={styles.sectionCopy}>
-                All account controls live under <strong>Account → Settings</strong>.
-                Adjust your identity and security in a few taps.
-              </p>
-            </div>
-          </div>
-
-          <div className={styles.settingsGrid}>
-            <div className={styles.settingItem}>
-              <div className={styles.iconBadge}>
-                <ImageIcon size={18} />
-              </div>
-              <div>
-                <p className={styles.settingTitle}>Change profile picture</p>
-                <p className={styles.settingCopy}>
-                  Upload a fresh avatar to keep your profile recognizable.
-                </p>
-              </div>
-            </div>
-            <div className={styles.settingItem}>
-              <div className={styles.iconBadge}>
-                <Mail size={18} />
-              </div>
-              <div>
-                <p className={styles.settingTitle}>Update email</p>
-                <p className={styles.settingCopy}>
-                  Swap to a new inbox and confirm the verification link we send.
-                </p>
-              </div>
-            </div>
-            <div className={styles.settingItem}>
-              <div className={styles.iconBadge}>
-                <UserRound size={18} />
-              </div>
-              <div>
-                <p className={styles.settingTitle}>Change username</p>
-                <p className={styles.settingCopy}>
-                  Pick a new handle; it updates on your posts and scrapbooks.
-                </p>
-              </div>
-            </div>
-            <div className={styles.settingItem}>
-              <div className={styles.iconBadge}>
-                <Lock size={18} />
-              </div>
-              <div>
-                <p className={styles.settingTitle}>Update password</p>
-                <p className={styles.settingCopy}>
-                  Choose a strong password to protect your account and memories.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className={styles.card}>
-          <div className={styles.sectionHeader}>
-            <Activity className={styles.iconAccent} />
-            <div>
-              <h2>Wrapped / Activity Stats Overview</h2>
-              <p className={styles.sectionCopy}>
-                Track your posting streaks and see a map of your activity over
-                time.
-              </p>
-            </div>
-          </div>
-
-          <div className={styles.statsBlock}>
-            <p className={styles.stepDetail}>
-              Heatmap tiles darken as you post more. Light squares mean fewer
-              posts; darker squares show your most active days.
-            </p>
-            <ul className={styles.statsList}>
-              <li className={styles.statItem}>
-                <MapPin size={18} />
-                <span>Total posts across all memories.</span>
-              </li>
-              <li className={styles.statItem}>
-                <Upload size={18} />
-                <span>Hearts received and how people react.</span>
-              </li>
-              <li className={styles.statItem}>
-                <Activity size={18} />
-                <span>Most active month plus streak highlights.</span>
-              </li>
-              <li className={styles.statItem}>
-                <BookMarked size={18} />
-                <span>Scrapbooks created and most visited sets.</span>
-              </li>
-            </ul>
-          </div>
-        </section>
 
         <section className={styles.card}>
           <div className={styles.sectionHeader}>
@@ -330,7 +259,7 @@ export default function HelpPage() {
               <details className={styles.accordionItem} key={item.question}>
                 <summary>
                   <span>{item.question}</span>
-                  <span className={styles.chevron}>+</span>
+                  <span className={styles.chevron} aria-hidden="true"></span>
                 </summary>
                 <p>{item.answer}</p>
               </details>

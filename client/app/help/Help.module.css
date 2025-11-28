@@ -23,11 +23,12 @@
 }
 
 .title {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2.2rem, 4vw, 3rem);
-  font-weight: 600;
-  color: #7b7063;
-  margin: 0;
+  font-family: serif;
+  font-size: 3rem;
+  font-weight: normal;
+  color: #928a7b;
+  margin: 1rem 0 0 0;
+  letter-spacing: 0.5px;
 }
 
 .subtitle {
@@ -287,13 +288,21 @@
   font-weight: 700;
 }
 
+.chevron::before {
+  content: "+";
+}
+
+.accordionItem[open] .chevron::before {
+  content: "−";
+}
+
 .accordionItem[open] summary {
   background: #f4eadf;
 }
 
 .accordionItem p {
   padding: 0 1rem 1rem 1rem;
-  margin: 0;
+  margin: 0.5rem 0 0 0;
   color: #7b7467;
   line-height: 1.45;
 }
