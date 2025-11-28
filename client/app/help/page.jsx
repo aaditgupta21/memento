@@ -40,27 +40,60 @@ const postSteps = [
   {
     title: "Click “Upload” in the top navigation bar.",
     detail: "This opens the upload workspace so you can start a memory.",
-    imageSrc: "/client/public/uploadstep.png",
+    imageSrc: "/uploadbuttonstep.png",
     alt: "Navigate to Upload",
   },
   {
     title: "Drag and drop up to 10 photos into the upload box.",
     detail: "Reorder them to tell the story the way you remember it.",
-    imageSrc: "/file.svg",
+    imageSrc: "/uploadstep.png",
     alt: "Upload photos",
   },
   {
     title: "Add a caption and location (required).",
     detail:
       "Context helps friends follow along, and it powers your map view later.",
-    imageSrc: "/file.svg",
+    imageSrc: "/captionlocstep.png",
     alt: "Add caption and location",
+  },
+  {
+    title: "Add tags to classify your post (optional)",
+    detail: "Users can look through specific memories they want using tags.",
+    imageSrc: "/categorystep.png",
+    alt: "Tag post",
   },
   {
     title: "Review your memory and click “Create Post”.",
     detail: "Final check: confirm the cover photo, categories, and details.",
-    imageSrc: "/file.svg",
+    imageSrc: "/reviewstep.png",
     alt: "Review and submit",
+  },
+];
+
+const scrapbookSteps = [
+  {
+    title: "Navigate to your Gallery.",
+    detail: "Switch from feed to your personal gallery to manage content.",
+    imageSrc: "/file.svg",
+    alt: "Gallery view",
+  },
+  {
+    title: "Switch to the “Scrapbooks” tab.",
+    detail: "See existing books and the option to make a new one.",
+    imageSrc: "/file.svg",
+    alt: "Scrapbooks tab",
+  },
+  {
+    title: "Click “Create Scrapbook”.",
+    detail: "Choose a theme or occasion to keep things organized.",
+    imageSrc: "/file.svg",
+    alt: "Create scrapbook",
+  },
+  {
+    title: "Select posts, choose a title + cover, and save it.",
+    detail: "You can rearrange pages anytime to refine the story.",
+    imageSrc: "/file.svg",
+    alt: "Select posts and save",
   },
 ];
 
@@ -68,9 +101,18 @@ export default function HelpPage() {
   const [openSteps, setOpenSteps] = useState(
     () => Array(postSteps.length).fill(false)
   );
+  const [openScrapSteps, setOpenScrapSteps] = useState(
+    () => Array(scrapbookSteps.length).fill(false)
+  );
 
   const toggleStep = (idx) => {
     setOpenSteps((prev) => prev.map((open, i) => (i === idx ? !open : open)));
+  };
+
+  const toggleScrapStep = (idx) => {
+    setOpenScrapSteps((prev) =>
+      prev.map((open, i) => (i === idx ? !open : open))
+    );
   };
 
   return (
@@ -114,8 +156,8 @@ export default function HelpPage() {
                     <div className={styles.stepImageWrap}>
                       <Image
                         src={step.imageSrc}
-                        width={300}
-                        height={200}
+                        width={200}
+                        height={300}
                         alt={step.alt}
                         className={styles.stepImage}
                       />
@@ -140,47 +182,37 @@ export default function HelpPage() {
           </div>
 
           <ol className={styles.stepList}>
-            <li className={styles.stepItem}>
-              <span className={styles.stepBadge}>1</span>
-              <div>
-                <p className={styles.stepText}>Navigate to your Gallery.</p>
-                <p className={styles.stepDetail}>
-                  Switch from feed to your personal gallery to manage content.
-                </p>
-              </div>
-            </li>
-            <li className={styles.stepItem}>
-              <span className={styles.stepBadge}>2</span>
-              <div>
-                <p className={styles.stepText}>
-                  Switch to the “Scrapbooks” tab.
-                </p>
-                <p className={styles.stepDetail}>
-                  Here you will see existing books and the option to make a new
-                  one.
-                </p>
-              </div>
-            </li>
-            <li className={styles.stepItem}>
-              <span className={styles.stepBadge}>3</span>
-              <div>
-                <p className={styles.stepText}>Click “Create Scrapbook”.</p>
-                <p className={styles.stepDetail}>
-                  Choose a theme or occasion to keep things organized.
-                </p>
-              </div>
-            </li>
-            <li className={styles.stepItem}>
-              <span className={styles.stepBadge}>4</span>
-              <div>
-                <p className={styles.stepText}>
-                  Select posts, choose a title + cover, and save it.
-                </p>
-                <p className={styles.stepDetail}>
-                  You can rearrange pages anytime to refine the story.
-                </p>
-              </div>
-            </li>
+            {scrapbookSteps.map((step, idx) => (
+              <li className={styles.stepItem} key={step.title}>
+                <span className={styles.stepBadge}>{idx + 1}</span>
+                <div className={styles.stepContent}>
+                  <div className={styles.stepHeaderRow}>
+                    <p className={styles.stepText}>{step.title}</p>
+                    <button
+                      type="button"
+                      className={`${styles.toggleButton} ${
+                        openScrapSteps[idx] ? styles.toggleOpen : ""
+                      }`}
+                      onClick={() => toggleScrapStep(idx)}
+                    >
+                      <ChevronDown className={styles.toggleIcon} size={16} />
+                    </button>
+                  </div>
+                  <p className={styles.stepDetail}>{step.detail}</p>
+                  {openScrapSteps[idx] && (
+                    <div className={styles.stepImageWrap}>
+                      <Image
+                        src={step.imageSrc}
+                        width={200}
+                        height={300}
+                        alt={step.alt}
+                        className={styles.stepImage}
+                      />
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
           </ol>
         </section>
 
