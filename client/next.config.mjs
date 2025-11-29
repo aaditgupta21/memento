@@ -20,6 +20,8 @@ const nextConfig = {
         hostname: "**",
       },
     ],
+    // Don't optimize external images - use them directly from CDN
+    unoptimized: true,
   },
 };
 

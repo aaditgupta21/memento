@@ -8,7 +8,10 @@ function setupMiddleware(app) {
   // CORS
   app.use(
     cors({
-      origin: process.env.CLIENT_ORIGIN || "http://localhost:3000",
+      origin:
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:3000"
+          : process.env.CLIENT_ORIGIN,
       credentials: true,
     })
   );

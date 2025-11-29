@@ -1,41 +1,35 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    container_name: memento-server
-    restart: unless-stopped
-    ports:
-      - "4000:4000"
-    env_file:
-      - ./server/.env
-    environment:
-      - NODE_ENV=production
-    networks:
-      - memento-network
-
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:4000}
-    container_name: memento-client
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    env_file:
-      - ./client/.env
+    container_name: next-client
+    restart: always
+    expose:
+      - "3000"
     environment:
-      - NODE_ENV=production
+      - NEXT_PUBLIC_API=https://api.trymemento.app
+      - UPLOADTHING_TOKEN=${UPLOADTHING_TOKEN}
+    volumes:
+      - /app/node_modules
     depends_on:
       - server
-    networks:
-      - memento-network
 
-networks:
-  memento-network:
-    driver: bridge
-
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: express-server
+    restart: always
+    expose:
+      - "4000"
+    environment:
+      - PORT=${PORT}
+      - NODE_ENV=${NODE_ENV}
+      - MONGODB_URI=${MONGODB_URI}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    volumes:
+      - /app/node_modules
