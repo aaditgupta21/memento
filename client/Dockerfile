@@ -8,9 +8,6 @@ COPY package.json package-lock.json* ./
 # Install dependencies (including devDependencies needed for build)
 RUN npm install
 
-# Verify next is installed
-RUN npx next --version || npm list next
-
 # Copy application code
 COPY . .
 
