@@ -34,7 +34,7 @@ export default function SetUsernamePage() {
     setSuccess("");
 
     try {
-      const response = await fetch("http://localhost:4000/api/update-username", {
+      const response = await fetch("http://localhost:4000/api/users/update-username", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -106,8 +106,7 @@ export default function SetUsernamePage() {
               required
               placeholder="Enter your username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoFocus
+              onChange={(e) => setUsername(e.target.value.toLowerCase())}
             />
           </div>
 

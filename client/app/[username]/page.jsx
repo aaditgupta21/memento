@@ -40,10 +40,8 @@ function GalleryContent() {
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
 
-  // Extract first name from profileUser's displayName
-  const firstName = profileUser?.displayName
-    ? profileUser.displayName.split(" ")[0]
-    : username || "My";
+  // Get first name from database
+  const firstName = profileUser?.firstName || profileUser?.displayName || "My";
 
   // Check if current user is viewing their own gallery
   const isOwnGallery = user?.displayName === username;

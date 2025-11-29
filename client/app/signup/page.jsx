@@ -7,6 +7,8 @@ import styles from "./SignupPage.module.css";
 
 export default function SignupPage() {
   // use states for user signing up to track relevant info
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,6 +37,8 @@ export default function SignupPage() {
           email,
           password,
           displayName: username,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
         }),
       });
 
@@ -74,6 +78,30 @@ export default function SignupPage() {
               {success}
             </div>
           )}
+          <div>
+            <label htmlFor="firstName">First Name</label>
+            <input
+              id="firstName"
+              name="firstName"
+              type="text"
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="lastName">Last Name</label>
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
+
           <div>
             <label htmlFor="username">Username</label>
             <input

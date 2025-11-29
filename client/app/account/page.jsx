@@ -100,7 +100,7 @@ export default function Account() {
 
             // Update username if it changed
             if (username !== user.displayName) {
-                const usernameUpdate = await fetch("http://localhost:4000/api/update-username", {
+                const usernameUpdate = await fetch("http://localhost:4000/api/users/update-username", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
