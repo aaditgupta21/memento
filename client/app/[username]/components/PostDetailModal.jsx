@@ -12,7 +12,7 @@ export default function PostDetailModal({ post, onClose }) {
   const { user } = useUser();
   const isOwnPost = post.author?._id === user?.id;
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
   // Handle both API format and transformed format for backward compatibility
   const imageUrls = post.images?.map((img) => img.url) || [post.image] || [];
   const title = post.caption || post.title || "Untitled";

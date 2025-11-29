@@ -86,6 +86,41 @@ npm run server
 npm run build
 ```
 
+### Running with Docker
+
+Make sure you have Docker and Docker Compose installed.
+
+1. Create `.env` files as described in the Environment Variables section
+2. Build and start all services:
+
+```bash
+docker-compose up --build
+```
+
+This will start:
+
+- MongoDB on port 27017
+- Server on port 4000
+- Client on port 3000
+
+To run in detached mode:
+
+```bash
+docker-compose up -d
+```
+
+To stop all services:
+
+```bash
+docker-compose down
+```
+
+To stop and remove volumes (including MongoDB data):
+
+```bash
+docker-compose down -v
+```
+
 ### Ports
 
 - **Client (Next.js)**: http://localhost:3000
@@ -117,6 +152,7 @@ Create a `.env` file in the `client/` directory with the following variables:
 
 ```
 UPLOADTHING_TOKEN=your_uploadthing_token
+NEXT_PUBLIC_API_URL=http://localhost:4000
 ```
 
 ## License

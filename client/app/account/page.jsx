@@ -106,7 +106,8 @@ export default function Account() {
 
             // Update username if it changed
             if (username !== user.displayName) {
-                const usernameUpdate = await fetch("http://localhost:4000/api/users/update-username", {
+                const API_URL = process.env.NEXT_PUBLIC_API_URL;
+                const usernameUpdate = await fetch(`${API_URL}/api/users/update-username`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
@@ -127,7 +128,8 @@ export default function Account() {
 
             // Update firstName and lastName if changed (only for non-Google users)
             if (!isGoogleUser && (firstName !== (user.firstName || '') || lastName !== (user.lastName || ''))) {
-                const nameUpdate = await fetch("http://localhost:4000/api/users/update-name", {
+                const API_URL = process.env.NEXT_PUBLIC_API_URL;
+                const nameUpdate = await fetch(`${API_URL}/api/users/update-name`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
@@ -149,7 +151,8 @@ export default function Account() {
 
             if (!isGoogleUser && newPassword) {
                 // send the requested password change to the backend
-                const pwUpdate = await fetch("http://localhost:4000/api/update-password", {
+                const API_URL = process.env.NEXT_PUBLIC_API_URL;
+                const pwUpdate = await fetch(`${API_URL}/api/update-password`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",

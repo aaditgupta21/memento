@@ -24,7 +24,7 @@ export default function Feed() {
   const [numRendered, setNumRendered] = useState(10);
   const [selectedCategory, setSelectedCategory] = useState(""); // "" = all
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     let mounted = true;

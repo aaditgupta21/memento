@@ -30,7 +30,7 @@ function setupMiddleware(app) {
         ttl: 60 * 60 * 24 * 7, // 7 days in seconds
       }),
       cookie: {
-        secure: process.env.NODE_ENV === "production",
+        secure: false, // Set to true only when using HTTPS
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
         sameSite: "lax",

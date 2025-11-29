@@ -7,7 +7,7 @@ import { useUser } from "@/context/UserContext";
 import styles from "./page.module.css";
 import PostDetailModal from "@/app/[username]/components/PostDetailModal";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 // PAGE THAT SHOWS UP WHEN YOU CLICK A SCRAPBOOK
 

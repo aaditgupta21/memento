@@ -74,7 +74,8 @@ export default function Upload() {
   const handleFourthSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("http://localhost:4000/api/posts", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${API_URL}/api/posts`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

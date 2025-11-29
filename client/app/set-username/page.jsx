@@ -34,7 +34,8 @@ export default function SetUsernamePage() {
     setSuccess("");
 
     try {
-      const response = await fetch("http://localhost:4000/api/users/update-username", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${API_URL}/api/users/update-username`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

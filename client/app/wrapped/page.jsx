@@ -47,7 +47,7 @@ export default function Wrapped() {
   const [loadingStats, setLoadingStats] = useState(true);
   const activityYear = new Date().getFullYear();
   const [selectedPost, setSelectedPost] = useState(null);
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
   // Redirect to home page if not logged in
   useEffect(() => {

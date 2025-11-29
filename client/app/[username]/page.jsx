@@ -36,7 +36,7 @@ function GalleryContent() {
   const [loadingScrapbooks, setLoadingScrapbooks] = useState(true);
   const [profileUser, setProfileUser] = useState(null);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
   // Get first name from database
   const firstName = profileUser?.firstName || profileUser?.displayName || "My";

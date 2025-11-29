@@ -27,7 +27,8 @@ export default function SignupPage() {
     setError("");
     setSuccess("");
     try {
-      const response = await fetch("http://localhost:4000/auth/signup", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${API_URL}/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -146,7 +147,8 @@ export default function SignupPage() {
             type="button"
             style={{ color: "black", border: "1px solid #e8e0d8" }}
             onClick={() => {
-              window.location.href = "http://localhost:4000/auth/google";
+              const API_URL = process.env.NEXT_PUBLIC_API_URL;
+              window.location.href = `${API_URL}/auth/google`;
             }}
           >
             Continue with Google
