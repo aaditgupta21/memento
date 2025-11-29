@@ -2,10 +2,19 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-COPY package*.json ./
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install dependencies (including devDependencies needed for build)
 RUN npm install
 
+# Verify next is installed
+RUN npx next --version || npm list next
+
+# Copy application code
 COPY . .
+
+# Build the application
 RUN npm run build
 
 # --- RUNTIME STAGE ---
