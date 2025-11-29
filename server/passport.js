@@ -21,12 +21,17 @@ passport.use(
           done(null, user);
         } else {
           // New user - use email as displayName initially
+          // Extract firstName and lastName from Google profile
+          const firstName = profile.name?.givenName || "";
+          const lastName = profile.name?.familyName || "";
           const newUser = {
             googleId: profile.id,
             displayName: profile.emails[0].value,
             email: profile.emails[0].value,
             disabled: false,
             profilePicture: profile.photos[0].value,
+            firstName: firstName,
+            lastName: lastName,
           };
           user = await User.create(newUser);
           done(null, user);

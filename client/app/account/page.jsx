@@ -2,12 +2,21 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState, useEffect } from 'react'
+import { useRouter } from "next/navigation";
 import { CameraIcon, UserIcon, SaveIcon } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import s from "./Account.module.css";
 
 export default function Account() {
     const { user, loading: userLoading, fetchUser } = useUser();
+    const router = useRouter();
+
+    // Redirect to home page if not logged in
+    useEffect(() => {
+        if (!userLoading && !user) {
+            router.push("/");
+        }
+    }, [userLoading, user, router]);
     const [profileImage, setProfileImage] = useState('');
     const [email, setEmail] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
@@ -91,7 +100,7 @@ export default function Account() {
 
             // Update username if it changed
             if (username !== user.displayName) {
-                const usernameUpdate = await fetch("http://localhost:4000/api/update-username", {
+                const usernameUpdate = await fetch("http://localhost:4000/api/users/update-username", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",

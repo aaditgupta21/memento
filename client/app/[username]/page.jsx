@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./gallery.module.css";
 import ScrapbookCard from "./components/ScrapbookCard";
 import CreateScrapbookModal from "./components/CreateScrapbookModal";
@@ -20,8 +21,9 @@ const TABS = {
 function GalleryContent() {
   const searchParams = useSearchParams();
   const params = useParams();
+  const router = useRouter();
   const username = params?.username;
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
   const initialTab =
     searchParams.get("tab") === TABS.SCRAPBOOKS ? TABS.SCRAPBOOKS : TABS.POSTS;
 
@@ -36,13 +38,18 @@ function GalleryContent() {
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
 
-  // Extract first name from profileUser's displayName
-  const firstName = profileUser?.displayName
-    ? profileUser.displayName.split(" ")[0]
-    : username || "My";
+  // Get first name from database
+  const firstName = profileUser?.firstName || profileUser?.displayName || "My";
 
   // Check if current user is viewing their own gallery
   const isOwnGallery = user?.displayName === username;
+
+  // Redirect to home page if not logged in
+  useEffect(() => {
+    if (!userLoading && !user) {
+      router.push("/");
+    }
+  }, [userLoading, user, router]);
 
   // Fetch user profile and posts based on URL username
   useEffect(() => {
@@ -131,6 +138,9 @@ function GalleryContent() {
       mounted = false;
     };
   }, [username, API_BASE]);
+
+  // Show nothing while loading or redirecting
+  if (userLoading || !user) return null;
 
   // Handle new scrapbook creation (called from modal after API success)
   const handleCreateScrapbook = (newScrapbook) => {

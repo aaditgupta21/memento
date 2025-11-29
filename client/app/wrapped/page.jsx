@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ImageIcon, HeartIcon, MapPinIcon, SparklesIcon } from "lucide-react";
 
 import { useUser } from "@/context/UserContext";
@@ -38,7 +39,8 @@ const DEFAULT_TOP_MEMORIES = [
   },
 ];
 export default function Wrapped() {
-  const { user } = useUser();
+  const { user, loading } = useUser();
+  const router = useRouter();
   const [posts, setPosts] = useState([]);
   const [memoriesCaptured, setMemoriesCaptured] = useState(0);
   const [heartsReceived, setHeartsReceived] = useState(0);
@@ -46,6 +48,13 @@ export default function Wrapped() {
   const activityYear = new Date().getFullYear();
   const [selectedPost, setSelectedPost] = useState(null);
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+
+  // Redirect to home page if not logged in
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/");
+    }
+  }, [loading, user, router]);
 
   useEffect(() => {
     let mounted = true;
@@ -157,6 +166,9 @@ export default function Wrapped() {
       icon: SparklesIcon,
     },
   ];
+
+  // Show nothing while loading or redirecting
+  if (loading || !user) return null;
 
   const topMemories = useMemo(() => {
     return posts

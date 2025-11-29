@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import styles from "./Upload.module.css";
@@ -20,6 +20,13 @@ export default function Upload() {
   const { user, loading } = useUser();
   const router = useRouter();
 
+  // Redirect to home page if not logged in
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/");
+    }
+  }, [loading, user, router]);
+
   const availableCategories = [
     "Travel",
     "Sports",
@@ -38,6 +45,7 @@ export default function Upload() {
     "Nature",
   ];
 
+  // Show nothing while loading or redirecting
   if (loading || !user) return null;
 
   const handleFirstSubmit = () => {
