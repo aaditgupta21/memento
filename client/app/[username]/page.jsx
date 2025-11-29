@@ -8,8 +8,6 @@ import CreateScrapbookModal from "./components/CreateScrapbookModal";
 import PostDetailModal from "./components/PostDetailModal";
 import { useSearchParams, useParams } from "next/navigation";
 import { useUser } from "@/context/UserContext";
-import { mockPosts } from "@/mock/posts";
-import { mockScrapbooks } from "@/mock/scrapbooks";
 
 // GALLERY PAGE THAT SHOWS UP WHEN FIRST CLICKED
 
