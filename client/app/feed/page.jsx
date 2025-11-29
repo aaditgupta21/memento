@@ -2,26 +2,9 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import Post from "./components/post";
+import CategoryFilter from "./components/CategoryFilter";
 import styles from "./Feed.module.css";
 import { useUser } from "@/context/UserContext";
-
-const CATEGORIES = [
-  "Travel",
-  "Sports",
-  "Gaming",
-  "Lifestyle",
-  "Food",
-  "Fitness",
-  "Fashion",
-  "Beauty",
-  "Wellness",
-  "Home",
-  "Family",
-  "Art",
-  "Music",
-  "Photography",
-  "Nature",
-];
 
 export default function Feed() {
   const { user } = useUser();
@@ -85,22 +68,10 @@ export default function Feed() {
       <div className={styles.container}>
         <h1 className={styles.title}>Your Feed</h1>
 
-        {/* Category Filter */}
-        <div className={styles.filterBar}>
-          <label className={styles.filterLabel}>Filter by category:</label>
-          <select
-            value={selectedCategory}
-            onChange={(e) => handleCategoryChange(e.target.value)}
-            className={styles.filterSelect}
-          >
-            <option value="">All Categories</option>
-            {CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </div>
+        <CategoryFilter
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
+        />
 
         {loading && <p className={styles.loadingText}>Loading...</p>}
         {error && (
