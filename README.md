@@ -1,4 +1,4 @@
-# CS35L Full Stack Project
+# Memento
 
 A full-stack web application with **Next.js** frontend and **Express** backend.
 
