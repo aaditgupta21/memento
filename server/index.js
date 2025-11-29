@@ -33,14 +33,16 @@ app.get(
   (req, res) => {
     // Check if user needs to set username
     const user = req.user;
+    const clientOrigin =
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : process.env.CLIENT_ORIGIN;
     if (user.displayName === user.email) {
       // User needs to set a username
-      res.redirect(
-        `${process.env.CLIENT_ORIGIN || "http://localhost:3000"}/set-username`
-      );
+      res.redirect(`${clientOrigin}/set-username`);
     } else {
       // User already has a username
-      res.redirect(process.env.CLIENT_ORIGIN || "http://localhost:3000");
+      res.redirect(clientOrigin);
     }
   }
 );
