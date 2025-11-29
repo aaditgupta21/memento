@@ -14,6 +14,7 @@ export default function Upload() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [caption, setCaption] = useState("");
   const [location, setLocation] = useState("");
+  const [geolocation, setGeolocation] = useState(null);
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [stage, setStage] = useState(1);
@@ -74,6 +75,7 @@ export default function Upload() {
           images: uploadedFiles.map((url, idx) => ({ url, order: idx })),
           caption: caption.trim(),
           location: location.trim(),
+          geolocation,
           categories,
         }),
       });
@@ -116,6 +118,7 @@ export default function Upload() {
             setCaption={setCaption}
             location={location}
             setLocation={setLocation}
+            setGeolocation={setGeolocation}
             onBack={handleBack}
             onNext={handleSecondSubmit}
           />

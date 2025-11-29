@@ -223,10 +223,11 @@ async function downloadImageFromUrl(url) {
  * @param {Object} query - MongoDB query filter (default: all posts)
  * @param {Object} options - Options
  * @param {number} options.limit - Limit number of posts to process
+ * @param {string} options.userId - Filter posts by user ID
  * @returns {Promise<Array>} Scrapbook entries with GPS data
  */
 async function loadScrapbookEntriesFromPosts(query = {}, options = {}) {
-  const { limit = null } = options;
+  const { limit = null, userId = null } = options;
 
   // Ensure MongoDB connection
   if (mongoose.connection.readyState === 0) {
@@ -241,6 +242,27 @@ async function loadScrapbookEntriesFromPosts(query = {}, options = {}) {
 
   // Import Post model
   const Post = require("../models/Post");
+
+  // Apply user filter if provided
+  if (userId) {
+    query = { ...query, author: userId };
+
+    // Optional: Look up user display name
+    try {
+      const User = require("../models/User");
+      const user = await User.findById(userId).select('username email').exec();
+      if (user) {
+        console.log(`[Posts] Filtering for user: ${user.username || user.email} (${userId})`);
+      } else {
+        console.log(`[Posts] Filtering for user: ${userId}`);
+        console.warn(`[Posts] Warning: User ${userId} not found in database`);
+      }
+    } catch (error) {
+      console.log(`[Posts] Filtering for user: ${userId}`);
+    }
+  } else {
+    console.log(`[Posts] Loading posts from all users`);
+  }
 
   // Query posts
   let queryBuilder = Post.find(query).sort({ createdAt: -1 });

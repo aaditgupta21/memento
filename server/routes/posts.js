@@ -11,7 +11,7 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    const { images, caption, location, categories } = req.body;
+    const { images, caption, location, categories, geolocation } = req.body;
 
     if (!images || !Array.isArray(images) || images.length === 0) {
       return res.status(400).json({ error: "At least one image is required" });
@@ -35,6 +35,7 @@ router.post("/", async (req, res) => {
       })),
       caption: caption ? caption.trim() : "",
       location: location ? location.trim() : undefined,
+      geolocation,
       categories: safeCategories,
       author: req.user._id,
     });

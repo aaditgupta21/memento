@@ -6,4 +6,10 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
 
+# Generated scrapbook files
+scrapbook_suggestions.json
+server/testBigDataCloud.js
+*.md
+.gitignore

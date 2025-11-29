@@ -8,6 +8,7 @@ export default function CaptionLocationStep({
   setCaption,
   location,
   setLocation,
+  setGeolocation,
   onBack,
   onNext,
 }) {
@@ -79,7 +80,7 @@ export default function CaptionLocationStep({
 
   const handleLocationSelect = (selectedLocation) => {
     // Format: "City, State, Country" or just "City, Country"
-    const { address, name, displayName } = selectedLocation;
+    const { address, name, displayName, lat, lon } = selectedLocation;
     let formattedLocation = "";
 
     if (address.city && address.state && address.country) {
@@ -93,6 +94,9 @@ export default function CaptionLocationStep({
     }
 
     setLocation(formattedLocation);
+    if (setGeolocation && lat && lon) {
+      setGeolocation({ lat: parseFloat(lat), lng: parseFloat(lon) });
+    }
     setLocationQuery(formattedLocation);
     setShowDropdown(false);
     setSuggestions([]);

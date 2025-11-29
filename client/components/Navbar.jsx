@@ -13,6 +13,7 @@ import {
   UserIcon,
   SparklesIcon,
   Info,
+  MapIcon,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -54,6 +55,17 @@ export default function Navbar() {
           <span className={styles.navLinkContent}>
             <ImageIcon className={styles.navIcon} size={18} />
             My Gallery
+          </span>
+        </Link>
+        <Link
+          href="/map"
+          className={`${styles.navLink} ${
+            isActive("/map") ? styles.active : ""
+          }`}
+        >
+          <span className={styles.navLinkContent}>
+            <MapIcon className={styles.navIcon} size={18} />
+            Map
           </span>
         </Link>
         <Link
