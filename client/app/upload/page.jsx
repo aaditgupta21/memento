@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import styles from "./Upload.module.css";
@@ -21,6 +21,13 @@ export default function Upload() {
   const { user, loading } = useUser();
   const router = useRouter();
 
+  // Redirect to home page if not logged in
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/");
+    }
+  }, [loading, user, router]);
+
   const availableCategories = [
     "Travel",
     "Sports",
@@ -39,6 +46,7 @@ export default function Upload() {
     "Nature",
   ];
 
+  // Show nothing while loading or redirecting
   if (loading || !user) return null;
 
   const handleFirstSubmit = () => {
@@ -67,7 +75,8 @@ export default function Upload() {
   const handleFourthSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("http://localhost:4000/api/posts", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${API_URL}/api/posts`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

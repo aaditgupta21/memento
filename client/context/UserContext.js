@@ -15,7 +15,8 @@ export function UserProvider({ children }) {
 
   async function fetchUser() {
     try {
-      const response = await fetch("http://localhost:4000/api/users/me", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${API_URL}/api/users/me`, {
         credentials: "include",
         cache: "no-store", // Prevent caching to always check current session
       });
@@ -39,7 +40,8 @@ export function UserProvider({ children }) {
 
   async function logout() {
     try {
-      const response = await fetch("http://localhost:4000/auth/logout", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${API_URL}/auth/logout`, {
         method: "GET",
         credentials: "include",
       });

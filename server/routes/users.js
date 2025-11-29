@@ -16,6 +16,8 @@ router.get("/me", (req, res) => {
         displayName: req.user.displayName,
         googleId: req.user.googleId || null,
         profilePicture: req.user.profilePicture || null,
+        firstName: req.user.firstName || null,
+        lastName: req.user.lastName || null,
       },
     });
   } else {
@@ -41,31 +43,61 @@ router.post("/update-username", async (req, res) => {
       return res.status(400).json({ error: "This username is reserved" });
     }
 
-    // Check if username is already taken
-    const existingUser = await User.findOne({
-      displayName,
-      _id: { $ne: req.user._id },
-    });
-
-    if (existingUser) {
-      return res.status(400).json({ error: "Username already taken" });
+    // Find user and update displayName
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
 
-    // Update user's displayName
-    req.user.displayName = displayName;
-    await req.user.save();
+    user.displayName = displayName;
+    await user.save();
 
     res.json({
       success: true,
       user: {
-        id: req.user._id,
-        email: req.user.email,
-        displayName: req.user.displayName,
+        id: user._id,
+        email: user.email,
+        displayName: user.displayName,
       },
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("Update username error:", err);
+    res.status(500).json({ error: err.message || "Server error" });
+  }
+});
+
+// Update name endpoint (firstName and lastName)
+router.post("/update-name", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  try {
+    const { firstName, lastName } = req.body;
+
+    // Find user and update firstName and lastName
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.firstName = firstName?.trim() || "";
+    user.lastName = lastName?.trim() || "";
+    await user.save();
+
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        displayName: user.displayName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+    });
+  } catch (err) {
+    console.error("Update name error:", err);
+    res.status(500).json({ error: err.message || "Server error" });
   }
 });
 
@@ -145,7 +177,7 @@ router.get("/username/:username", async (req, res) => {
 
   try {
     const user = await User.findOne({ displayName: username }).select(
-      "displayName profilePicture _id"
+      "displayName profilePicture _id firstName lastName"
     );
 
     if (!user) {

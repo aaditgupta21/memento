@@ -7,6 +7,8 @@ import styles from "./SignupPage.module.css";
 
 export default function SignupPage() {
   // use states for user signing up to track relevant info
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +27,8 @@ export default function SignupPage() {
     setError("");
     setSuccess("");
     try {
-      const response = await fetch("http://localhost:4000/auth/signup", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${API_URL}/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,6 +38,8 @@ export default function SignupPage() {
           email,
           password,
           displayName: username,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
         }),
       });
 
@@ -74,6 +79,30 @@ export default function SignupPage() {
               {success}
             </div>
           )}
+          <div>
+            <label htmlFor="firstName">First Name</label>
+            <input
+              id="firstName"
+              name="firstName"
+              type="text"
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="lastName">Last Name</label>
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
+
           <div>
             <label htmlFor="username">Username</label>
             <input
@@ -118,7 +147,8 @@ export default function SignupPage() {
             type="button"
             style={{ color: "black", border: "1px solid #e8e0d8" }}
             onClick={() => {
-              window.location.href = "http://localhost:4000/auth/google";
+              const API_URL = process.env.NEXT_PUBLIC_API_URL;
+              window.location.href = `${API_URL}/auth/google`;
             }}
           >
             Continue with Google

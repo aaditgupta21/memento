@@ -2,18 +2,29 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState, useEffect } from 'react'
+import { useRouter } from "next/navigation";
 import { CameraIcon, UserIcon, SaveIcon } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import s from "./Account.module.css";
 
 export default function Account() {
     const { user, loading: userLoading, fetchUser } = useUser();
+    const router = useRouter();
+
+    // Redirect to home page if not logged in
+    useEffect(() => {
+        if (!userLoading && !user) {
+            router.push("/");
+        }
+    }, [userLoading, user, router]);
     const [profileImage, setProfileImage] = useState('');
     const [email, setEmail] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [username, setUsername] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [isGoogleUser, setIsGoogleUser] = useState(false);
 
     const [error, setError] = useState('');
@@ -40,6 +51,9 @@ export default function Account() {
         if (user) {
             setEmail(user.email || '');
             setUsername(user.displayName || '');
+            // Populate firstName and lastName from database
+            setFirstName(user.firstName || '');
+            setLastName(user.lastName || '');
             setProfileImage(user.profilePicture || '');
             setIsGoogleUser(!!user.googleId);
         }
@@ -88,10 +102,12 @@ export default function Account() {
 
             let usernameChanged = false;
             let passwordChanged = false;
+            let nameChanged = false;
 
             // Update username if it changed
             if (username !== user.displayName) {
-                const usernameUpdate = await fetch("http://localhost:4000/api/update-username", {
+                const API_URL = process.env.NEXT_PUBLIC_API_URL;
+                const usernameUpdate = await fetch(`${API_URL}/api/users/update-username`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
@@ -110,10 +126,33 @@ export default function Account() {
                 await fetchUser();
             }
 
+            // Update firstName and lastName if changed (only for non-Google users)
+            if (!isGoogleUser && (firstName !== (user.firstName || '') || lastName !== (user.lastName || ''))) {
+                const API_URL = process.env.NEXT_PUBLIC_API_URL;
+                const nameUpdate = await fetch(`${API_URL}/api/users/update-name`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        firstName: firstName.trim(),
+                        lastName: lastName.trim()
+                    })
+                });
+
+                const nameUpdateData = await nameUpdate.json();
+                if (!nameUpdate.ok) {
+                    throw new Error(nameUpdateData.error || "Failed to update name.");
+                }
+
+                nameChanged = true;
+                await fetchUser();
+            }
+
 
             if (!isGoogleUser && newPassword) {
                 // send the requested password change to the backend
-                const pwUpdate = await fetch("http://localhost:4000/api/update-password", {
+                const API_URL = process.env.NEXT_PUBLIC_API_URL;
+                const pwUpdate = await fetch(`${API_URL}/api/update-password`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
@@ -136,18 +175,19 @@ export default function Account() {
             }
 
             // Provide specific feedback based on what was updated
-            if (usernameChanged && passwordChanged) {
-                setSuccess(`Username changed to "${username}" and password updated successfully!`);
-            } else if (usernameChanged) {
-                setSuccess(`Username changed to "${username}" successfully!`);
-            } else if (passwordChanged) {
-                setSuccess("Password updated successfully!");
+            const updates = [];
+            if (usernameChanged) updates.push(`Username changed to "${username}"`);
+            if (nameChanged) updates.push("Name updated");
+            if (passwordChanged) updates.push("password updated");
+
+            if (updates.length > 0) {
+                setSuccess(`${updates.join(", ")} successfully!`);
             } else {
                 setSuccess("No changes to save.");
             }
 
             // Clear success message after 5 seconds
-            if (usernameChanged || passwordChanged) {
+            if (usernameChanged || nameChanged || passwordChanged) {
                 setTimeout(() => {
                     setSuccess("");
                 }, 5000);
@@ -244,11 +284,38 @@ export default function Account() {
                                 placeholder="Your username"
                             />
                         </div>
+                        {!isGoogleUser && (
+                            <div className={s.passwordSection}>
+                                <h3 className={s.sectionTitle}>Name</h3>
+                                <div className={s.passwordFields}>
+                                    <div className={s.formGroup}>
+                                        <label className={s.label}>First Name</label>
+                                        <input
+                                            type="text"
+                                            value={firstName}
+                                            onChange={(e) => setFirstName(e.target.value)}
+                                            className={s.input}
+                                            placeholder="Enter your first name"
+                                        />
+                                    </div>
+                                    <div className={s.formGroup}>
+                                        <label className={s.label}>Last Name</label>
+                                        <input
+                                            type="text"
+                                            value={lastName}
+                                            onChange={(e) => setLastName(e.target.value)}
+                                            className={s.input}
+                                            placeholder="Enter your last name"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         {isGoogleUser ? (
                             <div className={s.passwordSection}>
                                 <h3 className={s.sectionTitle}>Account Type</h3>
                                 <p className={s.passwordHint}>
-                                    You are signed in with a Google account. Password changes are not available for Google accounts.
+                                    You are signed in with a Google account. Name and password changes are not available for Google accounts.
                                 </p>
                             </div>
                         ) : (

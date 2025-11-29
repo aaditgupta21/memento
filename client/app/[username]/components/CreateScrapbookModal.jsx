@@ -2,9 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import styles from "./CreateScrapbookModal.module.css";
-import { mockPosts } from "@/mock/posts";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
 // CREATE NEW SCRAPBOOK
 
@@ -12,7 +11,7 @@ export default function CreateScrapbookModal({
   isOpen,
   onClose,
   onCreate,
-  posts = mockPosts,
+  posts = [],
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -165,7 +164,7 @@ export default function CreateScrapbookModal({
 
           <div className={styles.grid}>
             {posts.map((post) => {
-              // Use _id for API posts, fallback to id for mock posts
+              // Use _id for posts
               const postId = post._id || post.id;
               const postImage = post.images?.[0]?.url || post.image || "";
               const postTitle = post.caption || post.title || "Untitled";

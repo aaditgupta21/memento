@@ -25,7 +25,7 @@ export default function Post({ post, user }) {
   const currentUserId = user?.id ?? null;
   const currentUsername = user?.displayName ?? null;
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
   // Redirect if no user
   // useEffect(() => {

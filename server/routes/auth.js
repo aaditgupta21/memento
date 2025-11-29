@@ -31,10 +31,23 @@ router.post("/signup", async (req, res) => {
     }
 
     // Create new user
+    const { firstName, lastName } = req.body;
+
+    // Validate username format before creating
+    const usernameRegex = /^[a-z0-9_.]+$/;
+    if (!usernameRegex.test(displayName)) {
+      return res.status(400).json({
+        error:
+          "Username can only contain lowercase letters, numbers, underscores, and periods",
+      });
+    }
+
     const user = await User.create({
       email,
       password,
       displayName,
+      firstName: firstName?.trim() || "",
+      lastName: lastName?.trim() || "",
     });
 
     // Log the user in
@@ -48,12 +61,41 @@ router.post("/signup", async (req, res) => {
           id: user._id,
           email: user.email,
           displayName: user.displayName,
+          firstName: user.firstName || null,
+          lastName: user.lastName || null,
         },
       });
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("Signup error:", err);
+
+    // Handle MongoDB validation errors
+    if (err.name === "ValidationError") {
+      const firstError = Object.values(err.errors)[0];
+      return res.status(400).json({ error: firstError.message });
+    }
+
+    // Handle MongoDB duplicate key errors
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern)[0];
+      if (field === "email") {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+      if (field === "displayName") {
+        return res.status(400).json({ error: "Username already taken" });
+      }
+      return res.status(400).json({ error: "Duplicate entry" });
+    }
+
+    // Handle MongoDB pattern validation errors
+    if (err.message && err.message.includes("pattern")) {
+      return res.status(400).json({
+        error:
+          "Invalid username format. Username can only contain lowercase letters, numbers, underscores, and periods",
+      });
+    }
+
+    res.status(500).json({ error: err.message || "Server error" });
   }
 });
 

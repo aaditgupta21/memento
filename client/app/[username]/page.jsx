@@ -2,14 +2,13 @@
 
 import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./gallery.module.css";
 import ScrapbookCard from "./components/ScrapbookCard";
 import CreateScrapbookModal from "./components/CreateScrapbookModal";
 import PostDetailModal from "./components/PostDetailModal";
 import { useSearchParams, useParams } from "next/navigation";
 import { useUser } from "@/context/UserContext";
-import { mockPosts } from "@/mock/posts";
-import { mockScrapbooks } from "@/mock/scrapbooks";
 
 // GALLERY PAGE THAT SHOWS UP WHEN FIRST CLICKED
 
@@ -22,8 +21,9 @@ const TABS = {
 function GalleryContent() {
   const searchParams = useSearchParams();
   const params = useParams();
+  const router = useRouter();
   const username = params?.username;
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
   const initialTab =
     searchParams.get("tab") === TABS.SCRAPBOOKS ? TABS.SCRAPBOOKS : TABS.POSTS;
 
@@ -36,15 +36,20 @@ function GalleryContent() {
   const [loadingScrapbooks, setLoadingScrapbooks] = useState(true);
   const [profileUser, setProfileUser] = useState(null);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
-  // Extract first name from profileUser's displayName
-  const firstName = profileUser?.displayName
-    ? profileUser.displayName.split(" ")[0]
-    : username || "My";
+  // Get first name from database
+  const firstName = profileUser?.firstName || profileUser?.displayName || "My";
 
   // Check if current user is viewing their own gallery
   const isOwnGallery = user?.displayName === username;
+
+  // Redirect to home page if not logged in
+  useEffect(() => {
+    if (!userLoading && !user) {
+      router.push("/");
+    }
+  }, [userLoading, user, router]);
 
   // Fetch user profile and posts based on URL username
   useEffect(() => {
@@ -134,6 +139,9 @@ function GalleryContent() {
     };
   }, [username, API_BASE]);
 
+  // Show nothing while loading or redirecting
+  if (userLoading || !user) return null;
+
   // Handle new scrapbook creation (called from modal after API success)
   const handleCreateScrapbook = (newScrapbook) => {
     // The scrapbook is already created in the backend, just add it to the list
@@ -183,15 +191,17 @@ function GalleryContent() {
           {/* Manual tab buttons; we keep local state only to avoid routing changes */}
           <div className={styles.tabRow}>
             <button
-              className={`${styles.tabButton} ${activeTab === TABS.POSTS ? styles.tabActive : ""
-                }`}
+              className={`${styles.tabButton} ${
+                activeTab === TABS.POSTS ? styles.tabActive : ""
+              }`}
               onClick={() => setActiveTab(TABS.POSTS)}
             >
               Posts
             </button>
             <button
-              className={`${styles.tabButton} ${activeTab === TABS.SCRAPBOOKS ? styles.tabActive : ""
-                }`}
+              className={`${styles.tabButton} ${
+                activeTab === TABS.SCRAPBOOKS ? styles.tabActive : ""
+              }`}
               onClick={() => setActiveTab(TABS.SCRAPBOOKS)}
             >
               Scrapbooks
@@ -272,9 +282,13 @@ function GalleryContent() {
           <div className={styles.scrapbookGrid}>
             {scrapbooks.map((scrapbook) => {
               const scrapbookId = scrapbook._id || scrapbook.id;
-              const postCount = scrapbook.posts?.length || scrapbook.postIds?.length || 0;
+              const postCount =
+                scrapbook.posts?.length || scrapbook.postIds?.length || 0;
               // Use coverImage from scrapbook, fallback to first post image only if coverImage is missing
-              const coverImage = scrapbook.coverImage || scrapbook.posts?.[0]?.images?.[0]?.url || "";
+              const coverImage =
+                scrapbook.coverImage ||
+                scrapbook.posts?.[0]?.images?.[0]?.url ||
+                "";
               return (
                 <Link
                   key={scrapbookId}

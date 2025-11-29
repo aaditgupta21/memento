@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ImageIcon, HeartIcon, MapPinIcon, SparklesIcon } from "lucide-react";
 
 import { useUser } from "@/context/UserContext";
@@ -38,14 +39,22 @@ const DEFAULT_TOP_MEMORIES = [
   },
 ];
 export default function Wrapped() {
-  const { user } = useUser();
+  const { user, loading } = useUser();
+  const router = useRouter();
   const [posts, setPosts] = useState([]);
   const [memoriesCaptured, setMemoriesCaptured] = useState(0);
   const [heartsReceived, setHeartsReceived] = useState(0);
   const [loadingStats, setLoadingStats] = useState(true);
   const activityYear = new Date().getFullYear();
   const [selectedPost, setSelectedPost] = useState(null);
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
+  // Redirect to home page if not logged in
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/");
+    }
+  }, [loading, user, router]);
 
   useEffect(() => {
     let mounted = true;
@@ -158,6 +167,9 @@ export default function Wrapped() {
     },
   ];
 
+  // Show nothing while loading or redirecting
+  if (loading || !user) return null;
+
   const topMemories = useMemo(() => {
     return posts
       .filter((post) => post.images && post.images.length > 0)
@@ -197,23 +209,29 @@ export default function Wrapped() {
         <div className={styles.topMomentsCard}>
           <h2 className={styles.sectionTitle}>Your Top Moments</h2>
 
-          <div className={styles.memoryGrid}>
-            {(topMemories.length ? topMemories : DEFAULT_TOP_MEMORIES).map(
-              (post, index) => (
-                <div
-                  key={index}
-                  className={styles.memoryImgWrapper}
-                  onClick={() => setSelectedPost(post)}
-                >
-                  <img
-                    src={post.images[0].url}
-                    alt={`Top memory ${index + 1}`}
-                    className={styles.memoryImg}
-                  />
-                </div>
-              )
-            )}
-          </div>
+          {!loadingStats && posts.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "2rem" }}>
+              <p style={{ fontSize: "1.1rem", color: "#666" }}>No posts</p>
+            </div>
+          ) : (
+            <div className={styles.memoryGrid}>
+              {(topMemories.length ? topMemories : DEFAULT_TOP_MEMORIES).map(
+                (post, index) => (
+                  <div
+                    key={index}
+                    className={styles.memoryImgWrapper}
+                    onClick={() => setSelectedPost(post)}
+                  >
+                    <img
+                      src={post.images[0].url}
+                      alt={`Top memory ${index + 1}`}
+                      className={styles.memoryImg}
+                    />
+                  </div>
+                )
+              )}
+            </div>
+          )}
         </div>
 
         {selectedPost && (
