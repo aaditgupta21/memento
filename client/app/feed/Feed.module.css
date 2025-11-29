@@ -55,3 +55,41 @@
   color: #666;
   margin: 2rem 0;
 }
+
+/* Category Filter Styles */
+.filterBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filterLabel {
+  font-size: 0.95rem;
+  color: #7a6e60;
+  font-weight: 500;
+}
+
+.filterSelect {
+  padding: 0.6rem 1rem;
+  border: 1px solid #e5ddd2;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: #51473d;
+  font-size: 0.95rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  min-width: 180px;
+}
+
+.filterSelect:hover {
+  border-color: #da8d72;
+}
+
+.filterSelect:focus {
+  border-color: #da8d72;
+  box-shadow: 0 0 0 3px rgba(218, 141, 114, 0.15);
+}
