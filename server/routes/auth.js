@@ -36,12 +36,10 @@ router.post("/signup", async (req, res) => {
     // Validate username format before creating
     const usernameRegex = /^[a-z0-9_.]+$/;
     if (!usernameRegex.test(displayName)) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Username can only contain lowercase letters, numbers, underscores, and periods",
-        });
+      return res.status(400).json({
+        error:
+          "Username can only contain lowercase letters, numbers, underscores, and periods",
+      });
     }
 
     const user = await User.create({
@@ -91,12 +89,10 @@ router.post("/signup", async (req, res) => {
 
     // Handle MongoDB pattern validation errors
     if (err.message && err.message.includes("pattern")) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Invalid username format. Username can only contain lowercase letters, numbers, underscores, and periods",
-        });
+      return res.status(400).json({
+        error:
+          "Invalid username format. Username can only contain lowercase letters, numbers, underscores, and periods",
+      });
     }
 
     res.status(500).json({ error: err.message || "Server error" });

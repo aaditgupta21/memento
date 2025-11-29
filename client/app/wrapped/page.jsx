@@ -209,23 +209,29 @@ export default function Wrapped() {
         <div className={styles.topMomentsCard}>
           <h2 className={styles.sectionTitle}>Your Top Moments</h2>
 
-          <div className={styles.memoryGrid}>
-            {(topMemories.length ? topMemories : DEFAULT_TOP_MEMORIES).map(
-              (post, index) => (
-                <div
-                  key={index}
-                  className={styles.memoryImgWrapper}
-                  onClick={() => setSelectedPost(post)}
-                >
-                  <img
-                    src={post.images[0].url}
-                    alt={`Top memory ${index + 1}`}
-                    className={styles.memoryImg}
-                  />
-                </div>
-              )
-            )}
-          </div>
+          {!loadingStats && posts.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "2rem" }}>
+              <p style={{ fontSize: "1.1rem", color: "#666" }}>No posts</p>
+            </div>
+          ) : (
+            <div className={styles.memoryGrid}>
+              {(topMemories.length ? topMemories : DEFAULT_TOP_MEMORIES).map(
+                (post, index) => (
+                  <div
+                    key={index}
+                    className={styles.memoryImgWrapper}
+                    onClick={() => setSelectedPost(post)}
+                  >
+                    <img
+                      src={post.images[0].url}
+                      alt={`Top memory ${index + 1}`}
+                      className={styles.memoryImg}
+                    />
+                  </div>
+                )
+              )}
+            </div>
+          )}
         </div>
 
         {selectedPost && (
