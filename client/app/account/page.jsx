@@ -23,6 +23,8 @@ export default function Account() {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [username, setUsername] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [isGoogleUser, setIsGoogleUser] = useState(false);
 
     const [error, setError] = useState('');
@@ -49,6 +51,9 @@ export default function Account() {
         if (user) {
             setEmail(user.email || '');
             setUsername(user.displayName || '');
+            // Populate firstName and lastName from database
+            setFirstName(user.firstName || '');
+            setLastName(user.lastName || '');
             setProfileImage(user.profilePicture || '');
             setIsGoogleUser(!!user.googleId);
         }
@@ -97,6 +102,7 @@ export default function Account() {
 
             let usernameChanged = false;
             let passwordChanged = false;
+            let nameChanged = false;
 
             // Update username if it changed
             if (username !== user.displayName) {
@@ -116,6 +122,27 @@ export default function Account() {
 
                 usernameChanged = true;
                 // Refresh user data in context after username change
+                await fetchUser();
+            }
+
+            // Update firstName and lastName if changed (only for non-Google users)
+            if (!isGoogleUser && (firstName !== (user.firstName || '') || lastName !== (user.lastName || ''))) {
+                const nameUpdate = await fetch("http://localhost:4000/api/users/update-name", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        firstName: firstName.trim(),
+                        lastName: lastName.trim()
+                    })
+                });
+
+                const nameUpdateData = await nameUpdate.json();
+                if (!nameUpdate.ok) {
+                    throw new Error(nameUpdateData.error || "Failed to update name.");
+                }
+
+                nameChanged = true;
                 await fetchUser();
             }
 
@@ -145,18 +172,19 @@ export default function Account() {
             }
 
             // Provide specific feedback based on what was updated
-            if (usernameChanged && passwordChanged) {
-                setSuccess(`Username changed to "${username}" and password updated successfully!`);
-            } else if (usernameChanged) {
-                setSuccess(`Username changed to "${username}" successfully!`);
-            } else if (passwordChanged) {
-                setSuccess("Password updated successfully!");
+            const updates = [];
+            if (usernameChanged) updates.push(`Username changed to "${username}"`);
+            if (nameChanged) updates.push("Name updated");
+            if (passwordChanged) updates.push("password updated");
+
+            if (updates.length > 0) {
+                setSuccess(`${updates.join(", ")} successfully!`);
             } else {
                 setSuccess("No changes to save.");
             }
 
             // Clear success message after 5 seconds
-            if (usernameChanged || passwordChanged) {
+            if (usernameChanged || nameChanged || passwordChanged) {
                 setTimeout(() => {
                     setSuccess("");
                 }, 5000);
@@ -253,6 +281,33 @@ export default function Account() {
                                 placeholder="Your username"
                             />
                         </div>
+                        {!isGoogleUser && (
+                            <div className={s.passwordSection}>
+                                <h3 className={s.sectionTitle}>Name</h3>
+                                <div className={s.passwordFields}>
+                                    <div className={s.formGroup}>
+                                        <label className={s.label}>First Name</label>
+                                        <input
+                                            type="text"
+                                            value={firstName}
+                                            onChange={(e) => setFirstName(e.target.value)}
+                                            className={s.input}
+                                            placeholder="Enter your first name"
+                                        />
+                                    </div>
+                                    <div className={s.formGroup}>
+                                        <label className={s.label}>Last Name</label>
+                                        <input
+                                            type="text"
+                                            value={lastName}
+                                            onChange={(e) => setLastName(e.target.value)}
+                                            className={s.input}
+                                            placeholder="Enter your last name"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         {isGoogleUser ? (
                             <div className={s.passwordSection}>
                                 <h3 className={s.sectionTitle}>Account Type</h3>

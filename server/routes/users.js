@@ -66,6 +66,41 @@ router.post("/update-username", async (req, res) => {
   }
 });
 
+// Update name endpoint (firstName and lastName)
+router.post("/update-name", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  try {
+    const { firstName, lastName } = req.body;
+
+    // Find user and update firstName and lastName
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.firstName = firstName?.trim() || "";
+    user.lastName = lastName?.trim() || "";
+    await user.save();
+
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        displayName: user.displayName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+    });
+  } catch (err) {
+    console.error("Update name error:", err);
+    res.status(500).json({ error: err.message || "Server error" });
+  }
+});
+
 // Update password endpoint
 router.post("/update-password", async (req, res) => {
   if (!req.user) {
