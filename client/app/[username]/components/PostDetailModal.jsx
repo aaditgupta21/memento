@@ -76,7 +76,9 @@ export default function PostDetailModal({ post, onClose }) {
             <p className={styles.meta}>{date}</p>
             <p className={styles.description}>{description}</p>
             <div className={styles.stats}>
-              <span className={styles.pill}>{likesCount} likes</span>
+              <span className={styles.pill}>
+                {likesCount} {likesCount === 1 ? "like" : "likes"}
+              </span>
               <span className={styles.pill}>{commentsCount} comments</span>
             </div>
             <div className={styles.comments}>
