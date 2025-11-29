@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Suspense, useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 import styles from "./page.module.css";
 import PostDetailModal from "@/app/[username]/components/PostDetailModal";
 
@@ -13,9 +14,17 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
 function ScrapbookDetailContent() {
   const { id } = useParams();
   const router = useRouter();
+  const { user, loading: userLoading } = useUser();
   const [selectedPost, setSelectedPost] = useState(null);
   const [scrapbook, setScrapbook] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Redirect to home page if not logged in
+  useEffect(() => {
+    if (!userLoading && !user) {
+      router.push("/");
+    }
+  }, [userLoading, user, router]);
 
   useEffect(() => {
     let mounted = true;
@@ -88,6 +97,9 @@ function ScrapbookDetailContent() {
       alert(`Error: ${error.message}`);
     }
   };
+
+  // Show nothing while loading or redirecting
+  if (userLoading || !user) return null;
 
   if (loading) {
     return (

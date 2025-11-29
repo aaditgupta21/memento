@@ -1,13 +1,21 @@
 "use client";
 import React from "react";
 import { useState, useEffect } from "react";
-import { mockPosts } from "./mockPosts";
+import { useRouter } from "next/navigation";
 import Post from "./components/post";
 import styles from "./Feed.module.css";
 import { useUser } from "@/context/UserContext";
 
 export default function Feed() {
-  const { user } = useUser();
+  const { user, loading: userLoading } = useUser();
+  const router = useRouter();
+
+  // Redirect to home page if not logged in
+  useEffect(() => {
+    if (!userLoading && !user) {
+      router.push("/");
+    }
+  }, [userLoading, user, router]);
 
   const [feedPosts, setFeedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,6 +50,9 @@ export default function Feed() {
       controller.abort();
     };
   }, []);
+
+  // Show nothing while loading or redirecting
+  if (userLoading || !user) return null;
 
   return (
     <main className={styles.page}>
