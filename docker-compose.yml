@@ -5,6 +5,7 @@ services:
     build: ./client
     container_name: next-client
     restart: always
+    dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -17,6 +18,7 @@ services:
     build: ./server
     container_name: express-server
     restart: always
+    dockerfile: Dockerfile
     ports:
       - "4000:4000"
     environment:
