@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import Map, { Source, Layer, Popup, NavigationControl } from "react-map-gl";
+// import Map, { Source, Layer, Popup, NavigationControl } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import styles from "./map.module.css";
 import { useUser } from "@/context/UserContext";
