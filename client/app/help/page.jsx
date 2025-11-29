@@ -2,19 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import {
-  Activity,
-  BookMarked,
-  ChevronDown,
-  Image as ImageIcon,
-  Info,
-  Lock,
-  Mail,
-  MapPin,
-  Settings,
-  Upload,
-  UserRound,
-} from "lucide-react";
+import { BookMarked, ChevronDown, Info, Upload } from "lucide-react";
 import styles from "./Help.module.css";
 
 const faqItems = [
@@ -68,7 +56,7 @@ const postSteps = [
   {
     title: "Click “Upload” in the top navigation bar.",
     detail: "This opens the upload workspace so you can start a memory.",
-    imageSrc: "/uploadbuttonstep.png",
+    imageSrc: "/uploadbutton.png",
     alt: "Navigate to Upload",
   },
   {
