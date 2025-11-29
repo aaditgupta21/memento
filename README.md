@@ -1,22 +1,27 @@
 # CS35L Full Stack Project
 
-A full-stack web application with **Vite + React** frontend and **Express** backend.
+A full-stack web application with **Next.js** frontend and **Express** backend.
 
 ## Project Structure
 
 ```
 35l-proj/
-├── client/          # Vite + React frontend
-│   ├── src/
-│   │   ├── App.jsx
-│   │   ├── App.css
-│   │   ├── index.css
-│   │   └── main.jsx
-│   ├── index.html
-│   ├── vite.config.js
+├── client/          # Next.js frontend
+│   ├── app/         # Next.js app directory
+│   │   ├── [username]/  # Dynamic user gallery pages
+│   │   ├── account/     # Account settings
+│   │   ├── feed/        # Posts feed
+│   │   ├── upload/      # Post upload
+│   │   ├── wrapped/     # Year wrapped
+│   │   └── ...
+│   ├── components/  # React components
+│   ├── context/      # React context (UserContext)
 │   └── package.json
 ├── server/          # Express backend
-│   ├── index.js
+│   ├── config/      # Database and middleware config
+│   ├── models/      # Mongoose models (User, Post, Scrapbook)
+│   ├── routes/      # API routes (auth, users, posts, scrapbooks)
+│   ├── index.js     # Main server file
 │   └── package.json
 └── package.json     # Root package.json
 ```
@@ -71,35 +76,36 @@ npm run build
 
 ### Ports
 
-- **Client (Vite)**: http://localhost:3000
-- **Server (Express)**: http://localhost:5000
-
-The Vite dev server is configured to proxy API requests to the Express server.
+- **Client (Next.js)**: http://localhost:3000
+- **Server (Express)**: http://localhost:4000
 
 ## Development
 
-- The client will automatically reload when you make changes (HMR)
+- The Next.js client will automatically reload when you make changes
 - The server uses nodemon for automatic restart on file changes
-- API calls from the client are proxied to http://localhost:5000
+- API calls from the client are made directly to http://localhost:4000
 
 ## Environment Variables
 
-The server uses a `.env` file for configuration:
+### Server `.env` file
+
+Create a `.env` file in the `server/` directory with the following variables:
 
 ```
-PORT=5000
+PORT=4000
 NODE_ENV=development
+MONGODB_URI=your_mongodb_connection_string
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
 ```
 
-### Geospatial photo clustering
+### Client `.env` file
 
-`server/scrapBookGen.js` can now annotate and cluster photos by official administrative boundaries (city, state, country, etc.) using GeoJSON polygons:
+Create a `.env` file in the `client/` directory with the following variables:
 
-1. Compile or download boundary GeoJSON files (e.g., Natural Earth, US Census TIGER) and describe them in a config file. See `server/geospatial/boundaryConfig.example.json` for the structure; each `level` points to either an inline `featureCollection` or an external GeoJSON file plus the property names that hold the unique id/name.
-2. Set `SCRAPBOOK_BOUNDARY_CONFIG=/absolute/path/to/your/config.json`. Optionally limit the processed layers with `SCRAPBOOK_BOUNDARY_LEVELS=city,state`.
-3. Run the ingestion script as usual, e.g. `node server/scrapBookGen.js photos/` or `node server/scrapBookGen.js --atlas myCollection`. When the env vars are set, the script performs a point-in-polygon lookup for every GPS-tagged photo, reports clusters per boundary level, and enriches the in-memory entries with a `boundaries` object describing the administrative matches.
-
-Photos without GPS metadata are reported separately so you can decide how to handle them.
+```
+UPLOADTHING_TOKEN=your_uploadthing_token
+```
 
 ## License
 
