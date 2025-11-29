@@ -2,6 +2,18 @@
 
 A full-stack web application with **Next.js** frontend and **Express** backend.
 
+Memento is a social media platform for sharing and organizing memories through photos. Users can create posts with images, captions, and locations, organize them into scrapbooks, and view their year in review through the wrapped feature.
+
+## Features
+
+- **User Authentication**: Sign up with email/password or Google OAuth
+- **Posts**: Create posts with multiple images, captions, locations, and categories
+- **Feed**: Browse and interact with posts from all users
+- **Gallery**: View your own or other users' posts and scrapbooks
+- **Scrapbooks**: Organize posts into curated collections with custom cover images
+- **Wrapped**: View your year in review with statistics and top moments
+- **Account Management**: Update profile information, username, and password
+
 ## Project Structure
 
 ```
