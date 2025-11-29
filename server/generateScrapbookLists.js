@@ -54,6 +54,9 @@ async function generateScrapbookLists(source, options = {}) {
   // Display source information
   if (source.type === 'posts') {
     console.log(`Source: Post collection (downloading from uploadthing URLs)`);
+    if (source.userId) {
+      console.log(`User Filter: ${source.userId}`);
+    }
     if (source.limit) {
       console.log(`Limit: ${source.limit} posts`);
     }
@@ -102,9 +105,14 @@ async function generateScrapbookLists(source, options = {}) {
 
   let entries;
   if (source.type === 'posts') {
-    console.log(`      Querying Post collection and downloading images...`);
+    if (source.userId) {
+      console.log(`      Querying Post collection for user ${source.userId}...`);
+    } else {
+      console.log(`      Querying Post collection (all users)...`);
+    }
     entries = await loadScrapbookEntriesFromPosts(source.query, {
-      limit: source.limit
+      limit: source.limit,
+      userId: source.userId
     });
   } else if (source.type === 'mongodb') {
     console.log(`      Loading from MongoDB collection: ${source.collection}`);
@@ -125,7 +133,11 @@ async function generateScrapbookLists(source, options = {}) {
     console.log("\n⚠️  No photos with GPS data found. Cannot generate location-based lists.");
     return {
       generated: new Date().toISOString(),
-      config: { minPhotos, levels },
+      config: {
+        minPhotos,
+        levels,
+        userId: source.type === 'posts' && source.userId ? source.userId : null
+      },
       summary: {
         totalPhotos: entries.length,
         photosWithGPS: 0,
@@ -166,7 +178,11 @@ async function generateScrapbookLists(source, options = {}) {
   // Step 4: Prepare output
   const output = {
     generated: new Date().toISOString(),
-    config: { minPhotos, levels },
+    config: {
+      minPhotos,
+      levels,
+      userId: source.type === 'posts' && source.userId ? source.userId : null
+    },
     summary: {
       totalPhotos: entries.length,
       photosWithGPS: withGPS.length,
@@ -313,7 +329,8 @@ function parseArgs(args) {
     source = {
       type: 'posts',
       query: {},  // Default: all posts
-      limit: null  // Default: no limit
+      limit: null,  // Default: no limit
+      userId: null  // Default: all users
     };
 
     startIndex = 1;
@@ -383,6 +400,24 @@ function parseArgs(args) {
       if (source.type === 'posts') {
         source.limit = value;
       }
+    } else if (arg.startsWith("--user=") || arg.startsWith("--user-id=")) {
+      const value = arg.split("=")[1];
+      if (!value) {
+        console.error("Error: --user requires a user ID value");
+        process.exit(1);
+      }
+
+      // Validate MongoDB ObjectId format (24 hex characters)
+      if (!/^[0-9a-fA-F]{24}$/.test(value)) {
+        console.error("Error: Invalid user ID format. Must be a 24-character hex string (MongoDB ObjectId)");
+        process.exit(1);
+      }
+
+      if (source.type === 'posts') {
+        source.userId = value;
+      } else {
+        console.warn("Warning: --user flag only applies to --posts mode, ignoring");
+      }
     } else {
       console.error(`Error: Unknown option: ${arg}`);
       printUsage();
@@ -410,6 +445,8 @@ Arguments:
   directory-path         Path to directory containing photos
 
 Options:
+  --user=USER_ID         Filter posts by user ID (only with --posts mode)
+  --user-id=USER_ID      Alias for --user
   --min-photos=N         Minimum photos per location to create list (default: 10)
   --levels=a,b,c         Comma-separated boundary levels (e.g., city,state)
   --output=file.json     Save output to JSON file
@@ -417,10 +454,15 @@ Options:
   --help, -h             Show this help message
 
 Examples:
-  # Posts mode (RECOMMENDED - works with your existing Post data)
+  # Posts mode - all users (RECOMMENDED - works with your existing Post data)
   node server/generateScrapbookLists.js --posts
   node server/generateScrapbookLists.js --posts --output=scrapbooks.json
   node server/generateScrapbookLists.js --posts --limit=50 --min-photos=5
+
+  # Posts mode - specific user
+  node server/generateScrapbookLists.js --posts --user=507f1f77bcf86cd799439011
+  node server/generateScrapbookLists.js --posts --user=507f1f77bcf86cd799439011 --limit=10
+  node server/generateScrapbookLists.js --posts --user=507f1f77bcf86cd799439011 --min-photos=15 --output=user_scrapbooks.json
 
   # Filesystem mode
   node server/generateScrapbookLists.js ~/Photos
