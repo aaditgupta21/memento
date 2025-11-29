@@ -1,10 +1,11 @@
 "use client";
 import React from "react";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Post from "./components/post";
+import CategoryFilter from "./components/CategoryFilter";
 import styles from "./Feed.module.css";
 import { useUser } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
 
 export default function Feed() {
   const { user, loading: userLoading } = useUser();
@@ -20,6 +21,8 @@ export default function Feed() {
   const [feedPosts, setFeedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [numRendered, setNumRendered] = useState(10);
+  const [selectedCategory, setSelectedCategory] = useState(""); // "" = all
 
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000";
 
@@ -51,23 +54,57 @@ export default function Feed() {
     };
   }, []);
 
-  // Show nothing while loading or redirecting
-  if (userLoading || !user) return null;
+  const handleLoadMore = () => {
+    setNumRendered((prev) => prev + 10);
+  };
+
+  // Filter posts by selected category
+  const filteredPosts = selectedCategory
+    ? feedPosts.filter((post) => post.categories?.includes(selectedCategory))
+    : feedPosts;
+
+  const visiblePosts = filteredPosts.slice(0, numRendered);
+  const hasMore = numRendered < filteredPosts.length;
+
+  // Reset numRendered when category changes
+  const handleCategoryChange = (cat) => {
+    setSelectedCategory(cat);
+    setNumRendered(10);
+  };
 
   return (
     <main className={styles.page}>
       <div className={styles.container}>
         <h1 className={styles.title}>Your Feed</h1>
-        {loading && <p>Loading...</p>}
+
+        <CategoryFilter
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
+        />
+
+        {loading && <p className={styles.loadingText}>Loading...</p>}
         {error && (
           <p style={{ color: "#b00" }}>Error: {error}. Showing fallback.</p>
         )}
-        {feedPosts.map((post) => (
+        {visiblePosts.map((post) => (
           <Post key={post._id ?? post.id} post={post} user={user} />
         ))}
         <p className={styles.endMessage}>
-          {!loading && !feedPosts.length ? "No more memories." : null}
+          {!loading && !filteredPosts.length
+            ? selectedCategory
+              ? `No posts in "${selectedCategory}" category.`
+              : "No more memories."
+            : null}
         </p>
+        {hasMore && !loading && (
+          <button onClick={handleLoadMore} className={styles.loadMoreBtn}>
+            Load More
+          </button>
+        )}
+
+        {!hasMore && filteredPosts.length > 0 && (
+          <p className={styles.endMessage}>You've reached the end!</p>
+        )}
       </div>
     </main>
   );

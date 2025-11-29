@@ -83,11 +83,11 @@ export default function CaptionLocationStep({
     let formattedLocation = "";
 
     if (address.city && address.state && address.country) {
-      formattedLocation = `${address.city}, ${address.state}, ${address.country}`;
+      formattedLocation = `${address.city}, ${address.state}`;
     } else if (address.city && address.country) {
       formattedLocation = `${address.city}, ${address.country}`;
     } else if (name && address.country) {
-      formattedLocation = `${name}, ${address.country}`;
+      formattedLocation = `${address.country}`;
     } else {
       formattedLocation = displayName;
     }
