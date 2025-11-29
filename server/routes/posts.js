@@ -56,7 +56,12 @@ router.post("/", async (req, res) => {
 // Get all posts
 router.get("/", async (req, res) => {
   try {
-    const posts = await Post.find()
+    const { author } = req.query;
+
+    // Build query - filter by author if provided
+    const query = author ? { author } : {};
+
+    const posts = await Post.find(query)
       .sort({ createdAt: -1 })
       .populate("author", "displayName email profilePicture")
       .populate({
@@ -191,6 +196,45 @@ router.post("/:postId/comments", async (req, res) => {
   } catch (err) {
     console.error("Error adding comment:", err);
     return res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Get photo locations with EXIF data
+router.get("/photo-locations", async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: "User ID required"
+      });
+    }
+
+    // Use existing EXIF reader with user filter
+    const { loadScrapbookEntriesFromPosts } = require('../geospatial/EXIFReader');
+
+    const entries = await loadScrapbookEntriesFromPosts(
+      { author: userId },
+      { limit: null }
+    );
+
+    // Transform to map-friendly format
+    const photoLocations = entries
+      .filter(entry => entry.gps?.latitude && entry.gps?.longitude)
+      .map(entry => ({
+        type: 'photo',
+        coordinates: [entry.gps.longitude, entry.gps.latitude],
+        imageUrl: entry.imageUrl,
+        postId: entry.postId,
+        timestamp: entry.capturedAt,
+        location: entry.postLocation || 'Unknown Location'
+      }));
+
+    res.json({ success: true, photoLocations });
+  } catch (error) {
+    console.error('Error extracting photo locations:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 

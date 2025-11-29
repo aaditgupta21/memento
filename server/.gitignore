@@ -9,8 +9,6 @@ yarn-error.log*
 geospatial/process.env
 
 # Scrapbook generation scripts (now replaced by backfillScrapbooks.js)
-generateMonthlyScrapbooks.js
-generateGenreScrapbooks.js
 listScrapbooks.js
 testAutoScrapbook.js
 
