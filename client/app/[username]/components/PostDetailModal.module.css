@@ -17,6 +17,7 @@
   width: 100%;
   overflow: hidden;
   position: relative;
+  max-height: 560px; /* Prevent growth beyond initial intended height */
 }
 
 .closeBtn {
@@ -38,6 +39,7 @@
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   gap: 0;
+  height: 560px; /* Lock grid height so right side can scroll */
 }
 
 .media {
@@ -97,6 +99,10 @@
   flex-direction: column;
   gap: 0.5rem;
   color: #51473d;
+  height: 560px; /* Match media panel height */
+  overflow-y: auto; /* Scroll comments instead of expanding modal */
+  padding-right: 1.15rem; /* Space for scrollbar */
+  overscroll-behavior: contain;
 }
 
 .eyebrow {
@@ -166,6 +172,7 @@
 @media (max-width: 800px) {
   .content {
     grid-template-columns: 1fr;
+    height: 320px; /* Match reduced media height on mobile */
   }
 
   .media {
@@ -173,6 +180,11 @@
     height: 320px;
     border-right: none;
     border-bottom: 1px solid rgba(146, 138, 123, 0.18);
+  }
+
+  .detail {
+    height: 320px;
+    overflow-y: auto;
   }
 }
 
