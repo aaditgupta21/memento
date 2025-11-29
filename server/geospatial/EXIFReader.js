@@ -3,6 +3,9 @@ const fs = require("fs/promises");
 const { existsSync } = require("fs");
 const mongoose = require("mongoose");
 const exifr = require("exifr");
+const {
+  mapEntriesWithReverseGeocode,
+} = require("./boundaryCluster");
 
 const DEFAULT_IMAGE_EXTENSIONS = new Set([
   ".jpeg",
@@ -162,13 +165,12 @@ async function main() {
         useDb ? `MongoDB Atlas (${collectionName})` : targetDir
       }`,
     );
-    const boundaryLayers = await resolveBoundaryLayersFromEnv();
-    if (boundaryLayers.length) {
+    if (process.env.BIGDATACLOUD_API_KEY) {
       const { annotatedEntries, clustersByLevel, withoutLocation } =
-        clusterEntriesByBoundary(scrapbookEntries, boundaryLayers);
+        await mapEntriesWithReverseGeocode(scrapbookEntries);
       enrichedEntries = annotatedEntries;
       console.log(
-        `[Geospatial] Annotated ${annotatedEntries.length} entries across ${boundaryLayers.length} boundary layer(s).`,
+        `[Geospatial] Reverse-geocoded ${annotatedEntries.length} entries across ${clustersByLevel.size} boundary level(s).`,
       );
       if (withoutLocation.length) {
         console.log(
@@ -194,6 +196,158 @@ async function main() {
   }
 }
 
+/**
+ * Download image from URL and return as Buffer
+ * @param {string} url - Image URL (uploadthing or any HTTP(S) URL)
+ * @returns {Promise<Buffer>} Image data as Buffer
+ */
+async function downloadImageFromUrl(url) {
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    // Get response as ArrayBuffer then convert to Buffer
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  } catch (error) {
+    throw new Error(`Failed to download image from ${url}: ${error.message}`);
+  }
+}
+
+/**
+ * Load scrapbook entries from Post collection
+ * Downloads images from uploadthing URLs and extracts EXIF
+ * @param {Object} query - MongoDB query filter (default: all posts)
+ * @param {Object} options - Options
+ * @param {number} options.limit - Limit number of posts to process
+ * @param {string} options.userId - Filter posts by user ID
+ * @returns {Promise<Array>} Scrapbook entries with GPS data
+ */
+async function loadScrapbookEntriesFromPosts(query = {}, options = {}) {
+  const { limit = null, userId = null } = options;
+
+  // Ensure MongoDB connection
+  if (mongoose.connection.readyState === 0) {
+    const uri = process.env.MONGODB_URI;
+    if (!uri) {
+      throw new Error(
+        "MONGODB_URI is not set. Provide it before using Post ingestion."
+      );
+    }
+    await mongoose.connect(uri);
+  }
+
+  // Import Post model
+  const Post = require("../models/Post");
+
+  // Apply user filter if provided
+  if (userId) {
+    query = { ...query, author: userId };
+
+    // Optional: Look up user display name
+    try {
+      const User = require("../models/User");
+      const user = await User.findById(userId).select('username email').exec();
+      if (user) {
+        console.log(`[Posts] Filtering for user: ${user.username || user.email} (${userId})`);
+      } else {
+        console.log(`[Posts] Filtering for user: ${userId}`);
+        console.warn(`[Posts] Warning: User ${userId} not found in database`);
+      }
+    } catch (error) {
+      console.log(`[Posts] Filtering for user: ${userId}`);
+    }
+  } else {
+    console.log(`[Posts] Loading posts from all users`);
+  }
+
+  // Query posts
+  let queryBuilder = Post.find(query).sort({ createdAt: -1 });
+  if (limit) {
+    queryBuilder = queryBuilder.limit(limit);
+  }
+
+  const posts = await queryBuilder.exec();
+  console.log(`[Posts] Found ${posts.length} posts to process`);
+
+  const entries = [];
+  let processedImages = 0;
+  let skippedImages = 0;
+
+  // Process each post
+  for (const post of posts) {
+    // Process each image in the post
+    for (const image of post.images || []) {
+      processedImages++;
+
+      try {
+        console.log(
+          `[${processedImages}/${posts.reduce((sum, p) => sum + p.images.length, 0)}] Downloading: ${image.url}`
+        );
+
+        // Download image from URL
+        const buffer = await downloadImageFromUrl(image.url);
+
+        // Extract EXIF metadata
+        const metadata = await extractExifMetadata(buffer, {
+          label: image.url,
+        });
+
+        if (!metadata) {
+          console.warn(`  ⚠️  No EXIF data found`);
+          skippedImages++;
+          continue;
+        }
+
+        // Check for GPS data
+        if (!metadata.latitude || !metadata.longitude) {
+          console.warn(`  ⚠️  No GPS data in EXIF`);
+          skippedImages++;
+          continue;
+        }
+
+        console.log(
+          `  ✓ GPS found: ${metadata.latitude.toFixed(4)}, ${metadata.longitude.toFixed(4)}`
+        );
+
+        // Create entry
+        entries.push({
+          source: "posts",
+          postId: post._id,
+          imageUrl: image.url,
+          imageOrder: image.order,
+          metadata,
+          capturedAt:
+            metadata.DateTimeOriginal || metadata.CreateDate || post.createdAt,
+          cameraModel: metadata.Model || null,
+          gps: {
+            latitude: metadata.latitude,
+            longitude: metadata.longitude,
+          },
+          // Include post metadata
+          postCaption: post.caption,
+          postLocation: post.location,
+          postCategories: post.categories,
+          postAuthor: post.author,
+          postCreatedAt: post.createdAt,
+        });
+      } catch (error) {
+        console.error(`  ❌ Error processing ${image.url}: ${error.message}`);
+        skippedImages++;
+      }
+    }
+  }
+
+  console.log(
+    `\n[Posts] Processed ${processedImages} images: ${entries.length} with GPS, ${skippedImages} skipped`
+  );
+
+  return entries;
+}
+
 if (require.main === module) {
   main();
 }
@@ -204,4 +358,6 @@ module.exports = {
   loadScrapbookEntriesFromDb,
   fetchImagesFromDb,
   extractExifMetadata,
+  downloadImageFromUrl,
+  loadScrapbookEntriesFromPosts,
 };

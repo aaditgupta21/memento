@@ -19,6 +19,7 @@
     "concurrently": "^8.2.2"
   },
   "dependencies": {
+    "client": "^0.0.1",
     "embla-carousel-react": "^8.6.0"
   }
 }

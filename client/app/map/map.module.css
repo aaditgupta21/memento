@@ -1,0 +1,17 @@
+.mapContainer {
+  width: 100%;
+  height: calc(100vh - 60px); /* Adjust for navbar height */
+  position: relative;
+}
+
+.popupContent {
+    max-width: 200px;
+}
+
+.popupImage {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    object-fit: cover;
+}

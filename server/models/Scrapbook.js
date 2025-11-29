@@ -47,6 +47,10 @@ scrapbookSchema.pre("save", function (next) {
   next();
 });
 
+// Index for efficient scrapbook lookups by author and title
+// Used by auto-update system to find/create scrapbooks quickly
+scrapbookSchema.index({ author: 1, title: 1 });
+
 // Ensure virtuals are included when converting to JSON
 scrapbookSchema.set("toJSON", { virtuals: true });
 scrapbookSchema.set("toObject", { virtuals: true });

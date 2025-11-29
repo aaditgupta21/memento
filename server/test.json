@@ -1,0 +1,305 @@
+{
+  "generated": "2025-11-29T00:03:27.459Z",
+  "config": {
+    "minPhotos": 10,
+    "levels": null
+  },
+  "summary": {
+    "totalPhotos": 10,
+    "photosWithGPS": 10,
+    "photosWithoutGPS": 0,
+    "locationsFound": 4,
+    "totalPhotosInLists": 40
+  },
+  "scrapbookLists": [
+    {
+      "boundaryId": "US",
+      "level": "2",
+      "name": "United States of America (the)",
+      "code": "US",
+      "photoCount": 10,
+      "dateRange": "Sep 21, 2025 - Nov 11, 2025",
+      "suggestedTitle": "United States of America (the) Memories (10 photos)",
+      "suggestedDescription": "Photos from United States of America (the), captured between Sep 21, 2025 - Nov 11, 2025.",
+      "photos": [
+        {
+          "latitude": 34.06801111111111,
+          "longitude": -118.45373611111111,
+          "timestamp": "2025-09-22T16:13:05.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06803611111111,
+          "longitude": -118.45374166666667,
+          "timestamp": "2025-09-22T16:13:10.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.067975000000004,
+          "longitude": -118.45369722222223,
+          "timestamp": "2025-09-22T01:26:10.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06802777777778,
+          "longitude": -118.45365277777778,
+          "timestamp": "2025-09-22T01:26:06.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06299166666666,
+          "longitude": -118.29774444444445,
+          "timestamp": "2025-09-28T02:51:48.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06299166666666,
+          "longitude": -118.29774444444445,
+          "timestamp": "2025-09-28T02:51:45.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06420555555555,
+          "longitude": -118.37265833333333,
+          "timestamp": "2025-11-02T22:13:16.000Z",
+          "camera": "iPhone 13"
+        },
+        {
+          "latitude": 34.06421666666667,
+          "longitude": -118.37267222222222,
+          "timestamp": "2025-11-02T22:13:14.000Z",
+          "camera": "iPhone 13"
+        },
+        {
+          "latitude": 34.09812222222222,
+          "longitude": -118.47314444444444,
+          "timestamp": "2025-11-11T14:53:43.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.08853055555556,
+          "longitude": -118.47488333333334,
+          "timestamp": "2025-11-11T14:36:14.000Z",
+          "camera": "iPhone 15 Pro"
+        }
+      ]
+    },
+    {
+      "boundaryId": "US-CA",
+      "level": "5",
+      "name": "California",
+      "code": "US-CA",
+      "photoCount": 10,
+      "dateRange": "Sep 21, 2025 - Nov 11, 2025",
+      "suggestedTitle": "California Memories (10 photos)",
+      "suggestedDescription": "Photos from California, captured between Sep 21, 2025 - Nov 11, 2025.",
+      "photos": [
+        {
+          "latitude": 34.06801111111111,
+          "longitude": -118.45373611111111,
+          "timestamp": "2025-09-22T16:13:05.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06803611111111,
+          "longitude": -118.45374166666667,
+          "timestamp": "2025-09-22T16:13:10.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.067975000000004,
+          "longitude": -118.45369722222223,
+          "timestamp": "2025-09-22T01:26:10.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06802777777778,
+          "longitude": -118.45365277777778,
+          "timestamp": "2025-09-22T01:26:06.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06299166666666,
+          "longitude": -118.29774444444445,
+          "timestamp": "2025-09-28T02:51:48.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06299166666666,
+          "longitude": -118.29774444444445,
+          "timestamp": "2025-09-28T02:51:45.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06420555555555,
+          "longitude": -118.37265833333333,
+          "timestamp": "2025-11-02T22:13:16.000Z",
+          "camera": "iPhone 13"
+        },
+        {
+          "latitude": 34.06421666666667,
+          "longitude": -118.37267222222222,
+          "timestamp": "2025-11-02T22:13:14.000Z",
+          "camera": "iPhone 13"
+        },
+        {
+          "latitude": 34.09812222222222,
+          "longitude": -118.47314444444444,
+          "timestamp": "2025-11-11T14:53:43.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.08853055555556,
+          "longitude": -118.47488333333334,
+          "timestamp": "2025-11-11T14:36:14.000Z",
+          "camera": "iPhone 15 Pro"
+        }
+      ]
+    },
+    {
+      "boundaryId": "Q65",
+      "level": "6",
+      "name": "Los Angeles",
+      "code": null,
+      "photoCount": 10,
+      "dateRange": "Sep 21, 2025 - Nov 11, 2025",
+      "suggestedTitle": "Los Angeles Memories (10 photos)",
+      "suggestedDescription": "Photos from Los Angeles, captured between Sep 21, 2025 - Nov 11, 2025.",
+      "photos": [
+        {
+          "latitude": 34.06801111111111,
+          "longitude": -118.45373611111111,
+          "timestamp": "2025-09-22T16:13:05.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06803611111111,
+          "longitude": -118.45374166666667,
+          "timestamp": "2025-09-22T16:13:10.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.067975000000004,
+          "longitude": -118.45369722222223,
+          "timestamp": "2025-09-22T01:26:10.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06802777777778,
+          "longitude": -118.45365277777778,
+          "timestamp": "2025-09-22T01:26:06.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06299166666666,
+          "longitude": -118.29774444444445,
+          "timestamp": "2025-09-28T02:51:48.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06299166666666,
+          "longitude": -118.29774444444445,
+          "timestamp": "2025-09-28T02:51:45.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06420555555555,
+          "longitude": -118.37265833333333,
+          "timestamp": "2025-11-02T22:13:16.000Z",
+          "camera": "iPhone 13"
+        },
+        {
+          "latitude": 34.06421666666667,
+          "longitude": -118.37267222222222,
+          "timestamp": "2025-11-02T22:13:14.000Z",
+          "camera": "iPhone 13"
+        },
+        {
+          "latitude": 34.09812222222222,
+          "longitude": -118.47314444444444,
+          "timestamp": "2025-11-11T14:53:43.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.08853055555556,
+          "longitude": -118.47488333333334,
+          "timestamp": "2025-11-11T14:36:14.000Z",
+          "camera": "iPhone 15 Pro"
+        }
+      ]
+    },
+    {
+      "boundaryId": "Q104994",
+      "level": "7",
+      "name": "Los Angeles County",
+      "code": null,
+      "photoCount": 10,
+      "dateRange": "Sep 21, 2025 - Nov 11, 2025",
+      "suggestedTitle": "Los Angeles County Memories (10 photos)",
+      "suggestedDescription": "Photos from Los Angeles County, captured between Sep 21, 2025 - Nov 11, 2025.",
+      "photos": [
+        {
+          "latitude": 34.06801111111111,
+          "longitude": -118.45373611111111,
+          "timestamp": "2025-09-22T16:13:05.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06803611111111,
+          "longitude": -118.45374166666667,
+          "timestamp": "2025-09-22T16:13:10.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.067975000000004,
+          "longitude": -118.45369722222223,
+          "timestamp": "2025-09-22T01:26:10.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06802777777778,
+          "longitude": -118.45365277777778,
+          "timestamp": "2025-09-22T01:26:06.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06299166666666,
+          "longitude": -118.29774444444445,
+          "timestamp": "2025-09-28T02:51:48.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06299166666666,
+          "longitude": -118.29774444444445,
+          "timestamp": "2025-09-28T02:51:45.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.06420555555555,
+          "longitude": -118.37265833333333,
+          "timestamp": "2025-11-02T22:13:16.000Z",
+          "camera": "iPhone 13"
+        },
+        {
+          "latitude": 34.06421666666667,
+          "longitude": -118.37267222222222,
+          "timestamp": "2025-11-02T22:13:14.000Z",
+          "camera": "iPhone 13"
+        },
+        {
+          "latitude": 34.09812222222222,
+          "longitude": -118.47314444444444,
+          "timestamp": "2025-11-11T14:53:43.000Z",
+          "camera": "iPhone 15 Pro"
+        },
+        {
+          "latitude": 34.08853055555556,
+          "longitude": -118.47488333333334,
+          "timestamp": "2025-11-11T14:36:14.000Z",
+          "camera": "iPhone 15 Pro"
+        }
+      ]
+    }
+  ],
+  "photosWithoutLocation": []
+}

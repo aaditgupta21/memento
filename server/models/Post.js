@@ -60,6 +60,10 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  geolocation: {
+    lat: Number,
+    lng: Number,
+  },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -101,5 +105,59 @@ postSchema.path("images").validate(function (images) {
 // Ensure virtuals are included when converting to JSON
 postSchema.set("toJSON", { virtuals: true });
 postSchema.set("toObject", { virtuals: true });
+
+// ============================================================================
+// AUTO-UPDATE SCRAPBOOKS
+// ============================================================================
+
+// Store original categories when document is initialized (for tracking changes)
+postSchema.post("init", function () {
+  this._originalCategories = this.categories ? [...this.categories] : [];
+});
+
+// Track whether this is a new post and category changes for scrapbook syncing
+postSchema.pre("save", function (next) {
+  // Track if this is a new post (isNew will be false in post-save hook)
+  this._wasNew = this.isNew;
+
+  // Track category changes
+  if (!this.isNew && this.isModified("categories")) {
+    this._categoriesChanged = true;
+    this._oldCategories = this._originalCategories || [];
+  }
+  next();
+});
+
+// Auto-update scrapbooks when post is created or categories change
+postSchema.post("save", async function (doc) {
+  const { updateAllScrapbooks, checkAndGenerateScrapbooks, syncGenreScrapbooks } = require("../utils/scrapbookUpdater");
+
+  if (this._wasNew) {
+    // New post - check thresholds and generate scrapbooks if needed, then update existing ones
+    await checkAndGenerateScrapbooks(doc, 6); // Minimum 6 posts to create a scrapbook
+    await updateAllScrapbooks(doc);
+    // Store current categories as baseline for future updates
+    this._originalCategories = this.categories ? [...this.categories] : [];
+  } else if (this._categoriesChanged) {
+    // Categories changed - sync genre scrapbooks
+    await syncGenreScrapbooks(doc, this._oldCategories || []);
+    // Update baseline with new categories
+    this._originalCategories = this.categories ? [...this.categories] : [];
+  }
+});
+
+// Remove post from scrapbooks when deleted (using findOneAndDelete)
+postSchema.post("findOneAndDelete", async function (doc) {
+  if (!doc) return;
+
+  const { removePostFromScrapbooks } = require("../utils/scrapbookUpdater");
+  await removePostFromScrapbooks(doc._id);
+});
+
+// Remove post from scrapbooks when deleted (using deleteOne/remove)
+postSchema.post("deleteOne", { document: true, query: false }, async function (doc) {
+  const { removePostFromScrapbooks } = require("../utils/scrapbookUpdater");
+  await removePostFromScrapbooks(this._id);
+});
 
 module.exports = mongoose.model("Post", postSchema);
