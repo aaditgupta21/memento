@@ -312,7 +312,7 @@ export default function Account() {
                             <div className={s.passwordSection}>
                                 <h3 className={s.sectionTitle}>Account Type</h3>
                                 <p className={s.passwordHint}>
-                                    You are signed in with a Google account. Password changes are not available for Google accounts.
+                                    You are signed in with a Google account. Name and password changes are not available for Google accounts.
                                 </p>
                             </div>
                         ) : (
