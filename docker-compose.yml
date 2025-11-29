@@ -12,6 +12,8 @@ services:
     environment:
       - NEXT_PUBLIC_API=https://api.trymemento.app
       - UPLOADTHING_TOKEN=${UPLOADTHING_TOKEN}
+    volumes:
+      - /app/node_modules
     depends_on:
       - server
 
@@ -29,3 +31,5 @@ services:
       - MONGODB_URI=${MONGODB_URI}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    volumes:
+      - /app/node_modules
