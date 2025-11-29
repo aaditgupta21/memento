@@ -1,32 +1,58 @@
-# --- BUILD STAGE ---
-FROM node:20-alpine AS builder
+# syntax=docker.io/docker/dockerfile:1
+
+FROM node:20-alpine AS base
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json* ./
+# -------------------------
+# Install dependencies
+# -------------------------
+FROM base AS deps
+WORKDIR /app
 
-# Install dependencies (including devDependencies needed for build)
-RUN npm install
+# Copy only package + lockfile
+COPY package.json package-lock.json ./
 
-# Copy application code
+# Install deps (npm only)
+RUN npm ci
+
+# -------------------------
+# Build Next.js standalone output
+# -------------------------
+FROM base AS builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Build the application
+# Build using npm
 RUN npm run build
 
-# --- RUNTIME STAGE ---
-FROM node:20-alpine
+# -------------------------
+# Production runner (standalone)
+# -------------------------
+FROM base AS runner
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
-COPY --from=builder /app/.next ./.next
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs \
+ && adduser --system --uid 1001 nextjs
+
+# Copy only needed files
 COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copy config + package.json
 COPY --from=builder /app/next.config.mjs ./next.config.mjs
 COPY --from=builder /app/package.json ./package.json
 
-EXPOSE 3000
-ENV NODE_ENV=production
+USER nextjs
 
-CMD ["npm", "start"]
+EXPOSE 3000
+
+CMD ["node", "server.js"]
