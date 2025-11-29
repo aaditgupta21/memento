@@ -5,6 +5,7 @@ import Post from "./components/post";
 import CategoryFilter from "./components/CategoryFilter";
 import styles from "./Feed.module.css";
 import { useUser } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
 
 export default function Feed() {
   const { user, loading: userLoading } = useUser();
