@@ -1,28 +1,14 @@
 version: "3.9"
 
 services:
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    container_name: next-client
-    restart: always
-    expose:
-      - "3000"
-    environment:
-      - NEXT_PUBLIC_API=https://api.trymemento.app
-      - UPLOADTHING_TOKEN=${UPLOADTHING_TOKEN}
-    depends_on:
-      - server
-
   server:
     build:
       context: ./server
       dockerfile: Dockerfile
     container_name: express-server
     restart: always
-    expose:
-      - "4000"
+    ports:
+      - "4000:4000"
     environment:
       - PORT=${PORT}
       - NODE_ENV=${NODE_ENV}
