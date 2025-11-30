@@ -1,16 +1,16 @@
 import { useMap } from '@vis.gl/react-google-maps';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { BubblePin } from './BubblePin';
 
 /**
  * Manages marker clustering for photos and posts
- * Simplified version without ref tracking to avoid infinite loops
+ * Uses refs to register markers with MarkerClusterer
  */
 export function ClusteredMarkers({ points, onPointClick, zoom }) {
   const map = useMap();
   const clustererRef = useRef(null);
-  const markersRef = useRef({});
+  const markersRef = useRef(new Map());
 
   // Initialize MarkerClusterer
   useEffect(() => {
@@ -33,8 +33,28 @@ export function ClusteredMarkers({ points, onPointClick, zoom }) {
     };
   }, [map]);
 
-  // Determine if point should show as post (larger) at high zoom
-  const isHighZoom = zoom >= 14;
+  // Handle marker load callback
+  const handleMarkerLoad = useCallback((marker, pointId) => {
+    markersRef.current.set(pointId, marker);
+
+    if (clustererRef.current) {
+      clustererRef.current.addMarker(marker);
+    }
+  }, []);
+
+  // Clean up markers when points change
+  useEffect(() => {
+    if (!clustererRef.current) return;
+
+    // Clear all markers from clusterer
+    clustererRef.current.clearMarkers();
+
+    // Re-add all current markers
+    const markerArray = Array.from(markersRef.current.values()).filter(Boolean);
+    if (markerArray.length > 0) {
+      clustererRef.current.addMarkers(markerArray);
+    }
+  }, [points]);
 
   return (
     <>
@@ -47,8 +67,9 @@ export function ClusteredMarkers({ points, onPointClick, zoom }) {
             key={key}
             position={{ lat: point.lat, lng: point.lng }}
             imageUrl={point.imageUrl}
-            isPost={isPost && isHighZoom}
+            isPost={isPost}
             onClick={() => onPointClick(point)}
+            onMarkerLoad={(marker) => handleMarkerLoad(marker, key)}
           />
         );
       })}
