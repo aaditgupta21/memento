@@ -11,21 +11,22 @@ function setupMiddleware(app) {
       ? ["http://localhost:3000"]
       : [
           process.env.CLIENT_ORIGIN,
-          // Add other production origins as needed
         ].filter(Boolean); // Remove any undefined values
 
   app.use(
     cors({
       origin: function (origin, callback) {
-        // Require origin for security - reject requests without origin
+        // Allow requests without origin (same-origin requests, health checks, etc.)
+        // But validate origin when present for cross-origin requests
         if (!origin) {
-          return callback(new Error("CORS: Origin header is required"));
+          // Allow same-origin requests and server-to-server requests
+          return callback(null, true);
         }
 
         if (allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
-          callback(new Error("Not allowed by CORS"));
+          callback(new Error(`Not allowed by CORS: ${origin}`));
         }
       },
       credentials: true,
