@@ -11,10 +11,10 @@
 
 const mongoose = require("mongoose");
 const path = require("path");
-const { generateLocationAlbumsForUser } = require("./utils/locationAlbumGenerator");
-const User = require("./models/User");
+const { generateLocationAlbumsForUser } = require("../utils/locationAlbumGenerator");
+const User = require("../models/User");
 
-require("dotenv").config({ path: path.join(__dirname, ".env") });
+require("dotenv").config({ path: path.join(__dirname, "../.env") });
 
 function parseArgs(argv) {
   const args = { all: false, userId: null, minPhotos: 10, levels: null };
