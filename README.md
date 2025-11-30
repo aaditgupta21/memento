@@ -126,6 +126,14 @@ docker-compose down -v
 - **Client (Next.js)**: http://localhost:3000
 - **Server (Express)**: http://localhost:4000
 
+## Deployment
+
+The application is deployed at **https://trymemento.app**:
+
+- **Frontend**: Deployed on [Vercel](https://vercel.com)
+- **Backend**: Deployed using Docker on Oracle VM
+- **API**: Available at `https://api.trymemento.app`
+
 ## Development
 
 - The Next.js client will automatically reload when you make changes
