@@ -110,6 +110,19 @@ postSchema.set("toObject", { virtuals: true });
 // AUTO-UPDATE SCRAPBOOKS
 // ============================================================================
 
+function scheduleLocationAlbumRefresh(authorId) {
+  if (!authorId) return;
+  // Run off-thread to avoid blocking the request lifecycle
+  setImmediate(async () => {
+    try {
+      const { generateLocationAlbumsForUser } = require("../utils/locationAlbumGenerator");
+      await generateLocationAlbumsForUser(authorId, { minPhotos: 10 });
+    } catch (error) {
+      console.warn("[LocationAlbums] Refresh skipped:", error.message);
+    }
+  });
+}
+
 // Store original categories when document is initialized (for tracking changes)
 postSchema.post("init", function () {
   this._originalCategories = this.categories ? [...this.categories] : [];
@@ -138,6 +151,7 @@ postSchema.post("save", async function (doc) {
     await updateAllScrapbooks(doc);
     // Store current categories as baseline for future updates
     this._originalCategories = this.categories ? [...this.categories] : [];
+    scheduleLocationAlbumRefresh(doc.author);
   } else if (this._categoriesChanged) {
     // Categories changed - sync genre scrapbooks
     await syncGenreScrapbooks(doc, this._oldCategories || []);
@@ -152,12 +166,14 @@ postSchema.post("findOneAndDelete", async function (doc) {
 
   const { removePostFromScrapbooks } = require("../utils/scrapbookUpdater");
   await removePostFromScrapbooks(doc._id);
+  scheduleLocationAlbumRefresh(doc.author);
 });
 
 // Remove post from scrapbooks when deleted (using deleteOne/remove)
 postSchema.post("deleteOne", { document: true, query: false }, async function (doc) {
   const { removePostFromScrapbooks } = require("../utils/scrapbookUpdater");
   await removePostFromScrapbooks(this._id);
+  scheduleLocationAlbumRefresh(this.author);
 });
 
 module.exports = mongoose.model("Post", postSchema);

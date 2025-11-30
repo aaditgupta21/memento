@@ -8,6 +8,7 @@ const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const postRoutes = require("./routes/posts");
 const scrapbookRoutes = require("./routes/scrapbooks");
+const locationAlbumRoutes = require("./routes/locationAlbums");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -23,6 +24,7 @@ app.use("/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/scrapbooks", scrapbookRoutes);
+app.use("/api/location-albums", locationAlbumRoutes);
 
 // Google OAuth callback (needs to be at root level, not /auth)
 app.get(
