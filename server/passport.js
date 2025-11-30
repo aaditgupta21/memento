@@ -11,7 +11,7 @@ passport.use(
       callbackURL:
         process.env.NODE_ENV === "development"
           ? "http://localhost:4000/google/callback"
-          : process.env.callbackURL,
+          : process.env.CALLBACK_URL || "https://api.trymemento.app/google/callback",
       passReqToCallback: true,
     },
     async (request, accessToken, refreshToken, profile, done) => {

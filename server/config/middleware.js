@@ -5,13 +5,29 @@ const MongoStore = require("connect-mongo");
 const passport = require("../passport");
 
 function setupMiddleware(app) {
-  // CORS
+  // CORS - Allow multiple origins in production
+  const allowedOrigins =
+    process.env.NODE_ENV === "development"
+      ? ["http://localhost:3000"]
+      : [
+          process.env.CLIENT_ORIGIN,
+          // Add other production origins as needed
+        ].filter(Boolean); // Remove any undefined values
+
   app.use(
     cors({
-      origin:
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:3000"
-          : process.env.CLIENT_ORIGIN,
+      origin: function (origin, callback) {
+        // Require origin for security - reject requests without origin
+        if (!origin) {
+          return callback(new Error("CORS: Origin header is required"));
+        }
+
+        if (allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
       credentials: true,
     })
   );
