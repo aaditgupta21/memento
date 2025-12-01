@@ -1,37 +1,14 @@
 "use client";
 import { UploadDropzone } from "@/utils/uploadthing";
-import useEmblaCarousel from "embla-carousel-react";
 import { useEffect, useState } from "react";
 import styles from "./UploadImagesStep.module.css";
+import PostImage from "@/app/feed/components/postImage";
 
 export default function UploadImagesStep({
   uploadedFiles,
   setUploadedFiles,
   onNext,
 }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    const onSelect = () => {
-      setCanScrollPrev(emblaApi.canScrollPrev());
-      setCanScrollNext(emblaApi.canScrollNext());
-    };
-    emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", onSelect);
-    onSelect();
-    return () => {
-      emblaApi.off("select", onSelect);
-      emblaApi.off("reInit", onSelect);
-    };
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (emblaApi && uploadedFiles.length > 0) emblaApi.reInit();
-  }, [emblaApi, uploadedFiles]);
-
   return (
     <>
       <h2>Upload Images</h2>
@@ -86,40 +63,16 @@ export default function UploadImagesStep({
         }}
       />
       {uploadedFiles.length > 0 && (
-        <div className={styles.carouselContainer}>
-          <div className={styles.embla} ref={emblaRef}>
-            <div className={styles.emblaContainer}>
-              {uploadedFiles.map((file, idx) => (
-                <div key={idx} className={styles.emblaSlide}>
-                  <img
-                    src={typeof file === "string" ? file : file.url}
-                    alt={`preview ${idx + 1}`}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-          {uploadedFiles.length > 1 && (
-            <div className={styles.carouselControls}>
-              <button
-                onClick={() => emblaApi?.scrollPrev()}
-                disabled={!canScrollPrev}
-                className={styles.carouselBtn}
-              >
-                ←
-              </button>
-              <span className={styles.slideCounter}>
-                {uploadedFiles.length} images
-              </span>
-              <button
-                onClick={() => emblaApi?.scrollNext()}
-                disabled={!canScrollNext}
-                className={styles.carouselBtn}
-              >
-                →
-              </button>
-            </div>
-          )}
+        <div className={styles.previewContainer}>
+          <PostImage
+            key={uploadedFiles.join(",")}
+            imageUrls={uploadedFiles}
+            caption={null}
+          />
+          <p className={styles.imageCount}>
+            {uploadedFiles.length}{" "}
+            {uploadedFiles.length === 1 ? "image" : "images"} uploaded
+          </p>
         </div>
       )}
       <div className={styles.stepButtons}>

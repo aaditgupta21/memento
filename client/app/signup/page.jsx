@@ -54,7 +54,7 @@ export default function SignupPage() {
       setAuthenticated(true);
       setSuccess("Account created successfully! Redirecting...");
       setTimeout(() => {
-        router.push("/");
+        router.push("/feed");
       }, 1500);
     } catch (err) {
       setError(err.message);
@@ -75,7 +75,10 @@ export default function SignupPage() {
             </div>
           )}
           {success && (
-            <div className="success-message" style={{ color: "green", fontWeight: "500" }}>
+            <div
+              className="success-message"
+              style={{ color: "green", fontWeight: "500" }}
+            >
               {success}
             </div>
           )}
