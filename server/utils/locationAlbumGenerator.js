@@ -164,8 +164,6 @@ async function generateLocationAlbumsForUser(userId, options = {}) {
   }
 
   // Optional: clean up old albums not in current set
-  const boundaryIds = finalAlbums.map((a) => a.boundaryId);
-
   return {
     albums: finalAlbums,
     summary: {
