@@ -218,8 +218,47 @@ async function downloadImageFromUrl(url) {
 }
 
 /**
+ * Extract EXIF data from image URL and return structured metadata
+ * Used by UploadThing onUploadComplete hook to store EXIF in database
+ * @param {string} imageUrl - Image URL (UploadThing or any HTTPS URL)
+ * @returns {Promise<Object|null>} Extracted EXIF data or null on failure
+ */
+async function extractExifFromUrl(imageUrl) {
+  try {
+    // Download image
+    const buffer = await downloadImageFromUrl(imageUrl);
+
+    // Extract EXIF metadata
+    const metadata = await extractExifMetadata(buffer, { label: imageUrl });
+
+    if (!metadata) {
+      return null;
+    }
+
+    // Return structured EXIF data (only fields we need)
+    return {
+      latitude: metadata.latitude || null,
+      longitude: metadata.longitude || null,
+      timestamp: metadata.DateTimeOriginal || metadata.CreateDate || null,
+      cameraModel: metadata.Model || null,
+    };
+  } catch (error) {
+    console.warn(
+      `[EXIF] Failed to extract from ${imageUrl}: ${error.message}`
+    );
+    return null;
+  }
+}
+
+/**
  * Load scrapbook entries from Post collection
  * Downloads images from uploadthing URLs and extracts EXIF
+ *
+ * @deprecated This function downloads images on-demand (inefficient).
+ * EXIF data is now stored in Post.images[].exif during upload.
+ * Use Post.find() and read from Post.images[].exif instead.
+ * This function is kept for backwards compatibility and migration purposes only.
+ *
  * @param {Object} query - MongoDB query filter (default: all posts)
  * @param {Object} options - Options
  * @param {number} options.limit - Limit number of posts to process
@@ -227,6 +266,10 @@ async function downloadImageFromUrl(url) {
  * @returns {Promise<Array>} Scrapbook entries with GPS data
  */
 async function loadScrapbookEntriesFromPosts(query = {}, options = {}) {
+  console.warn(
+    "[DEPRECATED] loadScrapbookEntriesFromPosts downloads images on-demand. " +
+    "Read EXIF from Post.images[].exif instead for 100x better performance."
+  );
   const { limit = null, userId = null } = options;
 
   // Ensure MongoDB connection
@@ -359,5 +402,6 @@ module.exports = {
   fetchImagesFromDb,
   extractExifMetadata,
   downloadImageFromUrl,
+  extractExifFromUrl,
   loadScrapbookEntriesFromPosts,
 };

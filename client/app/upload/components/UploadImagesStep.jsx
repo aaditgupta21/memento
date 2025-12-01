@@ -22,8 +22,12 @@ export default function UploadImagesStep({
               alert("You can upload a maximum of 10 photos.");
               return;
             }
-            const urls = res.map((f) => f.url);
-            setUploadedFiles((prev) => [...prev, ...urls]);
+            // Capture both URL and EXIF data from upload response
+            const filesWithExif = res.map((f) => ({
+              url: f.url,
+              exif: f.serverData?.exif || null,
+            }));
+            setUploadedFiles((prev) => [...prev, ...filesWithExif]);
           }
         }}
         onUploadError={(error) => alert(`ERROR! ${error.message}`)}
