@@ -1,0 +1,98 @@
+config:
+  target: "http://localhost:4000"
+  processor: "./load-test-helpers.js"
+  phases:
+    # Create 10 test users and 10 posts
+    - duration: 30
+      arrivalRate: 2
+      arrivalCount: 10
+      name: "Create users and posts"
+    # Quick test phase - just a few requests
+    - duration: 5
+      arrivalRate: 1
+      arrivalCount: 5
+      name: "Quick test"
+  plugins:
+    expect: {}
+  cookieJar:
+    shared: false  # Each VU maintains its own cookies
+
+scenarios:
+  # Create authenticated post (creates user, then creates post)
+  - name: "Create authenticated post"
+    weight: 20  # Write operations are less frequent than reads
+    flow:
+      - function: "generateUserData"
+      - post:
+          url: "/auth/signup"
+          json:
+            email: "{{ testEmail }}"
+            password: "{{ testPassword }}"
+            displayName: "{{ testDisplayName }}"
+          expect:
+            - statusCode: 200  # Should succeed with unique emails
+            - contentType: json
+            - hasProperty: success
+      - think: 1  # Small delay
+      - function: "generatePostData"
+      - post:
+          url: "/api/posts"
+          json:
+            images:
+              - "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&auto=format&fit=crop"
+            caption: "{{ postCaption }}"
+            location: "{{ postLocation }}"
+            categories: ["Travel", "Nature"]
+          expect:
+            - statusCode: 201
+            - contentType: json
+            - hasProperty: success
+            - hasProperty: post
+
+  # Test getting all posts (read-heavy scenario)
+  - name: "Get all posts"
+    weight: 50  # Most common operation - reading posts
+    flow:
+      - get:
+          url: "/api/posts"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - hasProperty: success
+            - hasProperty: posts
+
+  # Test getting posts with location search
+  - name: "Search locations"
+    weight: 15  # Search operations
+    flow:
+      - get:
+          url: "/api/posts/locations/search?query=beach"
+          expect:
+            - statusCode: [200, 500]  # 500 if external API fails
+            - contentType: json
+
+  # Test like endpoint (update operation)
+  - name: "Like a post"
+    weight: 15  # Update operations
+    flow:
+      - function: "generateUserData"
+      - post:
+          url: "/auth/signup"
+          json:
+            email: "{{ testEmail }}"
+            password: "{{ testPassword }}"
+            displayName: "{{ testDisplayName }}"
+          expect:
+            - statusCode: [200, 400]  # 400 if user already exists
+            - contentType: json
+      - get:
+          url: "/api/posts"
+          capture:
+            - json: "$.posts[0]._id"
+              as: "postId"
+      - post:
+          url: "/api/posts/{{ postId }}/like"
+          expect:
+            - statusCode: 200
+            - contentType: json
+
