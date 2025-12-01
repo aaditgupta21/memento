@@ -6,7 +6,7 @@ import { ImageIcon, HeartIcon, MapPinIcon, SparklesIcon } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import styles from "./Wrapped.module.css";
 import ActivityHeatmap from "./ActivityHeatmap";
-import PostModal from "@/app/[username]/components/PostModal";
+import PostDetailModal from "@/app/[username]/components/PostDetailModal";
 
 const DEFAULT_TOP_MEMORIES = [
   {
@@ -167,9 +167,6 @@ export default function Wrapped() {
     },
   ];
 
-  // Show nothing while loading or redirecting
-  if (loading || !user) return null;
-
   const topMemories = useMemo(() => {
     return posts
       .filter((post) => post.images && post.images.length > 0)
@@ -177,6 +174,9 @@ export default function Wrapped() {
       .slice(0, 4)
       .map((post) => post);
   }, [posts]);
+
+  // Show nothing while loading or redirecting
+  if (loading || !user) return null;
 
   return (
     <div className={styles.page}>
@@ -235,9 +235,8 @@ export default function Wrapped() {
         </div>
 
         {selectedPost && (
-          <PostModal
-            selectedPost={selectedPost}
-            user={user}
+          <PostDetailModal
+            post={selectedPost}
             onClose={() => setSelectedPost(null)}
           />
         )}
