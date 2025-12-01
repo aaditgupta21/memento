@@ -247,39 +247,48 @@ function GalleryContent() {
   return (
     <main className={styles.page}>
       <section className={styles.hero}>
-        <div>
-          <p className={styles.eyebrow}>{firstName}'s Gallery</p>
-          <h1 className={styles.title}>Memories & Scrapbooks</h1>
-          <p className={styles.subtitle}>
-            Keep your favorite posts together with soft, keepsake-ready sets.
-          </p>
-          {/* Manual tab buttons; we keep local state only to avoid routing changes */}
-          <div className={styles.tabRow}>
-            <button
-              className={`${styles.tabButton} ${
-                activeTab === TABS.POSTS ? styles.tabActive : ""
-              }`}
-              onClick={() => setActiveTab(TABS.POSTS)}
-            >
-              Posts
-            </button>
-            <button
-              className={`${styles.tabButton} ${
-                activeTab === TABS.SCRAPBOOKS ? styles.tabActive : ""
-              }`}
-              onClick={() => setActiveTab(TABS.SCRAPBOOKS)}
-            >
-              Scrapbooks
-            </button>
-            <button
-              className={`${styles.tabButton} ${
-                activeTab === TABS.ALBUMS ? styles.tabActive : ""
-              }`}
-              onClick={() => setActiveTab(TABS.ALBUMS)}
-            >
-              Albums
-            </button>
+        <div className={styles.heroContent}>
+          <div className={styles.avatarContainer}>
+            <img
+              src={profileUser ? profileUser.profilePicture : "default.jpeg"}
+              alt={`${firstName}'s profile`}
+              className={styles.avatar}
+            />
           </div>
+          <div className={styles.heroText}>
+            <p className={styles.eyebrow}>{firstName}'s Gallery</p>
+            <h1 className={styles.title}>Memories & Scrapbooks</h1>
+            <p className={styles.subtitle}>
+              Keep your favorite posts together with soft, keepsake-ready sets.
+            </p>
+          </div>
+        </div>
+        {/* Manual tab buttons; we keep local state only to avoid routing changes */}
+        <div className={styles.tabRow}>
+          <button
+            className={`${styles.tabButton} ${
+              activeTab === TABS.POSTS ? styles.tabActive : ""
+            }`}
+            onClick={() => setActiveTab(TABS.POSTS)}
+          >
+            Posts
+          </button>
+          <button
+            className={`${styles.tabButton} ${
+              activeTab === TABS.SCRAPBOOKS ? styles.tabActive : ""
+            }`}
+            onClick={() => setActiveTab(TABS.SCRAPBOOKS)}
+          >
+            Scrapbooks
+          </button>
+          <button
+            className={`${styles.tabButton} ${
+              activeTab === TABS.ALBUMS ? styles.tabActive : ""
+            }`}
+            onClick={() => setActiveTab(TABS.ALBUMS)}
+          >
+            Albums
+          </button>
         </div>
       </section>
 
