@@ -45,7 +45,7 @@ export default function LoginPage() {
       setAuthenticated(true);
       setSuccess("Logged in successfully! Redirecting...");
       setTimeout(() => {
-        router.push("/");
+        router.push("/feed");
       }, 1500);
     } catch (err) {
       setError(err.message);
@@ -66,7 +66,10 @@ export default function LoginPage() {
             </div>
           )}
           {success && (
-            <div className="success-message" style={{ color: "green", fontWeight: "500" }}>
+            <div
+              className="success-message"
+              style={{ color: "green", fontWeight: "500" }}
+            >
               {success}
             </div>
           )}
