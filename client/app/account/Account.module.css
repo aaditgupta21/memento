@@ -73,11 +73,27 @@
     right: 0;
     background-color: rgba(232, 155, 143);
     color: white;
-    padding: 0.75rem;
+    padding: 0.5rem;
     border-radius: 50%;
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.cameraButton :global(button) {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .cameraButton:hover {

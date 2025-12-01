@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from "next/navigation";
 import { CameraIcon, UserIcon, SaveIcon } from "lucide-react";
 import { useUser } from "@/context/UserContext";
+import { UploadButton } from "@/utils/uploadthing";
 import s from "./Account.module.css";
 
 export default function Account() {
@@ -31,17 +32,35 @@ export default function Account() {
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // handle a new profile image being uploaded when camera button is clicked
-    const handleImageUpload = (e) => {
-        // extract image file from event object
-        const image = e.target.files[0];
-        if (image) {
-            // create a fileReader object, which parses the image file and turns it into a URL that the profile pic can be set to
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setProfileImage(reader.result);
+    // Handle profile picture upload from UploadThing
+    const handleProfilePictureUpload = async (uploadedFiles) => {
+        if (uploadedFiles && uploadedFiles.length > 0) {
+            const imageUrl = uploadedFiles[0].url;
+            setProfileImage(imageUrl);
+
+            // Immediately save to backend
+            try {
+                const API_URL = process.env.NEXT_PUBLIC_API_URL;
+                const response = await fetch(`${API_URL}/api/users/update-profile-picture`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ profilePicture: imageUrl })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    setSuccess("Profile picture updated successfully!");
+                    // Refresh user data
+                    await fetchUser();
+                    setTimeout(() => setSuccess(""), 3000);
+                } else {
+                    setError(data.error || "Failed to update profile picture");
+                }
+            } catch (err) {
+                console.error("Error updating profile picture:", err);
+                setError("Failed to update profile picture");
             }
-            reader.readAsDataURL(image);
         }
     }
 
@@ -238,14 +257,36 @@ export default function Account() {
                                 )
                                 }
                             </div>
-                            <label className={s.cameraButton}>
-                                <CameraIcon size={20} />
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleImageUpload}
+                            <div className={s.cameraButton}>
+                                <UploadButton
+                                    endpoint="profilePictureUploader"
+                                    onClientUploadComplete={(res) => {
+                                        if (res && res.length > 0) {
+                                            handleProfilePictureUpload(res);
+                                        }
+                                    }}
+                                    onUploadError={(error) => {
+                                        setError(`Upload failed: ${error.message}`);
+                                    }}
+                                    appearance={{
+                                        allowedContent: {
+                                            display: "none",
+                                        },
+                                        button: {
+                                            width: "100%",
+                                            height: "100%",
+                                            padding: 0,
+                                            background: "transparent",
+                                            border: "none",
+                                        },
+                                    }}
+                                    content={{
+                                        button: ({ ready }) => (
+                                            <CameraIcon size={16} />
+                                        ),
+                                    }}
                                 />
-                            </label>
+                            </div>
                         </div>
                         <p className={s.profileHint}>Click the camera icon to update your profile picture</p>
                     </div>

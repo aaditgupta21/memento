@@ -101,6 +101,43 @@ router.post("/update-name", async (req, res) => {
   }
 });
 
+// Update profile picture endpoint
+router.post("/update-profile-picture", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  try {
+    const { profilePicture } = req.body;
+
+    if (!profilePicture || !profilePicture.trim()) {
+      return res.status(400).json({ error: "Profile picture URL is required" });
+    }
+
+    // Find user and update profilePicture
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.profilePicture = profilePicture.trim();
+    await user.save();
+
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        displayName: user.displayName,
+        profilePicture: user.profilePicture,
+      },
+    });
+  } catch (err) {
+    console.error("Update profile picture error:", err);
+    res.status(500).json({ error: err.message || "Server error" });
+  }
+});
+
 // Update password endpoint
 router.post("/update-password", async (req, res) => {
   if (!req.user) {

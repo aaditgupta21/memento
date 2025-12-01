@@ -38,4 +38,25 @@ export const ourFileRouter = {
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { uploadedBy: metadata.userId };
     }),
+
+  // Profile picture uploader - single image only
+  profilePictureUploader: f({
+    image: {
+      maxFileSize: "5MB",
+      maxFileCount: 1,
+    },
+  })
+    .middleware(async ({ req }) => {
+      const user = await auth(req);
+      if (!user) throw new UploadThingError("Unauthorized");
+      return { userId: user.id };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log(
+        "Profile picture upload complete for userId:",
+        metadata.userId
+      );
+      console.log("file url", file.ufsUrl);
+      return { uploadedBy: metadata.userId };
+    }),
 };
