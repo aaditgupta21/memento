@@ -45,8 +45,12 @@ export default function UploadImagesStep({
               alert("You can upload a maximum of 10 photos.");
               return;
             }
-            const urls = res.map((f) => f.url);
-            setUploadedFiles((prev) => [...prev, ...urls]);
+            // Capture both URL and EXIF data from upload response
+            const filesWithExif = res.map((f) => ({
+              url: f.url,
+              exif: f.serverData?.exif || null,
+            }));
+            setUploadedFiles((prev) => [...prev, ...filesWithExif]);
           }
         }}
         onUploadError={(error) => alert(`ERROR! ${error.message}`)}
@@ -85,9 +89,12 @@ export default function UploadImagesStep({
         <div className={styles.carouselContainer}>
           <div className={styles.embla} ref={emblaRef}>
             <div className={styles.emblaContainer}>
-              {uploadedFiles.map((url, idx) => (
+              {uploadedFiles.map((file, idx) => (
                 <div key={idx} className={styles.emblaSlide}>
-                  <img src={url} alt={`preview ${idx + 1}`} />
+                  <img
+                    src={typeof file === "string" ? file : file.url}
+                    alt={`preview ${idx + 1}`}
+                  />
                 </div>
               ))}
             </div>

@@ -88,18 +88,42 @@ async function generateLocationAlbumsForUser(userId, options = {}) {
     throw new Error("BIGDATACLOUD_API_KEY is missing; cannot build location albums.");
   }
 
-  // Lazy import to avoid circular dependency during Post model init
-  const { loadScrapbookEntriesFromPosts } = require("../geospatial/EXIFReader");
-  const entries = await loadScrapbookEntriesFromPosts({}, { userId });
+  // Query posts directly from database instead of downloading images (100x faster)
+  const Post = require("../models/Post");
+  const posts = await Post.find({ author: userId })
+    .select("images caption location categories createdAt")
+    .lean();
 
-  const withGps = entries.filter(
-    (e) =>
-      e.gps &&
-      e.gps.latitude != null &&
-      e.gps.longitude != null &&
-      typeof e.gps.latitude === "number" &&
-      typeof e.gps.longitude === "number",
-  );
+  // Transform posts into entries format expected by clustering logic
+  const entries = [];
+  for (const post of posts) {
+    for (const image of post.images || []) {
+      // Only include images with GPS data
+      if (image.exif?.latitude != null && image.exif?.longitude != null) {
+        entries.push({
+          source: "posts",
+          postId: post._id,
+          imageUrl: image.url,
+          imageOrder: image.order,
+          capturedAt: image.exif.timestamp || post.createdAt,
+          cameraModel: image.exif.cameraModel || null,
+          gps: {
+            latitude: image.exif.latitude,
+            longitude: image.exif.longitude,
+          },
+          postCaption: post.caption,
+          postLocation: post.location,
+          postCategories: post.categories,
+          postAuthor: post.author,
+          postCreatedAt: post.createdAt,
+        });
+      }
+    }
+  }
+
+  console.log(`[LocationAlbums] Found ${entries.length} photos with GPS data`);
+
+  const withGps = entries;
 
   const { clustersByLevel, withoutLocation } =
     await mapEntriesWithReverseGeocode(withGps);

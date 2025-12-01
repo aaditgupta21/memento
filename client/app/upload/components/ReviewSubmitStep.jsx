@@ -43,9 +43,12 @@ export default function ReviewSubmitStep({
           <h3>Photos ({uploadedFiles.length})</h3>
           <div className={styles.embla} ref={emblaRef}>
             <div className={styles.emblaContainer}>
-              {uploadedFiles.map((url, idx) => (
+              {uploadedFiles.map((file, idx) => (
                 <div key={idx} className={styles.emblaSlide}>
-                  <img src={url} alt={`preview ${idx + 1}`} />
+                  <img
+                    src={typeof file === "string" ? file : file.url}
+                    alt={`preview ${idx + 1}`}
+                  />
                 </div>
               ))}
             </div>

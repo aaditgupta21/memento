@@ -81,7 +81,11 @@ export default function Upload() {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          images: uploadedFiles.map((url, idx) => ({ url, order: idx })),
+          images: uploadedFiles.map((file, idx) => ({
+            url: typeof file === "string" ? file : file.url,
+            order: idx,
+            exif: typeof file === "object" ? file.exif : null,
+          })),
           caption: caption.trim(),
           location: location.trim(),
           geolocation,
