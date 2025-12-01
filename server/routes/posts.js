@@ -205,7 +205,7 @@ router.get("/photo-locations", async (req, res) => {
     const { userId } = req.query;
 
     if (!userId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         error: "User ID required"
       });

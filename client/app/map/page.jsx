@@ -126,6 +126,25 @@ export default function MapPage() {
     }
   };
 
+  // Validate environment variables
+  if (!GOOGLE_MAPS_API_KEY) {
+    return (
+      <div style={{ padding: 20, textAlign: "center", marginTop: 50 }}>
+        <h2>Configuration Error</h2>
+        <p>Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in client/.env</p>
+      </div>
+    );
+  }
+
+  if (!API_BASE) {
+    return (
+      <div style={{ padding: 20, textAlign: "center", marginTop: 50 }}>
+        <h2>Configuration Error</h2>
+        <p>Please set NEXT_PUBLIC_API_URL in client/.env</p>
+      </div>
+    );
+  }
+
   if (userLoading || loading) {
     return (
       <div className={styles.mapContainer}>
@@ -144,14 +163,6 @@ export default function MapPage() {
           <p>Please log in to view your map</p>
           <a href="/login">Log In</a>
         </div>
-      </div>
-    );
-  }
-
-  if (!GOOGLE_MAPS_API_KEY) {
-    return (
-      <div style={{ padding: 20 }}>
-        Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in client/.env
       </div>
     );
   }

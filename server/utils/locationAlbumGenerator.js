@@ -95,6 +95,8 @@ async function generateLocationAlbumsForUser(userId, options = {}) {
   const withGps = entries.filter(
     (e) =>
       e.gps &&
+      e.gps.latitude != null &&
+      e.gps.longitude != null &&
       typeof e.gps.latitude === "number" &&
       typeof e.gps.longitude === "number",
   );

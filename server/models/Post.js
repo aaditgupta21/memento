@@ -113,13 +113,18 @@ postSchema.set("toObject", { virtuals: true });
 function scheduleLocationAlbumRefresh(authorId) {
   if (!authorId) return;
   // Run off-thread to avoid blocking the request lifecycle
-  setImmediate(async () => {
-    try {
-      const { generateLocationAlbumsForUser } = require("../utils/locationAlbumGenerator");
-      await generateLocationAlbumsForUser(authorId, { minPhotos: 10 });
-    } catch (error) {
-      console.warn("[LocationAlbums] Refresh skipped:", error.message);
-    }
+  setImmediate(() => {
+    (async () => {
+      try {
+        const { generateLocationAlbumsForUser } = require("../utils/locationAlbumGenerator");
+        await generateLocationAlbumsForUser(authorId, { minPhotos: 10 });
+      } catch (error) {
+        console.warn("[LocationAlbums] Refresh skipped:", error.message);
+      }
+    })().catch((error) => {
+      // Catch any unhandled promise rejections
+      console.warn("[LocationAlbums] Unhandled error in refresh:", error.message);
+    });
   });
 }
 
