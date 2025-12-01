@@ -321,7 +321,37 @@ router.delete("/:postId", async (req, res) => {
         .json({ error: "Not authorized to delete this post" });
     }
 
+    // Extract UploadThing file keys from image URLs
+    const fileKeys = [];
+    for (const image of post.images || []) {
+      const url = image.url;
+      // UploadThing URLs follow pattern: https://utfs.io/f/{fileKey}
+      if (url && url.includes('utfs.io/f/')) {
+        const match = url.match(/utfs\.io\/f\/([^/?]+)/);
+        if (match && match[1]) {
+          fileKeys.push(match[1]);
+        }
+      }
+    }
+
+    // Delete files from UploadThing if we found any keys
+    if (fileKeys.length > 0) {
+      try {
+        const { UTApi } = require('uploadthing/server');
+        const utapi = new UTApi();
+        await utapi.deleteFiles(fileKeys);
+        console.log(`[UploadThing] Deleted ${fileKeys.length} file(s) for post ${postId}`);
+      } catch (utError) {
+        // Log but don't fail the deletion if UploadThing deletion fails
+        console.error('[UploadThing] Error deleting files:', utError.message);
+      }
+    }
+
+    // Delete the post (triggers Mongoose hooks for scrapbook updates)
     await Post.findByIdAndDelete(postId);
+
+    // Update scrapbook cover images if this post was used as a cover
+    await updateScrapbookCoversAfterPostDeletion(post);
 
     res.json({
       success: true,
