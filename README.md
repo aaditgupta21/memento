@@ -42,7 +42,7 @@ Memento is a social media platform for sharing and organizing memories through p
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js (v20 or higher)
 - npm
 
 ### Installation
