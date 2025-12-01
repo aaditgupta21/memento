@@ -10,7 +10,8 @@
     "load-test": "artillery run tests/load/posts-load-test.yml",
     "generate-albums": "node scripts/generateLocationAlbums.js",
     "list-scrapbooks": "node scripts/listScrapbooks.js",
-    "test:scrapbook": "node dev/testAutoScrapbook.js"
+    "test:scrapbook": "node dev/testAutoScrapbook.js",
+    "migrate-exif": "node scripts/migrateExifData.js"
   },
   "keywords": [],
   "author": "",

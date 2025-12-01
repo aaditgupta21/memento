@@ -70,13 +70,30 @@ router.post("/", async (req, res) => {
         .filter((c) => ALLOWED_CATEGORIES.includes(c));
     }
 
-    // Create post in database
-    const post = await Post.create({
-      images: images.map((img, idx) => ({
+    // Process images with EXIF data
+    const processedImages = images.map((img, idx) => {
+      const imageData = {
         url: typeof img === "string" ? img : img.url,
         order:
           typeof img === "object" && img.order !== undefined ? img.order : idx,
-      })),
+      };
+
+      // Add EXIF if provided
+      if (typeof img === "object" && img.exif) {
+        imageData.exif = {
+          latitude: img.exif.latitude || null,
+          longitude: img.exif.longitude || null,
+          timestamp: img.exif.timestamp ? new Date(img.exif.timestamp) : null,
+          cameraModel: img.exif.cameraModel || null,
+        };
+      }
+
+      return imageData;
+    });
+
+    // Create post in database
+    const post = await Post.create({
+      images: processedImages,
       caption: caption ? caption.trim() : "",
       location: location ? location.trim() : undefined,
       geolocation,
@@ -251,31 +268,35 @@ router.get("/photo-locations", async (req, res) => {
     if (!userId) {
       return res.status(400).json({
         success: false,
-        error: "User ID required"
+        error: "User ID required",
       });
     }
 
-    // Use existing EXIF reader with user filter
-    const { loadScrapbookEntriesFromPosts } = require('../geospatial/EXIFReader');
+    // Read from database instead of downloading images (100x faster)
+    const posts = await Post.find({ author: userId })
+      .select("images caption location createdAt")
+      .lean();
 
-    const entries = await loadScrapbookEntriesFromPosts(
-      { author: userId },
-      { limit: null }
-    );
+    const photoLocations = [];
 
-    // Transform to map-friendly format
-    const photoLocations = entries
-      .filter(entry => entry.gps?.latitude && entry.gps?.longitude)
-      .map(entry => ({
-        type: 'photo',
-        coordinates: [entry.gps.longitude, entry.gps.latitude],
-        imageUrl: entry.imageUrl,
-        postId: entry.postId,
-        timestamp: entry.capturedAt,
-        location: entry.postLocation || 'Unknown Location'
-      }));
+    for (const post of posts) {
+      for (const image of post.images || []) {
+        // Only include images with GPS data
+        if (image.exif?.latitude != null && image.exif?.longitude != null) {
+          photoLocations.push({
+            type: "photo",
+            coordinates: [image.exif.longitude, image.exif.latitude],
+            imageUrl: image.url,
+            postId: post._id,
+            timestamp: image.exif.timestamp || post.createdAt,
+            location: post.location || "Unknown Location",
+            cameraModel: image.exif.cameraModel || null,
+          });
+        }
+      }
+    }
 
-    res.json({ success: true, photoLocations });
+    res.json({ success: true, photoLocations, count: photoLocations.length });
   } catch (error) {
     console.error('Error extracting photo locations:', error);
     res.status(500).json({ success: false, error: error.message });

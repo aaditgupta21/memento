@@ -161,3 +161,24 @@
   background-color: #ccc;
   transform: none;
 }
+
+.previewContainer {
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+/* Ensure PostImage carousel has proper width */
+.previewContainer > div {
+  width: 100%;
+}
+
+.imageCount {
+  font-size: 0.9rem;
+  color: #928a7b;
+  font-weight: 500;
+}
