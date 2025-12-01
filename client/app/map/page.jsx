@@ -95,7 +95,7 @@ export default function MapPage() {
     posts.forEach((post) => {
       if (!post.geolocation?.lat || !post.geolocation?.lng) {
         // Find photo locations for this post
-        const postPhotos = photoLocations.filter(p => p.postId === post._id);
+        const postPhotos = photoLocations.filter(p => p.postId?.toString() === post._id?.toString());
         if (postPhotos.length > 0) {
           // Use first photo's location for the post marker
           allPoints.push({
