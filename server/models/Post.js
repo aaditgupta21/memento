@@ -27,6 +27,29 @@ const postSchema = new mongoose.Schema({
         type: Number,
         default: 0,
       },
+      exif: {
+        latitude: {
+          type: Number,
+          required: false,
+          min: -90,
+          max: 90,
+        },
+        longitude: {
+          type: Number,
+          required: false,
+          min: -180,
+          max: 180,
+        },
+        timestamp: {
+          type: Date,
+          required: false,
+        },
+        cameraModel: {
+          type: String,
+          required: false,
+          maxlength: 200,
+        },
+      },
     },
   ],
   categories: [
@@ -95,6 +118,20 @@ postSchema.virtual("commentCount").get(function () {
 // Virtual to get image count
 postSchema.virtual("imageCount").get(function () {
   return this.images.length;
+});
+
+// Virtual to get images with GPS data
+postSchema.virtual("imagesWithGPS").get(function () {
+  return this.images.filter(
+    (img) => img.exif?.latitude != null && img.exif?.longitude != null
+  );
+});
+
+// Virtual to check if post has any GPS data
+postSchema.virtual("hasGPS").get(function () {
+  return this.images.some(
+    (img) => img.exif?.latitude != null && img.exif?.longitude != null
+  );
 });
 
 // Validation: at least one image required
