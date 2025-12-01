@@ -35,21 +35,25 @@ test.describe("Login and interact with post flow", () => {
     // Unlike post for future test consistency
     await page.locator('button:has-text("Unlike")').first().click();
 
-    // TODO: Fix commenting test
-    // // scroll to comment plane
-    // const commentTextarea = page
-    //   .locator('textarea[placeholder="Add a comment..."]')
-    //   .first();
-    // await commentTextarea.scrollIntoViewIfNeeded();
-    // await commentTextarea.waitFor({ state: "visible" });
+    // Scroll to comment input
+    const commentInput = page
+      .locator('input[placeholder="Add a comment..."]')
+      .first();
+    await commentInput.scrollIntoViewIfNeeded();
+    await commentInput.waitFor({ state: "visible" });
 
-    // // Add a comment to the most recent post with unique text
-    // const commentText = `Great post! ${Date.now()}`;
-    // await commentTextarea.fill(commentText);
-    // await page.click('button:has-text("Post")');
+    // Add a comment to the most recent post with unique text
+    const commentText = `Great post! ${Date.now()}`;
+    await commentInput.fill(commentText);
 
-    // // Verify that the comment appears
-    // await expect(page.locator(`text=${commentText}`)).toBeVisible();
+    // Click the Post button within the same form
+    const postBtn = page.locator('button:has-text("Post")').first();
+    await postBtn.click();
+
+    // Verify that the comment appears
+    await expect(page.locator(`text=${commentText}`)).toBeVisible({
+      timeout: 10000,
+    });
 
     // Log out
     await page.click('button:has-text("Logout")');
