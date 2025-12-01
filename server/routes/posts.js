@@ -2,7 +2,51 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Post = require("../models/Post");
+const Scrapbook = require("../models/Scrapbook");
 const { ALLOWED_CATEGORIES } = require("../constants");
+
+/**
+ * Update scrapbook cover images after a post is deleted
+ * If a scrapbook was using the deleted post as its cover, update to use another post
+ */
+async function updateScrapbookCoversAfterPostDeletion(deletedPost) {
+  try {
+    // Find scrapbooks that used this post's image as cover
+    const postImageUrls = (deletedPost.images || []).map(img => img.url);
+
+    if (postImageUrls.length === 0) return;
+
+    // Find scrapbooks where the cover image matches any of this post's images
+    const affectedScrapbooks = await Scrapbook.find({
+      author: deletedPost.author,
+      coverImage: { $in: postImageUrls }
+    }).populate('posts');
+
+    for (const scrapbook of affectedScrapbooks) {
+      // Find a replacement post that's still in the scrapbook
+      const remainingPosts = scrapbook.posts.filter(p =>
+        p && !p._id.equals(deletedPost._id)
+      );
+
+      if (remainingPosts.length > 0) {
+        // Use the first image of the first remaining post as the new cover
+        const newCoverPost = remainingPosts[0];
+        if (newCoverPost.images && newCoverPost.images.length > 0) {
+          scrapbook.coverImage = newCoverPost.images[0].url;
+          await scrapbook.save();
+          console.log(`[Scrapbook] Updated cover for "${scrapbook.title}"`);
+        }
+      } else {
+        // No posts left in scrapbook, set empty cover
+        scrapbook.coverImage = '';
+        await scrapbook.save();
+        console.log(`[Scrapbook] Cleared cover for empty scrapbook "${scrapbook.title}"`);
+      }
+    }
+  } catch (error) {
+    console.error('[Scrapbook] Error updating covers after deletion:', error.message);
+  }
+}
 
 // Create post endpoint
 router.post("/", async (req, res) => {
@@ -56,7 +100,12 @@ router.post("/", async (req, res) => {
 // Get all posts
 router.get("/", async (req, res) => {
   try {
-    const posts = await Post.find()
+    const { author } = req.query;
+
+    // Build query - filter by author if provided
+    const query = author ? { author } : {};
+
+    const posts = await Post.find(query)
       .sort({ createdAt: -1 })
       .populate("author", "displayName email profilePicture")
       .populate({
@@ -194,6 +243,45 @@ router.post("/:postId/comments", async (req, res) => {
   }
 });
 
+// Get photo locations with EXIF data
+router.get("/photo-locations", async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: "User ID required"
+      });
+    }
+
+    // Use existing EXIF reader with user filter
+    const { loadScrapbookEntriesFromPosts } = require('../geospatial/EXIFReader');
+
+    const entries = await loadScrapbookEntriesFromPosts(
+      { author: userId },
+      { limit: null }
+    );
+
+    // Transform to map-friendly format
+    const photoLocations = entries
+      .filter(entry => entry.gps?.latitude && entry.gps?.longitude)
+      .map(entry => ({
+        type: 'photo',
+        coordinates: [entry.gps.longitude, entry.gps.latitude],
+        imageUrl: entry.imageUrl,
+        postId: entry.postId,
+        timestamp: entry.capturedAt,
+        location: entry.postLocation || 'Unknown Location'
+      }));
+
+    res.json({ success: true, photoLocations });
+  } catch (error) {
+    console.error('Error extracting photo locations:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Location search endpoint
 router.get("/locations/search", async (req, res) => {
   try {
@@ -277,7 +365,37 @@ router.delete("/:postId", async (req, res) => {
         .json({ error: "Not authorized to delete this post" });
     }
 
+    // Extract UploadThing file keys from image URLs
+    const fileKeys = [];
+    for (const image of post.images || []) {
+      const url = image.url;
+      // UploadThing URLs follow pattern: https://utfs.io/f/{fileKey}
+      if (url && url.includes('utfs.io/f/')) {
+        const match = url.match(/utfs\.io\/f\/([^/?]+)/);
+        if (match && match[1]) {
+          fileKeys.push(match[1]);
+        }
+      }
+    }
+
+    // Delete files from UploadThing if we found any keys
+    if (fileKeys.length > 0) {
+      try {
+        const { UTApi } = require('uploadthing/server');
+        const utapi = new UTApi();
+        await utapi.deleteFiles(fileKeys);
+        console.log(`[UploadThing] Deleted ${fileKeys.length} file(s) for post ${postId}`);
+      } catch (utError) {
+        // Log but don't fail the deletion if UploadThing deletion fails
+        console.error('[UploadThing] Error deleting files:', utError.message);
+      }
+    }
+
+    // Delete the post (triggers Mongoose hooks for scrapbook updates)
     await Post.findByIdAndDelete(postId);
+
+    // Update scrapbook cover images if this post was used as a cover
+    await updateScrapbookCoversAfterPostDeletion(post);
 
     res.json({
       success: true,
