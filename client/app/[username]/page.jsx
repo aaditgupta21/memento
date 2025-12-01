@@ -16,7 +16,47 @@ import { useUser } from "@/context/UserContext";
 const TABS = {
   POSTS: "posts",
   SCRAPBOOKS: "scrapbooks",
+  ALBUMS: "albums",
 };
+
+function AlbumDetailModal({ album, onClose }) {
+  if (!album) return null;
+
+  return (
+    <div className={styles.overlay} role="dialog" aria-modal="true">
+      <div className={styles.modal}>
+        <button className={styles.closeBtn} type="button" onClick={onClose}>
+          ×
+        </button>
+        <div className={styles.modalHeader}>
+          <div>
+            <p className={styles.muted}>{album.level || "Location album"}</p>
+            <h2 className={styles.title}>{album.title || album.name}</h2>
+            <p className={styles.metaLine}>
+              {album.photoCount || album.photos?.length || 0} photos •{" "}
+              {album.dateRange || "Unknown date"}
+            </p>
+          </div>
+        </div>
+        <div className={styles.albumPhotosGrid}>
+          {album.photos?.map((photo, idx) => (
+            <div key={photo.url || idx} className={styles.albumPhotoCard}>
+              <img src={photo.url} alt={photo.caption || album.title} />
+              <div className={styles.albumPhotoMeta}>
+                <span>{photo.location || album.title || "Unknown"}</span>
+                {photo.timestamp ? (
+                  <span>
+                    {new Date(photo.timestamp).toLocaleDateString("en-US")}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function GalleryContent() {
   const searchParams = useSearchParams();
@@ -29,11 +69,14 @@ function GalleryContent() {
 
   const [activeTab, setActiveTab] = useState(initialTab);
   const [scrapbooks, setScrapbooks] = useState([]);
+  const [locationAlbums, setLocationAlbums] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingScrapbooks, setLoadingScrapbooks] = useState(true);
+  const [loadingAlbums, setLoadingAlbums] = useState(true);
   const [profileUser, setProfileUser] = useState(null);
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL;
@@ -59,11 +102,14 @@ function GalleryContent() {
       if (!username) {
         setPosts([]);
         setLoading(false);
+        setLocationAlbums([]);
+        setLoadingAlbums(false);
         return;
       }
 
       try {
         setLoading(true);
+        setLoadingAlbums(true);
 
         // First fetch the user profile to get their displayName
         const userRes = await fetch(
@@ -114,11 +160,28 @@ function GalleryContent() {
           fetchedScrapbooks = scrapbooksData.scrapbooks || [];
         }
 
+        // Fetch location albums
+        let fetchedAlbums = [];
+        try {
+          const albumsRes = await fetch(
+            `${API_BASE}/api/location-albums/users/username/${username}/location-albums`,
+            { credentials: "include" }
+          );
+          if (albumsRes.ok) {
+            const albumsData = await albumsRes.json();
+            fetchedAlbums = albumsData.albums || [];
+          }
+        } catch (err) {
+          console.warn("Failed to load location albums", err);
+        }
+
         if (mounted) {
           setProfileUser(userData.user);
           setPosts(fetchedPosts);
           setScrapbooks(fetchedScrapbooks);
+          setLocationAlbums(fetchedAlbums);
           setLoadingScrapbooks(false);
+          setLoadingAlbums(false);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -126,7 +189,9 @@ function GalleryContent() {
           setProfileUser(null);
           setPosts([]);
           setScrapbooks([]);
+          setLocationAlbums([]);
           setLoadingScrapbooks(false);
+          setLoadingAlbums(false);
         }
       } finally {
         if (mounted) setLoading(false);
@@ -206,6 +271,14 @@ function GalleryContent() {
             >
               Scrapbooks
             </button>
+            <button
+              className={`${styles.tabButton} ${
+                activeTab === TABS.ALBUMS ? styles.tabActive : ""
+              }`}
+              onClick={() => setActiveTab(TABS.ALBUMS)}
+            >
+              Albums
+            </button>
           </div>
         </div>
       </section>
@@ -263,7 +336,7 @@ function GalleryContent() {
             </div>
           )}
         </section>
-      ) : (
+      ) : activeTab === TABS.SCRAPBOOKS ? (
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <div>
@@ -306,6 +379,58 @@ function GalleryContent() {
             })}
           </div>
         </section>
+      ) : (
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div>
+              <p className={styles.muted}>Geotagged clusters</p>
+              <h2 className={styles.sectionTitle}>Location Albums</h2>
+            </div>
+            <span className={styles.badge}>
+              {loadingAlbums ? "..." : locationAlbums.length} albums
+            </span>
+          </div>
+          {loadingAlbums ? (
+            <div style={{ textAlign: "center", padding: "2rem" }}>
+              Loading albums...
+            </div>
+          ) : locationAlbums.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "2rem" }}>
+              <p>No geotagged photos yet.</p>
+              <p style={{ color: "#a18f7f" }}>
+                Add photos with GPS/EXIF data to see albums by location.
+              </p>
+            </div>
+          ) : (
+            <div className={styles.albumGrid}>
+              {locationAlbums.map((album) => (
+                <button
+                  key={album._id || album.id || album.boundaryId}
+                  type="button"
+                  className={styles.albumCard}
+                  onClick={() => setSelectedAlbum(album)}
+                >
+                  <div className={styles.albumCover}>
+                    <img
+                      src={album.coverImage || album.photos?.[0]?.url || ""}
+                      alt={album.title || "Album cover"}
+                    />
+                  </div>
+                  <div className={styles.albumMeta}>
+                    <h3>{album.title || album.name}</h3>
+                    <p className={styles.metaLine}>
+                      {album.level || "Location"} •{" "}
+                      {album.photoCount || album.photos?.length || 0} photos
+                    </p>
+                    <p className={styles.metaLine}>
+                      {album.dateRange || "Unknown date"}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
       )}
 
       {isOwnGallery && (
@@ -319,6 +444,10 @@ function GalleryContent() {
       <PostDetailModal
         post={selectedPost}
         onClose={() => setSelectedPost(null)}
+      />
+      <AlbumDetailModal
+        album={selectedAlbum}
+        onClose={() => setSelectedAlbum(null)}
       />
     </main>
   );
