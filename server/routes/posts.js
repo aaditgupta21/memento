@@ -2,7 +2,51 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Post = require("../models/Post");
+const Scrapbook = require("../models/Scrapbook");
 const { ALLOWED_CATEGORIES } = require("../constants");
+
+/**
+ * Update scrapbook cover images after a post is deleted
+ * If a scrapbook was using the deleted post as its cover, update to use another post
+ */
+async function updateScrapbookCoversAfterPostDeletion(deletedPost) {
+  try {
+    // Find scrapbooks that used this post's image as cover
+    const postImageUrls = (deletedPost.images || []).map(img => img.url);
+
+    if (postImageUrls.length === 0) return;
+
+    // Find scrapbooks where the cover image matches any of this post's images
+    const affectedScrapbooks = await Scrapbook.find({
+      author: deletedPost.author,
+      coverImage: { $in: postImageUrls }
+    }).populate('posts');
+
+    for (const scrapbook of affectedScrapbooks) {
+      // Find a replacement post that's still in the scrapbook
+      const remainingPosts = scrapbook.posts.filter(p =>
+        p && !p._id.equals(deletedPost._id)
+      );
+
+      if (remainingPosts.length > 0) {
+        // Use the first image of the first remaining post as the new cover
+        const newCoverPost = remainingPosts[0];
+        if (newCoverPost.images && newCoverPost.images.length > 0) {
+          scrapbook.coverImage = newCoverPost.images[0].url;
+          await scrapbook.save();
+          console.log(`[Scrapbook] Updated cover for "${scrapbook.title}"`);
+        }
+      } else {
+        // No posts left in scrapbook, set empty cover
+        scrapbook.coverImage = '';
+        await scrapbook.save();
+        console.log(`[Scrapbook] Cleared cover for empty scrapbook "${scrapbook.title}"`);
+      }
+    }
+  } catch (error) {
+    console.error('[Scrapbook] Error updating covers after deletion:', error.message);
+  }
+}
 
 // Create post endpoint
 router.post("/", async (req, res) => {
