@@ -65,8 +65,8 @@ export default function UploadImagesStep({
       {uploadedFiles.length > 0 && (
         <div className={styles.previewContainer}>
           <PostImage
-            key={uploadedFiles.join(",")}
-            imageUrls={uploadedFiles}
+            key={uploadedFiles.map((f) => f.url || f).join(",")}
+            imageUrls={uploadedFiles.map((f) => f.url || f)}
             caption={null}
           />
           <p className={styles.imageCount}>
