@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import styles from "./likesDialog.module.css";
-
+import { useRouter } from "next/navigation";
 export default function LikesDialog({ isOpen, onClose, likes, postId }) {
+  const router = useRouter();
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -46,7 +47,12 @@ export default function LikesDialog({ isOpen, onClose, likes, postId }) {
                       height={40}
                       className={styles.avatar}
                     />
-                    <span className={styles.username}>{displayName}</span>
+                    <button
+                      className={styles.username}
+                      onClick={() => router.push(`/${displayName}`)}
+                    >
+                      {displayName}
+                    </button>
                   </li>
                 );
               })}
@@ -59,4 +65,3 @@ export default function LikesDialog({ isOpen, onClose, likes, postId }) {
     </div>
   );
 }
-

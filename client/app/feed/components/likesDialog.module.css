@@ -112,7 +112,18 @@
 .username {
   font-size: 16px;
   font-weight: 500;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   color: #333;
+  text-align: left;
+  transition: color 0.2s;
+}
+
+.username:hover {
+  color: #7a6e60;
+  text-decoration: underline;
 }
 
 .noLikes {
@@ -121,4 +132,3 @@
   padding: 40px 20px;
   font-size: 16px;
 }
-
