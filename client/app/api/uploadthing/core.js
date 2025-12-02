@@ -14,7 +14,7 @@ export const ourFileRouter = {
        * For full list of options and defaults, see the File Route API reference
        * @see https://docs.uploadthing.com/file-routes#route-config
        */
-      maxFileSize: "10MB",
+      maxFileSize: "20MB",
       maxFileCount: 10,
     },
   })
@@ -37,7 +37,8 @@ export const ourFileRouter = {
       // Extract EXIF from uploaded image
       let exifData = null;
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+        const API_URL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
         const response = await fetch(`${API_URL}/api/exif/extract`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -48,12 +49,16 @@ export const ourFileRouter = {
           const data = await response.json();
           exifData = data.exif;
           if (exifData?.latitude) {
-            console.log(`[EXIF] GPS: ${exifData.latitude}, ${exifData.longitude}`);
+            console.log(
+              `[EXIF] GPS: ${exifData.latitude}, ${exifData.longitude}`
+            );
           } else {
             console.log("[EXIF] No GPS data found");
           }
         } else {
-          console.warn(`[EXIF] Extraction endpoint returned ${response.status}`);
+          console.warn(
+            `[EXIF] Extraction endpoint returned ${response.status}`
+          );
         }
       } catch (error) {
         console.error(`[EXIF] Extraction failed: ${error.message}`);
