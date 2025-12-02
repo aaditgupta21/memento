@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./likesDialog.module.css";
 import { useRouter } from "next/navigation";
 export default function LikesDialog({ isOpen, onClose, likes, postId }) {
@@ -40,13 +41,15 @@ export default function LikesDialog({ isOpen, onClose, likes, postId }) {
 
                 return (
                   <li key={userId} className={styles.likeItem}>
-                    <Image
-                      src={profilePicture}
-                      alt={displayName}
-                      width={40}
-                      height={40}
-                      className={styles.avatar}
-                    />
+                    <Link href={`/${displayName}`}>
+                      <Image
+                        src={profilePicture}
+                        alt={displayName}
+                        width={40}
+                        height={40}
+                        className={styles.avatar}
+                      />
+                    </Link>
                     <button
                       className={styles.username}
                       onClick={() => router.push(`/${displayName}`)}
