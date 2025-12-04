@@ -1,7 +1,7 @@
 /* StepIndicator.module.css
  * GenAI Usage Note: I built the step indicator component logic independently,
  * then asked Copilot: "Would it be possible to have a step indicator with
- * circular steps and connecting lines that highlight the current step? If so, what are the types of CSS styles I can use to  * achieve this?"
+ * circular steps and connecting lines that highlight the current step? If so, what are the types of CSS styles I can use to achieve this?"
  * I kept control over the final design by tweaking sizes and transition timing.
  */
 
