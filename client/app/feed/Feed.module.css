@@ -65,7 +65,8 @@
 
 /* Category Filter Styles:
  * Prompt: Can you provide some potential approaches to styling a category filter bar
- * for the feed page that complements the existing design? Do not implement any code, however provide a number of suggestions  * and explain your reasoning for each one
+ * for the feed page that complements the existing design? Do not implement any code, however, provide a number of suggestions
+ * and explain your reasoning for each one
  */
 .filterBar {
   display: flex;
