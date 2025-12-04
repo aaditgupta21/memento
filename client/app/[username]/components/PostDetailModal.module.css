@@ -59,6 +59,7 @@
   position: relative;
 }
 
+/* Prompt: how can I customize the styling of the embla carousel component used within my media panel? I want to ensure that it can fit within the bounds of the post modal. Provide CSS examples to adjust its appearance, but do not modify the code, I will decide what to include */
 .media :global(.carouselWrapper) {
   width: 100%;
   height: 100%;

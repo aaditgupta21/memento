@@ -1,7 +1,6 @@
 "use client";
-import useEmblaCarousel from "embla-carousel-react";
-import { useEffect, useState } from "react";
 import styles from "./ReviewSubmitStep.module.css";
+import PostImage from "@/app/feed/components/postImage";
 
 export default function ReviewSubmitStep({
   uploadedFiles,
@@ -12,28 +11,11 @@ export default function ReviewSubmitStep({
   onSubmit,
   isSubmitting,
 }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    const onSelect = () => {
-      setCanScrollPrev(emblaApi.canScrollPrev());
-      setCanScrollNext(emblaApi.canScrollNext());
-    };
-    emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", onSelect);
-    onSelect();
-    return () => {
-      emblaApi.off("select", onSelect);
-      emblaApi.off("reInit", onSelect);
-    };
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (emblaApi && uploadedFiles.length > 0) emblaApi.reInit();
-  }, [emblaApi, uploadedFiles]);
+  // Convert uploadedFiles to image URLs for PostImage component
+  const imageUrls = uploadedFiles.map((file) => {
+    if (typeof file === "string") return file;
+    return file.url;
+  });
 
   return (
     <>
@@ -41,39 +23,8 @@ export default function ReviewSubmitStep({
       <div className={styles.reviewContainer}>
         <div className={styles.reviewSection}>
           <h3>Photos ({uploadedFiles.length})</h3>
-          <div className={styles.embla} ref={emblaRef}>
-            <div className={styles.emblaContainer}>
-              {uploadedFiles.map((file, idx) => (
-                <div key={idx} className={styles.emblaSlide}>
-                  <img
-                    src={typeof file === "string" ? file : file.url}
-                    alt={`preview ${idx + 1}`}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-          {uploadedFiles.length > 1 && (
-            <div className={styles.carouselControls}>
-              <button
-                onClick={() => emblaApi?.scrollPrev()}
-                disabled={!canScrollPrev}
-                className={styles.carouselBtn}
-              >
-                ←
-              </button>
-              <span className={styles.slideCounter}>
-                {uploadedFiles.length} images
-              </span>
-              <button
-                onClick={() => emblaApi?.scrollNext()}
-                disabled={!canScrollNext}
-                className={styles.carouselBtn}
-              >
-                →
-              </button>
-            </div>
-          )}
+          {/* use postImage instead of reimplementing image display */}
+          <PostImage imageUrls={imageUrls} caption={null} />
         </div>
         <div className={styles.reviewSection}>
           <h3>Caption</h3>

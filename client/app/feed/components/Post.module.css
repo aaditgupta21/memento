@@ -1,4 +1,10 @@
-/* Post.module.css */
+/* Post.module.css
+ * GenAI Usage Note: I designed the post component structure and functionality myself.
+ * For visual polish, I asked Copilot: "Style the post card with rounded corners,
+ * subtle shadow, and appropriate padding for a clean feed appearance."
+ * I reviewed the output and adjusted the coloring and shadow intensity to align with the rest of our design.
+ */
+
 .post {
   border-radius: 1.5rem;
   padding: 1.5rem;

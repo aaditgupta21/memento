@@ -1,3 +1,11 @@
+/* postImage.module.css
+ * GenAI Usage Note: I implemented the image carousel logic using Embla Carousel library.
+ * For carousel button styling, I prompted Copilot: "Style navigation buttons with
+ * circular shape, semi-transparent background, and smooth hover transitions."
+ * I retained control by adjusting opacity, backdrop-filter, and z-index values
+ * to ensure buttons were visible but not obtrusive.
+ */
+
 .carouselWrapper {
   position: relative;
   width: 100%;
@@ -16,6 +24,9 @@
   justify-content: center;
 }
 
+/* Prompt: Is it possible to use my own styling for the embla carousel component? 
+ * If so, please give suggestions on how to approach that.
+*/
 .embla {
   overflow: hidden;
   border-radius: 1rem;

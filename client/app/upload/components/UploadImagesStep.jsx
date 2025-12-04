@@ -1,6 +1,5 @@
 "use client";
 import { UploadDropzone } from "@/utils/uploadthing";
-import { useEffect, useState } from "react";
 import styles from "./UploadImagesStep.module.css";
 import PostImage from "@/app/feed/components/postImage";
 
@@ -24,7 +23,7 @@ export default function UploadImagesStep({
             }
             // Capture both URL and EXIF data from upload response
             const filesWithExif = res.map((f) => ({
-              url: f.url,
+              url: f.url || f.ufsUrl, // Fallback to ufsUrl if url doesn't exist
               exif: f.serverData?.exif || null,
             }));
             setUploadedFiles((prev) => [...prev, ...filesWithExif]);
