@@ -1,4 +1,11 @@
-/* Feed.module.css */
+/* Feed.module.css
+ * GenAI Usage Note: After implementing the feed's data fetching and component structure,
+ * I used Copilot for styling refinements. Example prompt: "Help style the feed container
+ * with appropriate spacing, a centered max-width layout, and a soft background."
+ * I maintained full control by reviewing each suggestion and ensuring consistency
+ * with our established color palette and spacing system.
+ */
+
 .page {
   min-height: 100vh;
   background-color: #f5f0eb;
@@ -56,7 +63,10 @@
   margin: 2rem 0;
 }
 
-/* Category Filter Styles */
+/* Category Filter Styles:
+ * Prompt: Can you provide some potential approaches to styling a category filter bar
+ * for the feed page that complements the existing design? Do not implement any code, however provide a number of suggestions  * and explain your reasoning for each one
+ */
 .filterBar {
   display: flex;
   align-items: center;

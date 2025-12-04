@@ -1,3 +1,13 @@
+/* likesDialog.module.css
+ * GenAI Usage Note: I built the likes dialog component and modal logic independently.
+ * For animation polish, I asked Copilot: "Add smooth fade-in and slide-up animations
+ * for the modal overlay and dialog box with appropriate timing."
+ * I did some research on what @keyframes does, and once I understood it, I came to the conclusion
+ * that it would be best to use it here.
+ * I reviewed the keyframe animations and adjusted duration values to ensure
+ * the transitions felt natural and weren't too slow. 
+ */
+
 .overlay {
   position: fixed;
   top: 0;
@@ -99,6 +109,7 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
+/* prompt: How do I ensure the border doesn't apply to the last item only? */
 .likeItem:last-child {
   border-bottom: none;
 }

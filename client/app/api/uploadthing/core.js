@@ -32,7 +32,7 @@ export const ourFileRouter = {
     .onUploadComplete(async ({ metadata, file }) => {
       // This code RUNS ON YOUR SERVER after upload
       console.log("Upload complete for userId:", metadata.userId);
-      console.log("file url", file.url);
+      console.log("file url", file.ufsUrl);
 
       // Extract EXIF from uploaded image
       let exifData = null;
@@ -42,7 +42,7 @@ export const ourFileRouter = {
         const response = await fetch(`${API_URL}/api/exif/extract`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageUrl: file.url }),
+          body: JSON.stringify({ imageUrl: file.ufsUrl }),
         });
 
         if (response.ok) {

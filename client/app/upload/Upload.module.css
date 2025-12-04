@@ -1,3 +1,11 @@
+/* Upload.module.css
+ * GenAI Usage Note: After building the upload form structure and logic myself,
+ * I used Copilot to assist with visual styling elements. Specifically, I prompted:
+ * "Help style the upload page container with a soft background, centered layout,
+ * and proper spacing for a clean multi-step form appearance."
+ * I reviewed the suggestions and adjusted values to match our project's design system.
+ */
+
 .page {
   min-height: 100vh;
   background-color: #f5f0eb;
