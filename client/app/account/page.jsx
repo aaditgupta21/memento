@@ -42,37 +42,42 @@ export default function Account() {
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Handle profile picture upload from UploadThing
+    // Handles a profile picture upload and immediately saves it to the backend
     const handleProfilePictureUpload = async (uploadedFiles) => {
-        if (uploadedFiles && uploadedFiles.length > 0) {
-            const imageUrl = uploadedFiles[0].url;
-            setProfileImage(imageUrl);
+        // Guard clause prevents null photos from being processed early 
+        if (!uploadedFiles?.length) return;
 
-            // Immediately save to backend
-            try {
-                const API_URL = process.env.NEXT_PUBLIC_API_URL;
-                const response = await fetch(`${API_URL}/api/users/update-profile-picture`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({ profilePicture: imageUrl })
-                });
+        const imageUrl = uploadedFiles[0].url;
+        // Update profile image on the frontend to minimize loading if it succeeds
+        setProfileImage(imageUrl);
 
-                const data = await response.json();
-                if (response.ok) {
-                    setSuccess("Profile picture updated successfully!");
-                    // Refresh user data
-                    await fetchUser();
-                    setTimeout(() => setSuccess(""), 3000);
-                } else {
-                    setError(data.error || "Failed to update profile picture");
-                }
-            } catch (err) {
-                console.error("Error updating profile picture:", err);
-                setError("Failed to update profile picture");
+        // Attempt to send the new profile pic to the server
+        try {
+            const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+            const response = await fetch(`${API_URL}/api/users/update-profile-picture`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ profilePicture: imageUrl }),
+            });
+
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Update page with new profile pic and show a temporary success message to tell the user it worked
+                setSuccess("Profile picture updated successfully!");
+                await fetchUser();
+                setTimeout(() => setSuccess(""), 3000);
+            } else {
+                setError(data.error || "Failed to update profile picture");
             }
+        } catch (err) {
+            console.error("Error updating profile picture:", err);
+            setError("Failed to update profile picture");
         }
-    }
+    };
+
 
 
     // Initialize form fields from UserContext
