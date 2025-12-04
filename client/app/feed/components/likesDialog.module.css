@@ -5,9 +5,9 @@
  * I did some research on what @keyframes does, and once I understood it, I came to the conclusion
  * that it would be best to use it here.
  * I reviewed the keyframe animations and adjusted duration values to ensure
- * the transitions felt natural and weren't too slow. 
+ * the transitions felt natural and weren't too slow.
  */
-
+ 
 .overlay {
   position: fixed;
   top: 0;

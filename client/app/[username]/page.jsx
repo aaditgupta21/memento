@@ -1,3 +1,14 @@
+/* client/app/[username]/page.jsx
+ * GenAI Usage Note: When implementing the gallery page to fetch and display user posts based
+ * on the URL username, I used Copilot to understand how to structure the data fetching logic.
+ * Example prompts: "How do I fetch user data and their posts from an API endpoint using
+ * the username from the URL params?" and "What's the best way to handle loading states and
+ * error handling when fetching multiple API endpoints in a useEffect?" I reviewed the React
+ * documentation on useEffect cleanup and implemented a mounted flag to prevent state updates
+ * after component unmount. I also structured the fetch calls to first get the user profile,
+ * then fetch their posts and scrapbooks, ensuring proper error handling for 404 cases.
+ */
+
 "use client";
 
 import { Suspense, useState, useEffect } from "react";
