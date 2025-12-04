@@ -1,15 +1,28 @@
 "use client";
 
+import { useEffect } from "react";
 import styles from "./PostDetailModal.module.css";
 import PostImage from "../../feed/components/postImage";
 import { useUser } from "@/context/UserContext";
 
 // Lightweight modal to show a single post's details
 export default function PostDetailModal({ post, onClose }) {
-  if (!post) return null;
-
   // check if this is own post
   const { user } = useUser();
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [onClose]);
+
+  if (!post) return null;
+
   const isOwnPost = post.author?._id === user?.id;
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL;
