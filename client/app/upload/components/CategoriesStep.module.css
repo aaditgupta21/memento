@@ -60,7 +60,7 @@
 }
 
 /* Prompt: How can I rotate the caret icon when the dropdown is expanded? Give
- * recommended approaches, would this be a CSS problem, or something I address in the JSX * file? 
+* recommended approaches, would this be a CSS problem, or something I address in the JSX * file? 
 */
 .catDropdownBtn[aria-expanded="true"] .catCaret {
   transform: rotate(180deg);
