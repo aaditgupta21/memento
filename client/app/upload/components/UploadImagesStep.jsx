@@ -1,6 +1,5 @@
 "use client";
 import { UploadDropzone } from "@/utils/uploadthing";
-import { useEffect, useState } from "react";
 import styles from "./UploadImagesStep.module.css";
 import PostImage from "@/app/feed/components/postImage";
 
