@@ -8,6 +8,9 @@ Memento is a social media platform for sharing and organizing memories through p
 ### Sequence Diagram to create a scrapbook
 <img width="725" height="709" alt="Screenshot 2025-12-04 at 17 40 29" src="https://github.com/user-attachments/assets/1978785a-28e4-4373-aa8d-1b3853b5fbae" />
 
+### Entity Relationship Diagram
+<img width="1473" height="1121" alt="ERD drawio" src="https://github.com/user-attachments/assets/28e7a1ee-d550-41aa-bab8-ccfe1d6c1b76" />
+
 
 
 ## Features
