@@ -4,7 +4,7 @@ Feature: Upload Feature Workflow
     so that I can share my memories
 
     Background:
-        Given that I am logged in as "testexample@example.com
+        Given I am logged in as "testexample@example.com"
     
     Scenario: Complete the full 4-step upload wizard
         When I navigate to the upload page
