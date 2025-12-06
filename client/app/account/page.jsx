@@ -1,3 +1,13 @@
+/* client/app/account/page.jsx
+ * GenAI Usage Note: When adding profile picture upload functionality, I used Copilot to
+ * understand how to integrate UploadThing's UploadButton component. Example prompts: "How do
+ * I use UploadThing's UploadButton component in a Next.js app?" and "How do I handle the
+ * onClientUploadComplete callback to save the uploaded image URL to my backend?" I reviewed
+ * the UploadThing documentation and implemented the handleProfilePictureUpload function to
+ * immediately save the profile picture URL to the backend after upload completes, ensuring
+ * the UI updates in real-time.
+ */
+
 "use client";
 import Link from "next/link";
 import Image from "next/image";
