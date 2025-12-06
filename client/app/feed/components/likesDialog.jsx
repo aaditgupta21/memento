@@ -7,6 +7,7 @@ import styles from "./likesDialog.module.css";
 import { useRouter } from "next/navigation";
 export default function LikesDialog({ isOpen, onClose, likes, postId }) {
   const router = useRouter();
+  // Disable body scroll when modal is open to prevent background scrolling
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -33,6 +34,7 @@ export default function LikesDialog({ isOpen, onClose, likes, postId }) {
           {likes && likes.length > 0 ? (
             <ul className={styles.likesList}>
               {likes.map((like) => {
+                // Likes can be stored as either user objects or just IDs; handle both cases
                 const user = typeof like === "object" ? like : null;
                 const userId = user?._id || like;
                 const displayName = user?.displayName || "Unknown User";

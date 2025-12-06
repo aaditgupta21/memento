@@ -11,7 +11,7 @@ export default function CategoriesStep({
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // close on escape / outside
+  // Close dropdown when user presses Escape or clicks outside
   useEffect(() => {
     if (!isOpen) return;
     const handleEscape = (e) => e.key === "Escape" && setIsOpen(false);
