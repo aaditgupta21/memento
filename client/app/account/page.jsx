@@ -1,4 +1,5 @@
-/* client/app/account/page.jsx
+/* Aadit:
+ * client/app/account/page.jsx
  * GenAI Usage Note: When adding profile picture upload functionality, I used Copilot to
  * understand how to integrate UploadThing's UploadButton component. Example prompts: "How do
  * I use UploadThing's UploadButton component in a Next.js app?" and "How do I handle the
@@ -7,6 +8,17 @@
  * immediately save the profile picture URL to the backend after upload completes, ensuring
  * the UI updates in real-time.
  */
+
+/*
+Shreyansh:
+AI Usage Note:
+ChatGPT was used to verify the correctness of a few validation patterns used in 
+this component. Specifically, I asked the AI to check whether regexes
+correctly enforced the rules I intended, and it helped confirm edge 
+cases and explained how each part of the pattern behaved. It also suggested that I 
+trim every input to remove extra whitespace, so I implemented that change.
+*/
+
 
 "use client";
 import Link from "next/link";
@@ -63,7 +75,7 @@ export default function Account() {
             });
 
             const data = await response.json();
-            
+
             if (response.ok) {
                 // Update page with new profile pic and show a temporary success message to tell the user it worked
                 setSuccess("Profile picture updated successfully!");
@@ -94,42 +106,71 @@ export default function Account() {
     }, [user]);
 
 
-    // for now handle submission by reloading component only and delivering success message
     const handleSave = async (e) => {
         e.preventDefault();
+        if (typeof window !== "undefined") {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
         setError("");
         setSuccess("");
         setLoading(true);
+        const hadPasswordInput = !!(currentPassword || newPassword || confirmPassword);
+
+        // Help clean up any errors
+        const stopWithError = (message) => {
+            setError(message);
+            setLoading(false);
+        };
 
         try {
-            // check that username is at least 1 character long, all lowercase letters
+            // Check that username is at least 1 character long, all lowercase letters
             const usernameRegex = /^[a-z0-9_.]+$/;
+            const nameRegex = /^[A-Za-z\s-]+$/;
 
-            if (username.trim().length < 1) {
-                throw new Error("Username must be at least 1 character long.");
+            const trimmedUsername = username.trim();
+            const trimmedFirstName = firstName.trim();
+            const trimmedLastName = lastName.trim();
+
+            if (trimmedUsername.length < 1) {
+                stopWithError("Username must be at least 1 character long.");
+                return;
             }
 
-            if (!usernameRegex.test(username)) {
-                throw new Error("Username can only contain lowercase letters, numbers, underscores, and periods");
+            if (!usernameRegex.test(trimmedUsername)) {
+                stopWithError("Username can only contain lowercase letters, numbers, underscores, and periods");
+                return;
+            }
+
+            if (!isGoogleUser) {
+                if (trimmedFirstName && !nameRegex.test(trimmedFirstName)) {
+                    stopWithError("First name can only include letters, spaces, and dashes");
+                    return;
+                }
+                if (trimmedLastName && !nameRegex.test(trimmedLastName)) {
+                    stopWithError("Last name can only include letters, spaces, and dashes");
+                    return;
+                }
             }
 
 
 
-            // check that passwords entered were valid (only for non-Google users)
+            // Check that passwords entered were valid (only for non-Google users)
             if (!isGoogleUser && (currentPassword || newPassword || confirmPassword)) {
 
                 if (!currentPassword) {
-                    throw new Error("Please enter your current password.");
+                    stopWithError("Please enter your current password.");
+                    return;
                 }
 
-                // Strong password validation disabled for now
-                // const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-                // if (!strongPassword.test(newPassword)) {
-                //     throw new Error("Password must be 8+ characters and include a letter, number, and special character (!@#$%^&*)");
-                // }
+                const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+                if (!strongPassword.test(newPassword)) {
+                    stopWithError("Password must be 8+ characters and include a letter, number, and special character (!@#$%^&*)");
+                    return;
+                }
 
                 if (newPassword !== confirmPassword) {
-                    throw new Error("New passwords do not match.");
+                    stopWithError("New passwords do not match.");
+                    return;
                 }
 
             }
@@ -139,54 +180,61 @@ export default function Account() {
             let nameChanged = false;
 
             // Update username if it changed
-            if (username !== user.displayName) {
+            if (trimmedUsername !== user.displayName) {
                 const API_URL = process.env.NEXT_PUBLIC_API_URL;
                 const usernameUpdate = await fetch(`${API_URL}/api/users/update-username`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
                     body: JSON.stringify({
-                        displayName: username
+                        displayName: trimmedUsername
                     })
                 });
 
                 const usernameUpdateData = await usernameUpdate.json();
                 if (!usernameUpdate.ok) {
-                    throw new Error(usernameUpdateData.error || "Failed to update username.");
+                    stopWithError(usernameUpdateData.error || "Failed to update username.");
+                    return;
                 }
 
                 usernameChanged = true;
+                setUsername(trimmedUsername);
                 // Refresh user data in context after username change
                 await fetchUser();
             }
 
             // Update firstName and lastName if changed (only for non-Google users)
-            if (!isGoogleUser && (firstName !== (user.firstName || '') || lastName !== (user.lastName || ''))) {
+            if (
+                !isGoogleUser &&
+                (trimmedFirstName !== (user.firstName || '') || trimmedLastName !== (user.lastName || ''))
+            ) {
                 const API_URL = process.env.NEXT_PUBLIC_API_URL;
                 const nameUpdate = await fetch(`${API_URL}/api/users/update-name`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
                     body: JSON.stringify({
-                        firstName: firstName.trim(),
-                        lastName: lastName.trim()
+                        firstName: trimmedFirstName,
+                        lastName: trimmedLastName
                     })
                 });
 
                 const nameUpdateData = await nameUpdate.json();
                 if (!nameUpdate.ok) {
-                    throw new Error(nameUpdateData.error || "Failed to update name.");
+                    stopWithError(nameUpdateData.error || "Failed to update name.");
+                    return;
                 }
-
+                setFirstName(trimmedFirstName);
+                setLastName(trimmedLastName);
                 nameChanged = true;
                 await fetchUser();
             }
 
 
             if (!isGoogleUser && newPassword) {
-                // send the requested password change to the backend
+                // Send the requested password change to the backend
                 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-                const pwUpdate = await fetch(`${API_URL}/api/update-password`, {
+                const pwUpdate = await fetch(`${API_URL}/api/users/update-password`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
@@ -195,17 +243,13 @@ export default function Account() {
                     })
                 });
 
-                // check if the password change was successful
+                // Check if the password change was successful
                 const pwUpdateData = await pwUpdate.json();
                 if (!pwUpdate.ok) {
-                    throw new Error(pwUpdateData.error || "Failed to update password.");
+                    stopWithError(pwUpdateData.error || "Failed to update password.");
+                    return;
                 }
                 passwordChanged = true;
-
-                // Clear password fields after successful update
-                setCurrentPassword('');
-                setNewPassword('');
-                setConfirmPassword('');
             }
 
             // Provide specific feedback based on what was updated
@@ -231,6 +275,11 @@ export default function Account() {
             setError(err.message || "Something went wrong. Please try again.");
         }
         finally {
+            if (hadPasswordInput) {
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+            }
             setLoading(false);
         }
 
@@ -385,6 +434,7 @@ export default function Account() {
                                         <label className={s.label}>Current Password</label>
                                         <input
                                             type="password"
+                                            value={currentPassword}
                                             onChange={(e) => setCurrentPassword(e.target.value)}
                                             className={s.input}
                                             placeholder="Enter current password"
@@ -394,6 +444,7 @@ export default function Account() {
                                         <label className={s.label}>New Password</label>
                                         <input
                                             type="password"
+                                            value={newPassword}
                                             onChange={(e) => setNewPassword(e.target.value)}
                                             className={s.input}
                                             placeholder="Enter new password"
@@ -403,6 +454,7 @@ export default function Account() {
                                         <label className={s.label}>Confirm New Password</label>
                                         <input
                                             type="password"
+                                            value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
                                             className={s.input}
                                             placeholder="Confirm new password"

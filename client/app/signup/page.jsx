@@ -15,6 +15,13 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    password: "",
+  });
 
   // router for navigation
   const router = useRouter();
@@ -26,7 +33,73 @@ export default function SignupPage() {
     setLoading(true);
     setError("");
     setSuccess("");
+    setErrors({
+      firstName: "",
+      lastName: "",
+      username: "",
+      email: "",
+      password: "",
+    });
     try {
+      const nameRegex = /^[A-Za-z\s-]+$/;
+      const usernameRegex = /^[a-z0-9_.]+$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const strongPassword =
+        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+      
+      // trim inputs to remove extra whitespace
+      const trimmedFirstName = firstName.trim();
+      const trimmedLastName = lastName.trim();
+      const trimmedUsername = username.trim();
+      const trimmedEmail = email.trim();
+
+      if (!nameRegex.test(trimmedFirstName)) {
+        setErrors((prev) => ({
+          ...prev,
+          firstName: "First name can only include letters, spaces, and dashes",
+        }));
+        setLoading(false);
+        return;
+      }
+
+      if (!nameRegex.test(trimmedLastName)) {
+        setErrors((prev) => ({
+          ...prev,
+          lastName: "Last name can only include letters, spaces, and dashes",
+        }));
+        setLoading(false);
+        return;
+      }
+
+      if (!usernameRegex.test(trimmedUsername)) {
+        setErrors((prev) => ({
+          ...prev,
+          username:
+            "Username can only contain lowercase letters, numbers, underscores, and periods",
+        }));
+        setLoading(false);
+        return;
+      }
+
+      if (!emailRegex.test(trimmedEmail)) {
+        setErrors((prev) => ({
+          ...prev,
+          email: "Please enter a valid email address",
+        }));
+        setLoading(false);
+        return;
+      }
+
+      if (!strongPassword.test(password)) {
+        setErrors((prev) => ({
+          ...prev,
+          password:
+            "Password must be 8+ characters and include a letter, number, and special character (!@#$%^&*)",
+        }));
+        setLoading(false);
+        return;
+      }
+
       const API_URL = process.env.NEXT_PUBLIC_API_URL;
       const response = await fetch(`${API_URL}/auth/signup`, {
         method: "POST",
@@ -35,11 +108,11 @@ export default function SignupPage() {
         },
         credentials: "include", // Important for cookies
         body: JSON.stringify({
-          email,
+          email: trimmedEmail,
           password,
-          displayName: username,
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
+          displayName: trimmedUsername,
+          firstName: trimmedFirstName,
+          lastName: trimmedLastName,
         }),
       });
 
@@ -67,7 +140,10 @@ export default function SignupPage() {
     <main className={styles.main}>
       <div>
         <h1>Welcome to your memories</h1>
-        <form onSubmit={handleSubmit}>
+        <form
+          onSubmit={handleSubmit}
+          className={`${styles.form} ${styles.focusHintsOnly}`}
+        >
           <h2>Sign up</h2>
           {error && (
             <div className="error-message" style={{ color: "red" }}>
@@ -82,8 +158,9 @@ export default function SignupPage() {
               {success}
             </div>
           )}
-          <div>
+          <div className={styles.field}>
             <label htmlFor="firstName">First Name</label>
+            <p className={styles.hint}>(Letters, spaces, and dashes only)</p>
             <input
               id="firstName"
               name="firstName"
@@ -91,11 +168,16 @@ export default function SignupPage() {
               required
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
+              className={errors.firstName ? styles.errorInput : ""}
             />
+            {errors.firstName && (
+              <p className={styles.error}>{errors.firstName}</p>
+            )}
           </div>
 
-          <div>
+          <div className={styles.field}>
             <label htmlFor="lastName">Last Name</label>
+            <p className={styles.hint}>(Letters, spaces, and dashes only)</p>
             <input
               id="lastName"
               name="lastName"
@@ -103,11 +185,16 @@ export default function SignupPage() {
               required
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
+              className={errors.lastName ? styles.errorInput : ""}
             />
+            {errors.lastName && <p className={styles.error}>{errors.lastName}</p>}
           </div>
 
-          <div>
+          <div className={styles.field}>
             <label htmlFor="username">Username</label>
+            <p className={styles.hint}>
+              (Lowercase letters, numbers, underscores, and periods only)
+            </p>
             <input
               id="username"
               name="username"
@@ -115,11 +202,16 @@ export default function SignupPage() {
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              className={errors.username ? styles.errorInput : ""}
             />
+            {errors.username && (
+              <p className={styles.error}>{errors.username}</p>
+            )}
           </div>
 
-          <div>
+          <div className={styles.field}>
             <label htmlFor="email">Email</label>
+            <p className={styles.hint}>(Enter a valid email like name@example.com)</p>
             <input
               id="email"
               name="email"
@@ -127,11 +219,16 @@ export default function SignupPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className={errors.email ? styles.errorInput : ""}
             />
+            {errors.email && <p className={styles.error}>{errors.email}</p>}
           </div>
 
-          <div>
+          <div className={styles.field}>
             <label htmlFor="password">Password</label>
+            <p className={styles.hint}>
+              (8+ characters with at least one letter, number, and special character !@#$%^&*)
+            </p>
             <input
               id="password"
               name="password"
@@ -140,7 +237,9 @@ export default function SignupPage() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className={errors.password ? styles.errorInput : ""}
             />
+            {errors.password && <p className={styles.error}>{errors.password}</p>}
           </div>
 
           <button type="submit" disabled={loading}>

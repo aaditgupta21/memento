@@ -37,16 +37,22 @@ body {
   gap: 20px;
 }
 
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .main form h2 {
   font-size: 20px;
   margin-bottom: 10px;
   color: #b8a296;
 }
 
-.main form div {
+.field {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .main label {
@@ -62,6 +68,26 @@ body {
   font-size: 14px;
   background-color: #faf8f6;
   color: #6b5d54;
+}
+
+.errorInput {
+  border-color: #c04c4c;
+  background-color: #fff8f8;
+}
+
+.error {
+  font-size: 10px;
+  color: #c04c4c;
+  margin: 2px 0 0 0;
+  text-align: left;
+}
+
+.hint {
+  font-size: 11px;
+  color: #a89b91;
+  margin: -2px 0 2px 0;
+  text-align: left;
+  line-height: 1.35;
 }
 
 .main input:focus {
@@ -112,5 +138,32 @@ body {
   text-decoration: underline;
   padding: 0;
   cursor: pointer;
+}
 
+.field .error {
+  color: #c04c4c;
+  font-size: 12px;
+  text-align: left;
+}
+
+.main p.hint {
+  text-align: left;
+  margin: -2px 0 2px 0;
+  font-size: 11px;
+  color: #a89b91;
+  line-height: 1.35;
+}
+
+.focusHintsOnly .hint {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transform: translateY(-4px);
+  transition: opacity 160ms ease, transform 160ms ease, max-height 160ms ease;
+}
+
+.focusHintsOnly .field:focus-within .hint {
+  opacity: 1;
+  max-height: 40px;
+  transform: translateY(0);
 }
