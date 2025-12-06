@@ -10,14 +10,19 @@
     "build": "cd client && npm run build",
     "install-client": "cd client && npm install",
     "install-server": "cd server && npm install",
-    "install-all": "npm run install-client && npm run install-server"
+    "install-all": "npm run install-client && npm run install-server",
+    "test": "playwright test",
+    "test:cucumber": "cucumber-js",
+    "test:cucumber:ui": "cucumber-js --format html:cucumber-report.html"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "baseline-browser-mapping": "^2.8.32",
+    "@cucumber/cucumber": "^12.3.0",
+    "@cucumber/pretty-formatter": "^2.4.1",
     "@playwright/test": "^1.57.0",
+    "baseline-browser-mapping": "^2.8.32",
     "concurrently": "^8.2.2"
   },
   "dependencies": {

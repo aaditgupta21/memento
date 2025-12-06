@@ -1,0 +1,232 @@
+[
+  {
+    "description": "    As a user,\n    I want to upload photos from my device to create a post,\n    so that I can share my memories",
+    "elements": [
+      {
+        "description": "",
+        "id": "upload-feature-workflow;complete-the-full-4-step-upload-wizard",
+        "keyword": "Scenario",
+        "line": 9,
+        "name": "Complete the full 4-step upload wizard",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 465061791
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "that I am logged in as \"testexample@example.com",
+            "result": {
+              "status": "undefined",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 10,
+            "name": "I navigate to the upload page",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:29"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 11,
+            "name": "I upload an image file",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:34"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 12,
+            "name": "I wait for the upload preview to appear",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:40"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 13,
+            "name": "I click \"Next: Caption & Location\"",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:51"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 14,
+            "name": "I fill in the caption with \"Test post from Cucumber\"",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:56"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 15,
+            "name": "I fill in the location with \"San Francisco\"",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:60"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 16,
+            "name": "I select the first location suggestion",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:64"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 17,
+            "name": "I click \"Next: Categories\"",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:51"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 18,
+            "name": "I select the first category",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:70"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "I click \"Review & Submit\"",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:51"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 20,
+            "name": "I scroll to the bottom of the page",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:78"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 21,
+            "name": "I click \"Create Post\"",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:51"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 22,
+            "name": "I should be redirected to the feed page",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:84"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 23,
+            "name": "the post with caption \"Test post from Cucumber\" should be visible",
+            "match": {
+              "location": "file:/Users/kianbaghai/Desktop/memento/features/step_definitions/uploadPost.steps.js:89"
+            },
+            "result": {
+              "status": "skipped",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 25473417
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "upload-feature-workflow",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "Upload Feature Workflow",
+    "tags": [],
+    "uri": "features/uploadPost.feature"
+  }
+]
