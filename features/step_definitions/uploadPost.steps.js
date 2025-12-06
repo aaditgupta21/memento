@@ -38,6 +38,9 @@ When("I upload an image file", async () => {
 });
 
 When("I wait for the upload preview to appear", async () => {
+  // Wait for the preview container to appear first
+  await page.waitForSelector('[class*="previewContainer"]', { timeout: 10000 });
+  // Then wait for the image to be visible
   const previewImage = page.locator('img[alt="image-0"]');
   await expect(previewImage).toBeVisible({ timeout: 15000 });
 });
