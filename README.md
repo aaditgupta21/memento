@@ -161,6 +161,8 @@ NODE_ENV=development
 MONGODB_URI=your_mongodb_connection_string
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
+BIGDATACLOUD_API_KEY=bdc_your_key_here
+AUTO_UPDATE_SCRAPBOOKS=true
 ```
 
 ### Client `.env` file
@@ -170,6 +172,7 @@ Create a `.env` file in the `client/` directory with the following variables:
 ```
 UPLOADTHING_TOKEN=your_uploadthing_token
 NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_maps_key
 ```
 
 ## License
