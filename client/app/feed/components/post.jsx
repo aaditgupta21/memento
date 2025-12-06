@@ -52,7 +52,7 @@ export default function Post({ post, user }) {
       return;
     }
 
-    // Optimistic update
+    // Show comment immediately for better UX, revert if API fails
     const tempComment = {
       _id: `temp-${Date.now()}`,
       text: commentText,
@@ -89,7 +89,7 @@ export default function Post({ post, user }) {
     }
   }
 
-  // toggle like/unlike on both frontend (optimistic update for speed) and backend (adjusting frontend if needed, but simple logic so shouldn't fail)
+  // Toggle like state optimistically on frontend, then sync with backend
   function toggleLike() {
     if (!currentUserId || isLiking) {
       return; // Prevent liking if no user ID or already processing
