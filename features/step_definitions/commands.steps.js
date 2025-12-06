@@ -123,3 +123,26 @@ Then("the like button should now say {string}", async (buttonText) => {
   const button = page.locator(`button:has-text("${buttonText}")`).first();
   await expect(button).toBeVisible({ timeout: 5000 });
 });
+
+// ===== COMMENT POST STEPS =====
+
+When("I type in the {string} Field", async (placeholder) => {
+  const commentInput = page
+    .locator(`input[placeholder="${placeholder}"]`)
+    .first();
+  await commentInput.scrollIntoViewIfNeeded();
+  await commentInput.waitFor({ state: "visible" });
+  const commentText = `Great post! ${Date.now()}`;
+  await commentInput.fill(commentText);
+});
+
+When("I submit the comment", async () => {
+  const postBtn = page.locator('button:has-text("Post")').first();
+  await postBtn.click();
+});
+
+Then("the comment should appear under the post", async () => {
+  await expect(page.locator("text=Great post!")).toBeVisible({
+    timeout: 10000,
+  });
+});
