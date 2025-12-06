@@ -1,3 +1,13 @@
+/* client/app/api/uploadthing/core.js
+ * GenAI Usage Note: When adding the profile picture uploader endpoint, I used Copilot to
+ * understand how to create a new FileRoute in UploadThing. Example prompts: "How do I add
+ * a second file uploader endpoint in UploadThing with different settings?" and "What's the
+ * difference between file.url and file.ufsUrl in UploadThing?" I reviewed the UploadThing
+ * documentation and configured the profilePictureUploader with maxFileSize: "5MB" and
+ * maxFileCount: 1, and updated the console.log to use file.ufsUrl instead of the deprecated
+ * file.url property.
+ */
+
 import { createUploadthing } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 

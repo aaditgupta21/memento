@@ -1,3 +1,13 @@
+/* server/config/middleware.js
+ * GenAI Usage Note: When fixing a CORS error where requests without an Origin header were
+ * being rejected, I asked Copilot: "How do I allow requests without an Origin header in CORS
+ * while still validating cross-origin requests?" The solution was to check if origin exists
+ * before validation - if no origin is present, allow the request (for same-origin requests
+ * and health checks), but if an origin is present, validate it against the allowed origins list.
+ * I reviewed the CORS middleware documentation to ensure this approach was secure and wouldn't
+ * allow unauthorized cross-origin requests.
+ */
+
 const cors = require("cors");
 const express = require("express");
 const session = require("express-session");
@@ -9,9 +19,7 @@ function setupMiddleware(app) {
   const allowedOrigins =
     process.env.NODE_ENV === "development"
       ? ["http://localhost:3000"]
-      : [
-          process.env.CLIENT_ORIGIN,
-        ].filter(Boolean); // Remove any undefined values
+      : [process.env.CLIENT_ORIGIN].filter(Boolean); // Remove any undefined values
 
   app.use(
     cors({

@@ -12,20 +12,20 @@ const { ALLOWED_CATEGORIES } = require("../constants");
 async function updateScrapbookCoversAfterPostDeletion(deletedPost) {
   try {
     // Find scrapbooks that used this post's image as cover
-    const postImageUrls = (deletedPost.images || []).map(img => img.url);
+    const postImageUrls = (deletedPost.images || []).map((img) => img.url);
 
     if (postImageUrls.length === 0) return;
 
     // Find scrapbooks where the cover image matches any of this post's images
     const affectedScrapbooks = await Scrapbook.find({
       author: deletedPost.author,
-      coverImage: { $in: postImageUrls }
-    }).populate('posts');
+      coverImage: { $in: postImageUrls },
+    }).populate("posts");
 
     for (const scrapbook of affectedScrapbooks) {
       // Find a replacement post that's still in the scrapbook
-      const remainingPosts = scrapbook.posts.filter(p =>
-        p && !p._id.equals(deletedPost._id)
+      const remainingPosts = scrapbook.posts.filter(
+        (p) => p && !p._id.equals(deletedPost._id)
       );
 
       if (remainingPosts.length > 0) {
@@ -38,13 +38,18 @@ async function updateScrapbookCoversAfterPostDeletion(deletedPost) {
         }
       } else {
         // No posts left in scrapbook, set empty cover
-        scrapbook.coverImage = '';
+        scrapbook.coverImage = "";
         await scrapbook.save();
-        console.log(`[Scrapbook] Cleared cover for empty scrapbook "${scrapbook.title}"`);
+        console.log(
+          `[Scrapbook] Cleared cover for empty scrapbook "${scrapbook.title}"`
+        );
       }
     }
   } catch (error) {
-    console.error('[Scrapbook] Error updating covers after deletion:', error.message);
+    console.error(
+      "[Scrapbook] Error updating covers after deletion:",
+      error.message
+    );
   }
 }
 
@@ -298,7 +303,7 @@ router.get("/photo-locations", async (req, res) => {
 
     res.json({ success: true, photoLocations, count: photoLocations.length });
   } catch (error) {
-    console.error('Error extracting photo locations:', error);
+    console.error("Error extracting photo locations:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -391,7 +396,7 @@ router.delete("/:postId", async (req, res) => {
     for (const image of post.images || []) {
       const url = image.url;
       // UploadThing URLs follow pattern: https://utfs.io/f/{fileKey}
-      if (url && url.includes('utfs.io/f/')) {
+      if (url && url.includes("utfs.io/f/")) {
         const match = url.match(/utfs\.io\/f\/([^/?]+)/);
         if (match && match[1]) {
           fileKeys.push(match[1]);
@@ -402,13 +407,15 @@ router.delete("/:postId", async (req, res) => {
     // Delete files from UploadThing if we found any keys
     if (fileKeys.length > 0) {
       try {
-        const { UTApi } = require('uploadthing/server');
+        const { UTApi } = require("uploadthing/server");
         const utapi = new UTApi();
         await utapi.deleteFiles(fileKeys);
-        console.log(`[UploadThing] Deleted ${fileKeys.length} file(s) for post ${postId}`);
+        console.log(
+          `[UploadThing] Deleted ${fileKeys.length} file(s) for post ${postId}`
+        );
       } catch (utError) {
         // Log but don't fail the deletion if UploadThing deletion fails
-        console.error('[UploadThing] Error deleting files:', utError.message);
+        console.error("[UploadThing] Error deleting files:", utError.message);
       }
     }
 
