@@ -94,3 +94,32 @@ Then("the post with caption {string} should be visible", async (caption) => {
   await postCaption.scrollIntoViewIfNeeded();
   await expect(postCaption).toBeVisible({ timeout: 10000 });
 });
+
+// ===== LIKE POST STEPS =====
+
+// Navigation for feed
+When("I navigate to the feed page", async () => {
+  await page.goto("http://localhost:3000/feed");
+});
+
+// Like button steps
+When("I click the like button on the first post", async () => {
+  const likeButton = page.locator('button:has-text("Like")').first();
+  await likeButton.waitFor({ state: "visible", timeout: 5000 });
+  await likeButton.click();
+  // Wait for state change
+  await page.waitForTimeout(500);
+});
+
+When("I click the unlike button on the first post", async () => {
+  const unlikeButton = page.locator('button:has-text("Unlike")').first();
+  await unlikeButton.waitFor({ state: "visible", timeout: 5000 });
+  await unlikeButton.click();
+  // Wait for state change
+  await page.waitForTimeout(500);
+});
+
+Then("the like button should now say {string}", async (buttonText) => {
+  const button = page.locator(`button:has-text("${buttonText}")`).first();
+  await expect(button).toBeVisible({ timeout: 5000 });
+});
