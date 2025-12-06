@@ -22,6 +22,7 @@ export function UserProvider({ children }) {
       });
       const data = await response.json();
 
+      // If the user is authenticated, set the user and authenticated state
       if (data.authenticated) {
         setUser(data.user);
         setAuthenticated(true);
@@ -50,7 +51,7 @@ export function UserProvider({ children }) {
         throw new Error("Logout failed");
       }
 
-      const data = await response.json();
+      // Clear user and authenticated state
       setUser(null);
       setAuthenticated(false);
 
